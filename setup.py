@@ -11,7 +11,7 @@ config = {
     'download_url': 'http://actual.download.example.com',
     'author_email': 'paul.lesack@ubc.ca',
     'version' : '0.1',
-    'install_requires': ['nose222'],
+    'install_requires': ['nose','requests_toolbelt'],
     'packages': ['dryad2dataverse'], 
     'scripts':[],
     'name': 'dryad2dataverse'
