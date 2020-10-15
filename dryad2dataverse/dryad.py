@@ -10,7 +10,36 @@ class Dryad(object):
         '''
         self.doi = doi
         self.dryJson = None
-    
+
+    def _convert_generic(self, **kwargs):
+        '''
+        Generic json creator of form:
+            {dvField:
+                {'typeName': dvField,
+                  'value': dryField}
+        Suitable for generalized conversions.
+        
+        dvField : str
+            Dataverse output field
+        dryField : str
+            Dryad JSON field to convert
+        inJson : dict
+            JSON segment to convert
+        '''
+
+        dvField = kwargs.get('dvField')
+        dryField = kwargs.get('dryField')
+        inJson = kwargs.get('inJson')
+        if not dvField or not dryField or not inJson:
+            raise TypeError('Incorrect or insufficient fields provided')
+        outfield = inJson.get(dryField)
+        if not outfield:
+            raise ValueError(f'Dryad field {dryField} not found')
+
+        return {dvField:
+                        {'typeName':dvField,
+                         'value': outfield}}
+
     def _convert_abstract(self, abstract):
         '''
         abstract : str

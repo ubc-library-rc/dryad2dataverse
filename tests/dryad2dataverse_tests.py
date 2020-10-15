@@ -28,6 +28,7 @@ def test_abstract():
               'value':abstract}}
     assert_equal(isinstance(testCase.dryJson['abstract'], str), True)
     assert_equal(testCase._convert_abstract(testCase.dryJson['abstract']), abs)
+    assert_equal(testCase._convert_generic(inJson=testCase.dryJson, dvField='dsDescriptionValue', dryField='abstract'), abs)
 
 def test_author():
     #dvAuthor = json.loads("{'authorName':{'typeName':'authorName', 'value': 'Powers, Jennifer'}}")
@@ -53,11 +54,17 @@ def test_orcid():
     assert_equal(isinstance(testCase.dryJson['authors'][0], dict), True)
     assert_equal(testCase._convert_orcid(testCase.dryJson['authors'][0]),orcid)
 
-
 def test_affiliation():
     affil = {'authorAffiliation': 
                {'typeName':'authorAffiliation', 'value': 'University of Minnesota'}
             }
-    isinstance(testCase.dryJson['authors'][0], dict)
     assert_equal(isinstance(testCase.dryJson['authors'][0], dict), True)
     assert_equal(testCase._convert_affiliation(testCase.dryJson['authors'][0]),affil)
+
+def test_generic():
+    #Test on affiliation
+    out = {'authorAffiliation':{'typeName':'authorAffiliation', 'value':'University of Minnesota'}}
+    assert_equal(isinstance(testCase.dryJson['authors'][0], dict), True)
+    assert_equal(testCase._convert_generic(inJson=testCase.dryJson['authors'][0], 
+                dvField='authorAffiliation',
+                dryField='affiliation'), out)
