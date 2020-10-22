@@ -39,7 +39,8 @@ def test_generic():
 
 @with_setup(setup)
 def test_abstract():
-    abstract = '<p>Drought-related tree mortality is now a widespread phenomenon predicted to increase in magnitude with climate change. However, the patterns of which species and trees are most vulnerable to drought, and the underlying mechanisms have remained elusive, in part due to the lack of relevant data and difficulty of predicting the location of catastrophic drought years in advance. We used long‐term demographic records and extensive databases of functional traits and distribution patterns to understand the responses of 20 to 53 species to an extreme drought in a seasonally dry tropical forest in Costa Rica, which occurred during the 2015 El Niño Southern Oscillation event. Overall, species-specific mortality rates during the drought ranged from 0% to 34%, and varied little as a function of tree size. By contrast, hydraulic safety margins correlated well with probability of mortality among species, while morphological or leaf economics spectrum traits did not. This firmly suggests hydraulic traits as targets for future research.</p>\r\n'
+    assert_equal.__self__.maxDiff = None
+    abstract = '<p>Drought-related tree mortality is now a widespread phenomenon predicted to increase in magnitude with climate change. However, the patterns of which species and trees are most vulnerable to drought, and the underlying mechanisms have remained elusive, in part due to the lack of relevant data and difficulty of predicting the location of catastrophic drought years in advance. We used long‐term demographic records and extensive databases of functional traits and distribution patterns to understand the responses of 20 to 53 species to an extreme drought in a seasonally dry tropical forest in Costa Rica, which occurred during the 2015 El Niño Southern Oscillation event. Overall, species-specific mortality rates during the drought ranged from 0% to 34%, and varied little as a function of tree size. By contrast, hydraulic safety margins correlated well with probability of mortality among species, while morphological or leaf economics spectrum traits did not. This firmly suggests hydraulic traits as targets for future research.</p>'
 
     abs = {'dsDescriptionValue': 
             {'typeName':'dsDescriptionValue', 
@@ -141,7 +142,10 @@ def test_lastmod():
 
 def test_notes():
     assert_equal.__self__.maxDiff = None
-    notes = {'typeName': 'notesText', 'value': '<p>Dryad version number: 4</p>\n<p><p>All data and associated R scripts are contained in the files. The R scripts refer to the three main questions asked in the associated publication.</p></p>\n<p><p>The dataset contains annual observations of tree mortality in different 18 plots, expanded sampling for mortality during 2015, and datasets of plant functional and hydraulic traits.\xa0 Please refer to the publication for exact methods.\xa0 All data come from Guanacaste, Costa Rica.</p></p>\n'}
+    notes = {'typeName': 'notesText', 
+             'typeClass':'primitive',
+             'multiple':False,
+             'value': '<p><b>Dryad version number:</b> 4</p>\n<p><b>Version status:</b> submitted</p>\n<p><b>Dryad curation status:</b> Published</p>\n<p><b>Sharing link:</b> https://datadryad.org/stash/share/anFoRwjUzvjvpH8RA2T0mNipNsVst0s0N5mFzcTTcJE</p>\n<p><b>Storage size:</b> 23874866</p>\n<p><b>Visibility:</b> public</p>\n'}
     assert_equal(testCase._convert_notes(testCase.dryJson), notes )
 
 def test_pub_date():

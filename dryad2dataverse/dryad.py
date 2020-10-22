@@ -115,24 +115,52 @@ class Dryad(object):
         #multiple fields must be concatenated into one.
         notes = ''
         #these fields should be concatenated into notes
-        notable = ['versionNumber', 'manuscriptNumber',
-                   'usageNotes', 'methods','preserveCurationStatus',
-                   'invoiceId']
+        notable = ['versionNumber', 
+                   'versionStatus',
+                   'manuscriptNumber',
+                   'curationStatus', 
+                   'preserveCurationStatus',
+                   'invoiceId',
+                   'sharingLink',
+                   'loosenValidation',
+                   'skipDataciteUpdate', 
+                   'storageSize',
+                   'visibility',
+                   'skipEmails']
         for note in notable:
             text = dryJson.get(note)
             if text:
+                text = str(text).strip()
                 if note =='versionNumber':
-                    text = f'Dryad version number: {text}'
+                    text = f'<b>Dryad version number:</b> {text}'
+                if note == 'versionStatus':
+                    text = f'<b>Version status:</b> {text}'
                 if note == 'manuscriptNumber':
-                    text == f'Manuscript number: {text}'
+                    text = f'<b>Manuscript number:</b> {text}'
+                if note == 'curationStatus':
+                    text = f'<b>Dryad curation status:</b> {text}'
                 if note == 'preserveCurationStatus':
-                    text = f'Preserve curation status: {text}'
+                    text = f'<b>Dryad preserve curation status:</b> {text}'
                 if note == 'invoiceId':
-                    text == f'Invoice ID: {text}'
-                text = text.strip()
+                    text = f'<b>Invoice ID:</b> {text}'
+                if note == 'sharingLink':
+                    text = f'<b>Sharing link:</b> {text}'
+                if note == 'loosenValidation':
+                    text = f'<b>Loosen validation:</b> {text}'
+                if note == 'skipDataciteUpdate': 
+                    text = f'<b>Skip Datacite update:</b> {text}'
+                if note == 'storageSize':
+                    text = f'<b>Storage size:</b> {text}'
+                if note == 'visibility':
+                    text = f'<b>Visibility:</b> {text}'
+                if note == 'skipEmails':
+                    text = f'<b>Skip emails:</b> {text}'
+
                 notes += f'<p>{text}</p>\n'
         concat = {'typeName':'notesText',
-                  'value': notes}
+                   'multiple':False,
+                   'typeClass': 'primitive',
+                   'value': notes}
         return concat
 
     def _assemble_json(self, dryJson=None):
@@ -222,12 +250,26 @@ class Dryad(object):
         contacts = self._typeclass(typeName='datasetContact', multiple=True, typeClass='compound')
         contacts['value'] = out
         self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(contacts)
-            
 
         #Description
         description = self._typeclass(typeName='dsDescription', multiple=True, typeClass='compound')
-        descrField = self._convert_generic(inJson=dryJson, dvField='dsDescriptionValue', dryField='abstract')
-        description['value'] = [descrField] ##FFFFUUUU
+        desCat =[('abstract','<b>Abstract</b><br/>'),
+                  ('methods','<b>Methods</b><br />'), 
+                  ('usageNotes','<b>Usage notes</b><br />')]
+        out = []
+        for desc in desCat:
+            if dryJson.get(desc[0]):
+                descrField = self._convert_generic(inJson=dryJson, 
+                                                   dvField='dsDescriptionValue', 
+                                                   dryField=desc[0])
+                descrField['dsDescriptionValue']['value'] = desc[1] + descrField['dsDescriptionValue']['value']
+                
+                descDate = self._convert_generic(inJson=dryJson,
+                                                 dvField='dsDescriptionDate',
+                                                 dryField='lastModificationDate')
+                descrField.update(descDate)
+                out.append(descrField)
+        description['value'] = out
         self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(description)
 
         #Granting agencies
@@ -247,7 +289,7 @@ class Dryad(object):
             grants = self._typeclass(typeName='grantNumber', multiple=True, typeClass='compound')
             grants['value'] = out 
             self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(grants)
-
+        
         #Keywords
             keywords = self._typeclass(typeName='keyword', multiple=True, typeClass='compound')
             out = []
@@ -264,18 +306,53 @@ class Dryad(object):
                 out.append(kv)
             keywords['value'] = out
             self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(keywords)
-
-        #distribution date
+        #modification date
         moddate = self._convert_generic(inJson=dryJson,
                                             dvField='dateOfDeposit',
                                             dryField='lastModificationDate')
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(moddate)
-
+        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(moddate['dateOfDeposit'])#This one isn't nested BFY
+        
         #distribution date
         distdate = self._convert_generic(inJson=dryJson,
                                             dvField='distributionDate',
                                             dryField='publicationDate')
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(distdate)
+        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(distdate['distributionDate'])#Also not nested
 
-        ##TODO create minimal JSON as test for upload
+        #publications
+        publications = self._typeclass(typeName='publication', multiple=True, typeClass='compound')
+        #quick and dirty lookup tabls
+        lookup = {'IsDerivedFrom':'Is derived from', 'Cites':'Cites', 'IsSupplementTo': 'Is supplement to', 'IsSupplementedBy': 'Is supplmented by'}
+        out=[]
+        if dryJson.get('relatedWorks'):
+            for r in dryJson.get('relatedWorks'):
+                id = r.get('identifier')
+                relationship = r.get('relationship')
+                idType = r.get('identifierType')
+                citation = {'citation': f"{lookup[relationship]}: {id}"}
+
+                pubcite = self._convert_generic(inJson=citation,
+                                                dvField='publicationCitation',
+                                                dryField='citation')
+                pubIdType = self._convert_generic(inJson=r,
+                                                  dvField='publicationIDType',
+                                                  dryField='identifierType')
+                #ID type must be lower case
+                pubIdType['publicationIDType']['value'] =  pubIdType['publicationIDType']['value'].lower()
+                pubIdType['publicationIDType']['typeClass'] = 'controlledVocabulary'
+
+                pubUrl = self._convert_generic(inJson=r,
+                                               dvField='publicationURL',
+                                               dryField='identifier')
+                pubcite.update(pubIdType)
+                pubcite.update(pubUrl)
+                out.append(pubcite)
+        publications['value'] = out
+        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(publications)
+        #notes
+        #go into primary notes field, not DDI
+        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(self._convert_notes(dryJson))
+                
+        
+
+       ##TODO create minimal JSON as test for upload
         
