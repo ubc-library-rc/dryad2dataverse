@@ -1,5 +1,6 @@
 '''Import and convert dryad metadata'''
 
+#TODO rename class to Serializer
 class Dryad(object):
     def __init__(self, doi):
         '''
@@ -13,6 +14,7 @@ class Dryad(object):
         '''
         Download Dryad JSON and save to Dryad.dryadJson
         '''
+        #TODO fetch Dryad JSON with requests
         pass
 
     def _typeclass(self, typeName, multiple, typeClass):
@@ -41,7 +43,7 @@ class Dryad(object):
         dryField : str
             Dryad JSON field to convert
         inJson : dict
-            JSON segment to convert
+            Dryad JSON **segment** to convert
         addJSON : dict (optional)
             any other JSON required to complete (cf ISNI)
         rType : str
@@ -88,7 +90,7 @@ class Dryad(object):
         '''
         Produces required author json fields. Special csase, requires concatenation of several fields
         author : dict
-            dryad['author']
+            dryad['author'] JSON segment
         '''
         first = author.get('firstName')
         last = author.get('lastName')
@@ -102,7 +104,7 @@ class Dryad(object):
         Produces the insane keyword structure from a list of words
         args : list with str elements
             remember to expand with *
-
+        General input is Dryad JSON 'keywords', ie *Dryad['keywords']
         '''
         outlist = []
         for arg in args:
@@ -112,7 +114,13 @@ class Dryad(object):
         return outlist
 
     def _convert_notes(self, dryJson):
-        #multiple fields must be concatenated into one.
+        '''
+        dryJson : dict
+            Dryad JSON in dict format
+
+        returns formatted notes field with Dryad JSON values that
+        don't really fit anywhere into the Dataverse JSON.
+        '''
         notes = ''
         #these fields should be concatenated into notes
         notable = ['versionNumber', 
@@ -163,9 +171,90 @@ class Dryad(object):
                    'value': notes}
         return concat
 
+    def _boundingbox(self, north, south, east, west):
+        '''
+        Makes a dataverse bounding box from appropriate coordinates. Returns dataverse json
+
+        north, south, east, west | float
+        Coordinates in decimal degrees.
+        '''
+        names = ['north', 'south', 'east', 'west']
+        points = [str(x) for x in [north, south, east, west]]#Because coordinates in DV are strings BFY
+        coords = [(x[0]+'Longitude', {x[0]:x[1]}) for x in zip(names, points)]#Yes, everything is longitude
+        out = []
+        for c in coords:
+            out.append(self._convert_generic(inJson=c[1],
+                                             dvField=c[0],
+                                             #dryField='north'))
+                                             dryField=[k for k in c[1].keys()][0]))
+        return out
+
+            
+
+    def _convert_geospatial(self, dryJson):
+        '''
+        Outputs Dataverse geospatial metadata block.
+        Requires internet connection to connect to https://geonames.org
+        dryJson : dict
+            Dryad json as dict
+        '''
+        if dryJson.get('locations'):
+            out ={}
+            coverage = []
+            box = []
+            otherCov = None
+            gbbox = None
+            for loc in dryJson.get('locations'):
+                if loc.get('place'):
+                    '''These are impossible to clean. Going to "other" field"'''
+
+                    other = self._convert_generic(inJson=loc,
+                                                  dvField='otherGeographicCoverage',
+                                                  dryField='place')
+                    coverage.append(other)
+                
+                    
+                if loc.get('point'):
+                    #makes size zero bounding box
+                    north = loc['point']['latitude']
+                    south = north
+                    east = loc['point']['longitude']
+                    west = east
+                    point = self._boundingbox(north, south, east, west)
+                    box.append(point)
+
+                if loc.get('box'):
+                    north = loc['box']['neLatitude']
+                    south = loc['box']['swLatitude']
+                    east = loc['box']['neLongitude']
+                    west =  loc['box']['swLongitude']
+                    area = self._boundingbox(north, south, east, west)
+                    box.append(area)
+
+            if coverage:
+                otherCov = self._typeclass(typeName='geographicCoverage', multiple=True, typeClass='compound')
+                otherCov['values'] = coverage
+
+            if box:
+                gbbox = self._typeclass(typeName='geographicCoverage', multiple=True, typeClass='compound')
+                gbbox['values'] = box
+
+            if otherCov or gbbox:
+                gblock = {'geospatial': {'displayName' : 'Geospatial Metadata',
+                                         'fields': []}}
+                if otherCov:
+                    gblock['geospatial']['fields'].append(otherCov)
+                if gbbox:
+                    gblock['geospatial']['fields'].append(gbbox)
+            return gblock
+        else:
+            return{}
+        
+        pass
+
     def _assemble_json(self, dryJson=None):
         '''
-        Assembles Dataverse json from Dryad components
+        Assembles Dataverse json from Dryad JSON components
 
         dryJson : dict
             Dryad json as dict
@@ -351,8 +440,3 @@ class Dryad(object):
         #notes
         #go into primary notes field, not DDI
         self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(self._convert_notes(dryJson))
-                
-        
-
-       ##TODO create minimal JSON as test for upload
-        
