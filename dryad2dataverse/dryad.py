@@ -1,4 +1,6 @@
 '''Import and convert dryad metadata'''
+import urllib.parse
+import requests
 
 #TODO rename class to Serializer
 class Dryad(object):
@@ -9,13 +11,22 @@ class Dryad(object):
         '''
         self.doi = doi
         self._dryadJson = None
-    
-    def fetch_record(self):
+
+    def fetch_record(self, timeout=45):
         '''
-        Download Dryad JSON and save to Dryad.dryadJson
+        Fetches Dryad study record JSON from Dryad V2 API at https://datadryad.org/api/v2/datasets/
+        Saves to Dryad._dryadJson
+
+        timeout : int
+            timeout in seconds. Default 45
         '''
-        #TODO fetch Dryad JSON with requests
-        pass
+
+        headers = {'accept':'application/json', 'Content-Type':'application/json'}
+        doiClean = urllib.parse.quote(self.doi, safe='')
+        resp = requests.get(f'https://datadryad.org/api/v2/datasets/{doiClean}',
+                            headers=headers, timeout=timeout)
+        resp.raise_for_status()
+        self._dryadJson = resp.json() 
 
     def _typeclass(self, typeName, multiple, typeClass):
         '''
@@ -189,8 +200,6 @@ class Dryad(object):
                                              dryField=[k for k in c[1].keys()][0]))
         return out
 
-            
-
     def _convert_geospatial(self, dryJson):
         '''
         Outputs Dataverse geospatial metadata block.
@@ -233,11 +242,11 @@ class Dryad(object):
 
             if coverage:
                 otherCov = self._typeclass(typeName='geographicCoverage', multiple=True, typeClass='compound')
-                otherCov['values'] = coverage
+                otherCov['value'] = coverage
 
             if box:
                 gbbox = self._typeclass(typeName='geographicCoverage', multiple=True, typeClass='compound')
-                gbbox['values'] = box
+                gbbox['value'] = box
 
             if otherCov or gbbox:
                 gblock = {'geospatial': {'displayName' : 'Geospatial Metadata',
@@ -250,9 +259,7 @@ class Dryad(object):
         else:
             return{}
         
-        pass
-
-    def _assemble_json(self, dryJson=None):
+    def assemble_json(self, dryJson=None):
         '''
         Assembles Dataverse json from Dryad JSON components
 
@@ -382,7 +389,7 @@ class Dryad(object):
         #Keywords
             keywords = self._typeclass(typeName='keyword', multiple=True, typeClass='compound')
             out = []
-            for key in dryJson['keywords']:
+            for key in dryJson.get('keywords', []): #Apparently keywords are not required
                 keydict = {'keyword':key}#because takes a dict
                 kv = self._convert_generic(inJson=keydict,
                                            dvField='keywordValue',
@@ -440,3 +447,7 @@ class Dryad(object):
         #notes
         #go into primary notes field, not DDI
         self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(self._convert_notes(dryJson))
+
+        #Geospatial metadata
+        self.dvJson['datasetVersion']['metadataBlocks'].update(self._convert_geospatial(dryJson))
+
