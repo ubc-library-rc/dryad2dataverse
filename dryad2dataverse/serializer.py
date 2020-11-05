@@ -1,32 +1,60 @@
 '''Import and convert dryad metadata'''
+from . import constants
 import urllib.parse
 import requests
 
 #TODO rename class to Serializer
-class Dryad(object):
+class Serializer(object):
     def __init__(self, doi):
         '''
         doi : str
-            DOI of Dryad study. Required for downloading
+            DOI of Dryad study. Required for downloading. eg: 'doi:10.5061/dryad.2rbnzs7jp'
         '''
         self.doi = doi
         self._dryadJson = None
 
-    def fetch_record(self, timeout=45):
+    def fetch_record(self, url=None, timeout=45):
         '''
         Fetches Dryad study record JSON from Dryad V2 API at https://datadryad.org/api/v2/datasets/
         Saves to Dryad._dryadJson
-
+        url : str
+            Dryad instance base URL (eg: 'https://datadryad.org')
         timeout : int
             timeout in seconds. Default 45
         '''
-
+        if not url:
+            url = constants.DRYURL
         headers = {'accept':'application/json', 'Content-Type':'application/json'}
         doiClean = urllib.parse.quote(self.doi, safe='')
-        resp = requests.get(f'https://datadryad.org/api/v2/datasets/{doiClean}',
+        resp = requests.get(f'{url}/api/v2/datasets/{doiClean}',
                             headers=headers, timeout=timeout)
         resp.raise_for_status()
         self._dryadJson = resp.json() 
+
+    @property
+    def id(self):
+        '''
+        Returns Dryad unique ID.
+
+        The 'id' is not dryadjson['id']
+        It's actually the integer part of testCase._dryadJson['_links']['stash:version']['href']
+
+        The documentation, naturally, is not clear that this is the case.
+        '''
+        href = self.dryadJson['_links']['stash:version']['href']
+        index = href.rfind('/') + 1
+        return int(href[index:])
+    
+    @property
+    def dryadJson(self):
+        if not self._dryadJson:
+            self.fetch_record()
+        return self._dryadJson
+
+    @property
+    def dvJson(self):
+        self.assemble_json()
+        return self._dvJson
 
     def _typeclass(self, typeName, multiple, typeClass):
         '''
@@ -267,9 +295,9 @@ class Dryad(object):
             Dryad json as dict
         '''
         if not dryJson:
-            dryJson = self._dryadJson
+            dryJson = self.dryadJson
         #print(dryJson)
-        self.dvJson ={'datasetVersion':
+        self._dvJson ={'datasetVersion':
                 {'license':'CC0',
                  'termsOfUse': 'CC0 Waiver',
                  'metadataBlocks':{'citation':
@@ -289,13 +317,13 @@ class Dryad(object):
                        'typeClass':'controlledVocabulary',
                        'multiple': True,
                        'value' : ['Other']}
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(defaultSubj) 
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(defaultSubj) 
 
         reqdTitle = self._convert_generic(inJson=dryJson,
                                          dryField='title',
                                          dvField='title')['title']
         
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(reqdTitle) 
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(reqdTitle) 
        
         ##rewrite as function: authors
         out = []
@@ -322,7 +350,7 @@ class Dryad(object):
         authors= self._typeclass(typeName='author', multiple=True, typeClass='compound')
         authors['value'] = out
 
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(authors)
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(authors)
 
 
         ##rewrite as function:contact
@@ -345,7 +373,7 @@ class Dryad(object):
                 out.append(reqdContact)
         contacts = self._typeclass(typeName='datasetContact', multiple=True, typeClass='compound')
         contacts['value'] = out
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(contacts)
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(contacts)
 
         #Description
         description = self._typeclass(typeName='dsDescription', multiple=True, typeClass='compound')
@@ -365,8 +393,18 @@ class Dryad(object):
                                                  dryField='lastModificationDate')
                 descrField.update(descDate)
                 out.append(descrField)
+        #Add original DOI to description as well
+        formattedDoi = '<b>Dryad DOI:</b><br />' + self.dryadJson['identifier']+ '\n'
+        origDoi = self._convert_generic(inJson={'doi':formattedDoi},
+                                       dvField='dsDescriptionValue',
+                                       dryField='doi')
+        descDate = self._convert_generic(inJson=dryJson,
+                                         dvField='dsDescriptionDate',
+                                         dryField='lastModificationDate')
+        origDoi.update(descDate)
+        out.append(origDoi)
         description['value'] = out
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(description)
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(description)
 
         #Granting agencies
         if dryJson.get('funders'):
@@ -384,7 +422,7 @@ class Dryad(object):
                 out.append(org)
             grants = self._typeclass(typeName='grantNumber', multiple=True, typeClass='compound')
             grants['value'] = out 
-            self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(grants)
+            self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(grants)
         
         #Keywords
             keywords = self._typeclass(typeName='keyword', multiple=True, typeClass='compound')
@@ -401,18 +439,18 @@ class Dryad(object):
                 kv.update(voc)
                 out.append(kv)
             keywords['value'] = out
-            self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(keywords)
+            self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(keywords)
         #modification date
         moddate = self._convert_generic(inJson=dryJson,
                                             dvField='dateOfDeposit',
                                             dryField='lastModificationDate')
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(moddate['dateOfDeposit'])#This one isn't nested BFY
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(moddate['dateOfDeposit'])#This one isn't nested BFY
         
         #distribution date
         distdate = self._convert_generic(inJson=dryJson,
                                             dvField='distributionDate',
                                             dryField='publicationDate')
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(distdate['distributionDate'])#Also not nested
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(distdate['distributionDate'])#Also not nested
 
         #publications
         publications = self._typeclass(typeName='publication', multiple=True, typeClass='compound')
@@ -443,11 +481,11 @@ class Dryad(object):
                 pubcite.update(pubUrl)
                 out.append(pubcite)
         publications['value'] = out
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(publications)
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(publications)
         #notes
         #go into primary notes field, not DDI
-        self.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(self._convert_notes(dryJson))
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(self._convert_notes(dryJson))
 
         #Geospatial metadata
-        self.dvJson['datasetVersion']['metadataBlocks'].update(self._convert_geospatial(dryJson))
+        self._dvJson['datasetVersion']['metadataBlocks'].update(self._convert_geospatial(dryJson))
 
