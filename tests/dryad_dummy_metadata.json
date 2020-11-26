@@ -1,0 +1,222 @@
+{
+  "_links": {
+    "self": {
+      "href": "/api/v2/datasets/doi%3A10.5061%2Fdryad.2rbnzs7jp"
+    },
+    "stash:versions": {
+      "href": "/api/v2/datasets/doi%3A10.5061%2Fdryad.2rbnzs7jp/versions"
+    },
+    "stash:version": {
+      "href": "/api/v2/versions/57535"
+    },
+    "stash:download": {
+      "href": "/api/v2/datasets/doi%3A10.5061%2Fdryad.2rbnzs7jp/download"
+    },
+    "curies": [
+      {
+        "name": "stash",
+        "href": "https://github.com/CDL-Dryad/stash/blob/main/stash_api/link-relations.md#{rel}",
+        "templated": "true"
+      }
+    ]
+  },
+  "identifier": "doi:10.5061/dryad.2rbnzs7jp",
+  "id": 43358,
+  "storageSize": 23874866,
+  "title": "This is dummy data",
+  "authors": [
+    {
+      "firstName": "Paul",
+      "lastName": "Lesack",
+      "email": "paul.lesack@ubc.ca",
+      "affiliation": "University of British Columbia",
+      "affiliationROR": "https://ror.org/017zqws13",
+      "orcid": "0000-0000-0000-0000"
+    },
+    {
+      "firstName": "German",
+      "lastName": "Vargas-G",
+      "email": "",
+      "affiliation": "University of Minnesota",
+      "affiliationROR": "https://ror.org/017zqws13"
+    },
+    {
+      "firstName": "Timothy",
+      "lastName": "Brodribb",
+      "email": "",
+      "affiliation": "University of Tasmania",
+      "affiliationROR": "https://ror.org/01nfmeh72"
+    },
+    {
+      "firstName": "Naomi",
+      "lastName": "Schwartz",
+      "email": "",
+      "affiliation": "University of British Columbia",
+      "affiliationROR": "https://ror.org/03rmrcq20"
+    },
+    {
+      "firstName": "Daniel",
+      "lastName": "Perez-Aviles",
+      "email": "",
+      "affiliation": "University of Minnesota",
+      "affiliationROR": "https://ror.org/017zqws13"
+    },
+    {
+      "firstName": "Chris",
+      "lastName": "Smith-Martin",
+      "email": "",
+      "affiliation": "University of Minnesota",
+      "affiliationROR": "https://ror.org/017zqws13"
+    },
+    {
+      "firstName": "Justin",
+      "lastName": "Becknell",
+      "email": "",
+      "affiliation": "Colby College",
+      "affiliationROR": "https://ror.org/00fvyjk73"
+    },
+    {
+      "firstName": "Filippo",
+      "lastName": "Aureli",
+      "email": "",
+      "affiliation": "Liverpool John Moores University",
+      "affiliationROR": "https://ror.org/04zfme737"
+    },
+    {
+      "firstName": "Roger",
+      "lastName": "Blanco",
+      "email": "",
+      "affiliation": "Área de Conservación Guanacaste"
+    },
+    {
+      "firstName": "Erick",
+      "lastName": "Calderón-Morales",
+      "email": "",
+      "affiliation": "University of Minnesota",
+      "affiliationROR": "https://ror.org/017zqws13"
+    },
+    {
+      "firstName": "Julio César",
+      "lastName": "Calvo-Alvarado",
+      "email": "",
+      "affiliation": "Costa Rica Institute of Technology",
+      "affiliationROR": "https://ror.org/04zhrfn38"
+    },
+    {
+      "firstName": "Ana Julieta",
+      "lastName": "Calvo-Obando",
+      "email": "",
+      "affiliation": "Costa Rica Institute of Technology",
+      "affiliationROR": "https://ror.org/04zhrfn38"
+    },
+    {
+      "firstName": "María Marta",
+      "lastName": "Chavarría",
+      "email": "",
+      "affiliation": "Área de Conservación Guanacaste"
+    },
+    {
+      "firstName": "Dorian",
+      "lastName": "Carvajal-Vanegas",
+      "email": "",
+      "affiliation": "Costa Rica Institute of Technology",
+      "affiliationROR": "https://ror.org/04zhrfn38"
+    },
+    {
+      "firstName": "César Dionisio",
+      "lastName": "Jiménez-Rodríguez",
+      "email": "",
+      "affiliation": "Costa Rica Institute of Technology",
+      "affiliationROR": "https://ror.org/04zhrfn38"
+    },
+    {
+      "firstName": "Evin",
+      "lastName": "Murillo Chacon",
+      "email": "",
+      "affiliation": "Costa Rica Institute of Technology",
+      "affiliationROR": "https://ror.org/04zhrfn38"
+    },
+    {
+      "firstName": "Colleen",
+      "lastName": "Schaffner",
+      "email": "",
+      "affiliation": "Universidad Veracruzana",
+      "affiliationROR": "https://ror.org/03efxn362"
+    },
+    {
+      "firstName": "Leland",
+      "lastName": "Werden",
+      "email": "",
+      "affiliation": "University of Minnesota",
+      "affiliationROR": "https://ror.org/017zqws13"
+    },
+    {
+      "firstName": "Xiangtao",
+      "lastName": "Xu",
+      "email": "",
+      "affiliation": "Harvard University",
+      "affiliationROR": "https://ror.org/03vek6s52"
+    },
+    {
+      "firstName": "David",
+      "lastName": "Medvigy",
+      "email": "",
+      "affiliation": "University of Notre Dame",
+      "affiliationROR": "https://ror.org/00mkhxb43"
+    }
+  ],
+  "abstract": "<p>Abstract goes here. Very important</p>\r\n",
+  "funders": [
+    {
+      "organization": "National Science Foundation",
+      "awardNumber": "CAREER grant DEB 1053237"
+    },
+    {
+      "organization": "National Science Foundation",
+      "awardNumber": "PRFB 1711366"
+    },
+    {
+      "organization": "National Science Foundation",
+      "awardNumber": "CRN3025"
+    },
+    {
+      "organization": "Instituto Tecnológico de Costa Rica",
+      "awardNumber": ""
+    },
+    {
+      "organization": "Australian Research Council",
+      "awardNumber": "DP170100761"
+    },
+    {
+      "organization": "Consejo Nacional de Ciencia y Tecnología",
+      "awardNumber": ""
+    },
+    {
+      "organization": "U.S. Department of Energy",
+      "awardNumber": "DESC0014363"
+    }
+  ],
+  "keywords": [
+    "drought",
+    "Tree mortality",
+    "Costa Rica"
+  ],
+  "methods": "<p>If I had a method, it would be here</p>\r\n",
+  "usageNotes": "<p>This is how data usage works</p>\r\n",
+  "relatedWorks": [
+    {
+      "relationship": "Cites",
+      "identifierType": "DOI",
+      "identifier": "https://doi.org/10.1111/gcb.15037"
+    }
+  ],
+  "versionNumber": 4,
+  "versionStatus": "submitted",
+  "curationStatus": "Published",
+  "publicationDate": "2020-03-17",
+  "lastModificationDate": "2020-03-17",
+  "visibility": "public",
+  "sharingLink": "https://datadryad.org/stash/share/anFoRwjUzvjvpH8RA2T0mNipNsVst0s0N5mFzcTTcJE",
+  "userId": 53625,
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/"
+}

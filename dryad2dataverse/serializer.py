@@ -3,7 +3,8 @@ from . import constants
 import urllib.parse
 import requests
 
-#TODO rename class to Serializer
+#TODO Add generic contact info to required metadata
+
 class Serializer(object):
     def __init__(self, doi):
         '''
@@ -12,6 +13,10 @@ class Serializer(object):
         '''
         self.doi = doi
         self._dryadJson = None
+        self._fileJson = None
+        #Serializer objects will be assigned a dataverse study PID 
+        #if dryad2Dataverse.transfer.Transfer() is instantiated
+        self.dvpid = None
 
     def fetch_record(self, url=None, timeout=45):
         '''
@@ -53,8 +58,62 @@ class Serializer(object):
 
     @property
     def dvJson(self):
-        self.assemble_json()
+        self._assemble_json()
         return self._dvJson
+
+    #taken from transfer.py
+    @property
+    def fileJson(self, timeout=45):
+        '''
+        Despite what you may think, the uniquely identifying integer describing a dataset is not
+        dryadJson['id']
+
+        It's actually the integer part of testCase._dryadJson['_links']['stash:version']['href']
+
+        '''
+        if not self._fileJson:
+            headers = {'accept':'application/json', 'Content-Type':'application/json'}
+            #print(f'{constants.DRYURL}/api/v2/versions/{self.dryad.id}/files') 
+            fileList = requests.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files', 
+                                    headers=headers,
+                                    timeout=timeout)
+            fileList.raise_for_status()
+            self._fileJson = fileList.json()
+        return self._fileJson 
+
+    #also taken from transfer.py
+    @property
+    def files(self):
+        '''
+        Returns a list of tuples with:
+        (Download_location, filename, mimetype, size, description)
+
+        '''
+        out = []
+        files = self.fileJson['_embedded'].get('stash:files')
+        if files:
+            for f in files:
+                downLink = f['_links']['stash:file-download']['href']
+                downLink = f'{constants.DRYURL}{downLink}'
+                name = f['path']
+                mimeType = f['mimeType']
+                size = f['size']
+                descr = f.get('description', '') #HOW ABOUT PUTTING THIS IN THE DRYAD API PAGE?
+                out.append((downLink, name, mimeType, size, descr))
+
+        return out
+
+    @property
+    def oversize(self, maxsize=None):
+        if not maxsize:
+            maxsize = constants.MAX_UPLOAD
+        toobig=[]
+        for f in self.files:
+            if f[3] >= maxsize:
+                toobig.append(f)
+        return toobig
+
+
 
     def _typeclass(self, typeName, multiple, typeClass):
         '''
@@ -287,13 +346,23 @@ class Serializer(object):
         else:
             return{}
         
-    def assemble_json(self, dryJson=None):
+    def _assemble_json(self, dryJson=None, dvContact=None, dvEmail=None, defContact=True):
         '''
         Assembles Dataverse json from Dryad JSON components
 
         dryJson : dict
             Dryad json as dict
+        dvContact : str 
+            default Dataverse contact name
+        dvEmail : str
+            default Dataverse 4 contact email address
+        defContact : boolean
+            include default contact information with record
         '''
+        if not dvContact:
+            dvContact = constants.DV_CONTACT_NAME
+        if not dvEmail:
+            dvEmail = constants.DV_CONTACT_EMAIL
         if not dryJson:
             dryJson = self.dryadJson
         #print(dryJson)
@@ -371,6 +440,17 @@ class Serializer(object):
                                                 dryField='affiliation')
                 if affiliation: reqdContact.update(affiliation)
                 out.append(reqdContact)
+
+        if defContact: #Adds default contact information the tail of the list
+            defEmail = self._convert_generic(inJson={'em':dvEmail},
+                                             dvField='datasetContactEmail',
+                                             dryField='em')
+            defName = self._convert_generic(inJson={'name':dvContact},
+                                            dvField='datasetContactName',
+                                            dryField='name')
+            defEmail.update(defName)
+            out.append(defEmail)
+
         contacts = self._typeclass(typeName='datasetContact', multiple=True, typeClass='compound')
         contacts['value'] = out
         self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(contacts)
@@ -393,7 +473,9 @@ class Serializer(object):
                                                  dryField='lastModificationDate')
                 descrField.update(descDate)
                 out.append(descrField)
+        '''
         #Add original DOI to description as well
+        #Decided to move it to Agency
         formattedDoi = '<b>Dryad DOI:</b><br />' + self.dryadJson['identifier']+ '\n'
         origDoi = self._convert_generic(inJson={'doi':formattedDoi},
                                        dvField='dsDescriptionValue',
@@ -403,6 +485,7 @@ class Serializer(object):
                                          dryField='lastModificationDate')
         origDoi.update(descDate)
         out.append(origDoi)
+        '''
         description['value'] = out
         self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(description)
 
@@ -477,6 +560,11 @@ class Serializer(object):
                 pubUrl = self._convert_generic(inJson=r,
                                                dvField='publicationURL',
                                                dryField='identifier')
+                #Dryad doesn't just put URLs in their URL field. 
+                if pubUrl['publicationURL']['value'].lower().startswith('doi:'):
+                    fixurl = 'https://doi.org/' + pubUrl['publicationURL']['value'][4:]
+                    pubUrl['publicationURL']['value'] = fixurl
+                    print(fixurl)
                 pubcite.update(pubIdType)
                 pubcite.update(pubUrl)
                 out.append(pubcite)
@@ -488,4 +576,14 @@ class Serializer(object):
 
         #Geospatial metadata
         self._dvJson['datasetVersion']['metadataBlocks'].update(self._convert_geospatial(dryJson))
-
+        
+        #DOI --> agency/identifier
+        doi = self._convert_generic(inJson=dryJson, dryField='identifier',
+                                    dvField='otherIdValue')
+        doi.update(self._convert_generic(inJson={'agency':'Dryad'},
+                                         dryField='agency',
+                                         dvField='otherIdAgency'))
+        agency = self._typeclass(typeName='otherId', multiple=True, typeClass='compound')
+        agency['value'] = [doi]
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(agency)
+        
