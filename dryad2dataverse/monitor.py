@@ -33,7 +33,8 @@ class Monitor(object):
                       'CREATE TABLE IF NOT EXISTS dvStudy \
                       (dryaduid INTEGER references dryadStudy (uid), dvpid TEXT);',
                       'CREATE TABLE IF NOT EXISTS dvFiles \
-                      (dryaduid INTEGER references dryadStudy (uid), dryfid INT, dvfid TEXT, \
+                      (dryaduid INTEGER references dryadStudy (uid), dryfid INT, \
+                      drymd5 TEXT, dvfid TEXT, dvmd5 TEXT, \
                       dvfilejson TEXT);']
             for c in create:
                 cls.cursor.execute(c)
@@ -107,7 +108,7 @@ class Monitor(object):
             return out
         else: return None 
 
-    def diff_files(self, serial):
+    def diff_files(self, transfer):
         '''https://docs.python.org/3/library/stdtypes.html#frozenset.symmetric_difference
 
         Also:
@@ -126,15 +127,24 @@ class Monitor(object):
         '''
         '''
         Returns a dict with additions and deletions from previous Dryad to dataverse upload
+
+        Because checksums are not necessarily included in Dryad file metadata and they're
+        the only way to ensure a file change.
+
+        if dryad2dataverse.monitor.Monitor.status()
+        indicates a change,
+        
         {'add':[dyadfiletuples], 'delete:[dryadfiletuples]}
         
-        serial : dryad2dataverse.serializer.Serial instance
+        transfer : dryad2dataverse.transfer.Transfer instance
+        Note: Dataverse can use md5, sha-1, sha-256 and sha-512, but        Dryad only supports md5.
+
+        If no hashes are found in dryad2dataverse.transfer.Transfer
+        the files will be downloaded and generated
         '''
-        if self.status(serial)['status'] == 'new':
-            return {}
         diffReport = {}
         self.cursor.execute('SELECT uid from dryadStudy WHERE doi = ?',
-                                (serial.dryadJson['identifier'],))
+                                (transfer.doi,))
         mostRecent = self.cursor.fetchall()[-1][0]
         self.cursor.execute('SELECT dryfilesjson from dryadFiles WHERE dryaduid = ?',
                                 (mostRecent,))
@@ -153,11 +163,12 @@ class Monitor(object):
                 mimeType = f['mimeType']
                 size = f['size']
                 descr = f.get('description', '')
-                out.append((downLink, name, mimeType, size, descr))
+                md5 = f.get('md5', '')
+                out.append((downLink, name, mimeType, size, descr, md5))
             oldFiles = out
 
                 
-        newFiles = serial.files
+        newFiles = transfer.files
         ###Tests go here
         ## Can't use set on a list of dicts. Joder!
         must = set(oldFiles).issuperset(set(newFiles))
@@ -170,7 +181,6 @@ class Monitor(object):
             needsdel = set(oldFiles) - (set(newFiles) & set(oldFiles))
 
             diffReport.update({'delete': list(needsdel)})
-        #now how do I get the file ids of files that need to be deleted?
         return diffReport
 
     def get_dv_fid(self, url):
@@ -220,7 +230,7 @@ class Monitor(object):
         if olduid:
             olduid = int(olduid)
         if self.status(transfer.dryad)['status'] != 'unchanged':
-            doi = transfer.dryad.dryadJson.get('identifier')
+            doi = transfer.doi
             lastmod = transfer.dryad.dryadJson.get('lastModificationDate')
             dryadJson = json.dumps(transfer.dryad.dryadJson)
             dvJson = json.dumps(transfer.dvStudy)
@@ -270,8 +280,18 @@ class Monitor(object):
                 self.cursor.execute('DELETE FROM dvFiles WHERE dvfid=? AND dryaduid=?',
                                     (int(rec),dryaduid))#Dryad record ID is int not str
                 print(f'deleted dryfid ={rec}, dryaduid = {dryaduid}')
+            #And lastly, any JSON metadata updates:
+            #NOW WHAT?
+            self.cursor.execute('SELECT FROM dvfiles WHERE dryfid=? and dryaduid=?)',
+                        (0, dryaduid))#JSON has dryfid==0
+
+            if transfer.jsonFlag:
+                #TODO add or update dryad JSON
+                pass
+
         self.conn.commit()
 
+    #TODO: delete this
     def notify(self, user, pwd,  mailserve, port, recipients, serial):
 
         try:

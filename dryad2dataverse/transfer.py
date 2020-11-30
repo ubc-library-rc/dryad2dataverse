@@ -2,6 +2,8 @@ import requests
 import os
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from . import constants
+import hashlib
+import copy
 
 #TODO Set publication date 
 '''
@@ -20,9 +22,12 @@ class Transfer(object):
         '''
         self.dryad = dryad
         self._fileJson = None
+        #self._files =  [list(f) for f in self.dryad.files]
+        self._files = copy.deepcopy(self.dryad.files)
         self.fileUpRecord = []
         self.fileDelRecord = []
         self.dvStudy = None
+        self.jsonFlag = None #Whether or not new json uploaded
 
     def _del(self): #Change name to __del__ to make a destructor
         '''Clears crap from constants.TMP on deletion'''
@@ -52,15 +57,19 @@ class Transfer(object):
     @property
     def files(self):
         '''
-        Returns a list of tuples with:
-        (Download_location, filename, mimetype, size)
+        Returns a list of lists with:
+        [Download_location, filename, mimetype, size, description, md5digest]
+        This is mutable; downloading a file will add md5 info if not available
         '''
-        return self.dryad.files.copy()   
+        return self._files
 
     @property
     def oversize(self):
         return self.dryad.oversize
     
+    @property
+    def doi(self):
+        return self.dryad.doi
 
     def _dryad_file_id(self, url):
         '''
@@ -132,8 +141,25 @@ class Transfer(object):
         if dvpid:
             self.dryad.dvpid = updata['data'].get('datasetPersistentId')
         return self.dvpid
-        
-    def download_file(self, url, filename, timeout=45):
+
+    def _check_md5(self, infile):
+        '''
+        Returns md5 checksum of file
+
+        infile : str
+            complete path to file
+        '''
+        blocksize = 2**16
+        with open(infile, 'rb') as m:
+            fmd5 = hashlib.md5()
+            fblock = m.read(blocksize)
+            while len(fblock) > 0:
+                fmd5.update(fblock)
+                fblock = m.read(blocksize)
+        return fmd5.hexdigest()
+
+    def download_file(self, url, filename, tmp=None, maxsize=None, timeout=45):
+        #TODO finish max size checking, figure out what to do with the md5
         '''
         Downloads file via requests streaming and saves to constants.TMP
         returns 1 on success and 0 
@@ -143,14 +169,41 @@ class Transfer(object):
             output file name
         timeout: int
             requests timeout
+        tmp : str
+            temporary directory for downloads. Defaults to dryad2dataverse.constants.TMP
+        maxsize : int
+            Maximum file size in bytes. Defaults to dryad2dataverse.constants.MAX_UPLOAD
+        chk : str
+            md5 sum of file (if available)
         '''
+        if not tmp:
+            tmp = constants.TMP
+        if tmp.endswith(os.sep): tmp = tmp[:-1]
+        if not maxsize:
+            maxsize = constants.MAX_UPLOAD
+        
         try:
             down = requests.get(url, timeout=timeout, stream=True)
             down.raise_for_status()
-            with open(f'{constants.TMP}/{filename}', 'wb') as fi:
+            with open(f'{tmp}{os.sep}{filename}', 'wb') as fi:
                 for chunk in down.iter_content(chunk_size=8192):
                     fi.write(chunk)
-            return 1
+
+            #verify size
+            #https://stackoverflow.com/questions/2104080/how-can-i-check-file-size-in-python'
+            if maxsize:
+                checkSize = os.stat(f'{tmp}{os.sep}{filename}').st_size
+                if checkSize != maxsize:
+                    raise #raise what? I need some custom exceptions
+            #now check the md5
+            md5 = self._check_md5(f'{tmp}{os.sep}{filename}')
+            if chk:
+                if md5 != chk:
+                    raise #is this really what I want to do on a bad checksum?
+            for i in self._files:
+                if url == i[0]:
+                    i[-1] = md5
+            return md5 
         except:
             raise
             return 0
@@ -160,11 +213,11 @@ class Transfer(object):
             files = self.files
         try:
             for f in files:
-                self.download_file(f[0], f[1]) 
+                self.download_file(f[0], f[1], chk=f[-1]) 
         except:
             raise
 
-    def upload_file(self, filename, mimetype, size, descr, studyId=None, dest=None, fprefix=None, timeout=300, dryadUrl=None):
+    def upload_file(self, filename, mimetype, size, descr, md5, studyId=None, dest=None, fprefix=None, timeout=300, dryadUrl=None):
         '''
         Uploads file to Dataverse study. Returns a tuple of the dryadFid (or None) and Dataverse JSON from the POST request.
         Failures produce JSON with different status messages rather than raising an exception.
@@ -179,6 +232,8 @@ class Transfer(object):
             Persistent study identifier for dataverse. Defaults to Transfer.dvpid
         dest : str
             Destination dataverse installation url. Defaults to constants.DVURL
+        md5 : str
+            md5 checksum for file
         fprefix : str
             Path to file, not including a trailing slash
         timeout : int
@@ -220,14 +275,16 @@ class Transfer(object):
             upload = requests.post(url, params=params, headers=tmphead, data=multi, timeout=timeout)
             upload.raise_for_status()
             self.fileUpRecord.append((fid, upload.json()))
+            upmd5 = upload.json()['data']['files'][0]['dataFile']['checksum']['value']
+            if upmd5 != md5:
+                raise
             return (fid, upload.json())
         except:
             print( upload.text)
-
             raise
             return (fid, {'status' : f'Failure: Reason {upload.reason}'})
 
-    def upload_files(self, files=None, pid=None):
+    def upload_files(self, files=None, pid=None, fprefix=None):
         '''
         Uploads multiple files to study with persistentId pid. Returns a list of the original tuples plus JSON responses.
         
@@ -238,10 +295,39 @@ class Transfer(object):
         '''
         if not files:
             files = self.files
+        if not fprefix:
+            fprefix = constants.TMP
         out = []
         for f in files:
-            out.append(self.upload_file(f[1], f[2], f[3], f[4], pid, dryadUrl=f[0]))
+            out.append(self.upload_file(f[1], f[2], f[3], f[4], f[5], pid, dryadUrl=f[0], fprefix=fprefix))
         return out
+
+    def upload_json(self, studyId=None, dest=None):
+        '''
+        Uploads Dryad json as a separate file for archival purposes
+        pid : str
+            Dataverse pid
+        '''
+        if not studyId:
+            studyId = self.dvpid
+        if not dest:
+            dest = constants.DVURL
+        if not self.jsonflag:
+            url = dest + '/api/datasets/:persistentId/add'
+            pack = io.StringIO(json.dumps(self.dryad.dryadJson))
+            desc = {'description':f'{self.dryad.doi}.json', 'categories':['Documentation', 'Code']} 
+            try:
+                meta = requests.post(f'{url}', 
+                                     params={'persistentId':studyId}, 
+                                     headers=self.auth, 
+                                     files={'file':(f'Dryad_{self.doi}.json', pack, 'text/plain;charset=UTF-8'), 
+                                            'jsonData':f'{desc}'})
+                self.fileUpRecord.append(0, meta.json())#0 because no dryad fid will be zero
+                meta.raise_for_status()
+                self.jsonflag = (0, meta.json())
+
+            except:
+                raise
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):
         #WTAF curl -u $API_TOKEN: -X DELETE https://$HOSTNAME/dvn/api/data-deposit/v1.1/swordv2/edit-media/file/123

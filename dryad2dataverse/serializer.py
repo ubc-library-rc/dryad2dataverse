@@ -99,7 +99,12 @@ class Serializer(object):
                 mimeType = f['mimeType']
                 size = f['size']
                 descr = f.get('description', '') #HOW ABOUT PUTTING THIS IN THE DRYAD API PAGE?
-                out.append((downLink, name, mimeType, size, descr))
+                digestType = f.get('digestType')
+                digest = f.get('digest') #not all files have a digest
+                md5 = ''
+                if digestType == 'md5' and digest:
+                    md5 = digest #nothing in the docs as to algorithms so just picking md5
+                out.append((downLink, name, mimeType, size, descr, md5))
 
         return out
 

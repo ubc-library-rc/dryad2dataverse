@@ -22,7 +22,8 @@ def teardown():
 #@params(testCase)
 def test_file_id():
     dryad = testCase
-    files = [('https://datadryad.org/api/v2/files/385819/download', 'GCB_ACG_Mortality_2020.zip', 'application/x-zip-compressed', 23787587, ''), ('https://datadryad.org/api/v2/files/385820/download', 'Readme_ACG_Mortality.txt', 'text/plain', 1350, '')]
+    assert_equal.__self__.maxDiff = None
+    files = [('https://datadryad.org/api/v2/files/385819/download', 'GCB_ACG_Mortality_2020.zip', 'application/x-zip-compressed', 23787587, '', ''), ('https://datadryad.org/api/v2/files/385820/download', 'Readme_ACG_Mortality.txt', 'text/plain', 1350, '', '')]
     ftest = dryad2dataverse.transfer.Transfer(dryad)
     assert_equal(files, ftest.files, True)
     assert_equal(385819, ftest._dryad_file_id(ftest.files[0][0]), True)
