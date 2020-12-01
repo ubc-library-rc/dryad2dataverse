@@ -27,7 +27,7 @@ def test_file_id():
     files=[('https://datadryad.org/api/v2/files/385819/download', 'ubc_rand1.zip', 'application/x-zip-compressed', 23787587, '', ''), ('https://datadryad.org/api/v2/files/385820/download', 'ubc_rand2.csv', 'text/plain', 1350, '', '')]
 
     ftest = dryad2dataverse.transfer.Transfer(dryad)
-    assert_equal(files, ftest.files, True)
+    assert_equal(files, [tuple(x) for x in ftest.files], True)
     assert_equal(385819, ftest._dryad_file_id(ftest.files[0][0]), True)
 
 def test_newmeta():

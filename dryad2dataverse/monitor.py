@@ -108,7 +108,7 @@ class Monitor(object):
             return out
         else: return None 
 
-    def diff_files(self, transfer):
+    def diff_files(self, serial):
         '''https://docs.python.org/3/library/stdtypes.html#frozenset.symmetric_difference
 
         Also:
@@ -136,15 +136,16 @@ class Monitor(object):
         
         {'add':[dyadfiletuples], 'delete:[dryadfiletuples]}
         
-        transfer : dryad2dataverse.transfer.Transfer instance
-        Note: Dataverse can use md5, sha-1, sha-256 and sha-512, but        Dryad only supports md5.
+        serial : dryad2dataverse.serializer.Serializer instance
 
-        If no hashes are found in dryad2dataverse.transfer.Transfer
-        the files will be downloaded and generated
+        Only md5 digest supported at this time.
         '''
         diffReport = {}
+        if self.status(serial)['status'] == 'new':
+            #return {'add': [x for x in serial.files]}#everything is new in this case
+            return {}
         self.cursor.execute('SELECT uid from dryadStudy WHERE doi = ?',
-                                (transfer.doi,))
+                                (serial.doi,))
         mostRecent = self.cursor.fetchall()[-1][0]
         self.cursor.execute('SELECT dryfilesjson from dryadFiles WHERE dryaduid = ?',
                                 (mostRecent,))
@@ -168,7 +169,7 @@ class Monitor(object):
             oldFiles = out
 
                 
-        newFiles = transfer.files
+        newFiles = serial.files
         ###Tests go here
         ## Can't use set on a list of dicts. Joder!
         must = set(oldFiles).issuperset(set(newFiles))
@@ -260,8 +261,9 @@ class Monitor(object):
                 self.cursor.execute('SELECT * FROM dvFiles WHERE dryaduid=?', (olduid,))
                 inserter = self.cursor.fetchall()
                 for rec in inserter:
-                    self.cursor.execute('INSERT INTO dvFiles VALUES (?, ?, ?, ?)',
-                                        (dryaduid, rec[1], rec[2], rec[3]))
+                    #TODO FIX THIS
+                    self.cursor.execute('INSERT INTO dvFiles VALUES (?, ?, ?, ?, ?, ?)',
+                                        (dryaduid, rec[1], rec[2], rec[3], rec[4], rec[5]))
             #insert newly uploaded files
             for rec in transfer.fileUpRecord:
                 try:
@@ -272,8 +274,9 @@ class Monitor(object):
                         continue
                     else:
                         dvfid='JSON read error'
-                self.cursor.execute('INSERT INTO dvFiles VALUES (?, ?, ?, ?)',
-                                    (dryaduid, json.dumps(rec[0]), dvfid, json.dumps(rec[1])))
+                recMd5 = rec[1]['data']['files'][0]['dataFile']['checksum']['value']#md5s verified during upload step, so they should match already
+                self.cursor.execute('INSERT INTO dvFiles VALUES (?, ?, ?, ?, ?, ?)',
+                                    (dryaduid, rec[0], recMd5, dvfid, recMd5, json.dumps(rec[1])))#HERE IS ERROR, WHAT TO INSERT
 
             #Now the deleted files
             for rec in transfer.fileDelRecord: #fileDelRecord consists only of [fid,fid2, ...]
@@ -282,12 +285,20 @@ class Monitor(object):
                 print(f'deleted dryfid ={rec}, dryaduid = {dryaduid}')
             #And lastly, any JSON metadata updates:
             #NOW WHAT?
-            self.cursor.execute('SELECT FROM dvfiles WHERE dryfid=? and dryaduid=?)',
+            self.cursor.execute('SELECT * FROM dvfiles WHERE dryfid=? and dryaduid=?',
                         (0, dryaduid))#JSON has dryfid==0
+            try:
+                exists=self.cursor.fetchone()[0]
+                self.cursor.execute('DELETE FROM dvfiles WHERE dryfid=? and dryaduid=?', (0, dryaduid))
+            except:
+                pass
 
             if transfer.jsonFlag:
-                #TODO add or update dryad JSON
-                pass
+                #update dryad JSON
+                djson5 = transfer.jsonFlag[1]['data']['files'][0]['dataFile']['checksum']['value']
+                dfid = transfer.jsonFlag[1]['data']['files'][0]['dataFile']['id']
+                self.cursor.execute('INSERT INTO dvfiles VALUES (?, ?, ?, ?, ?, ?)',
+                                    (dryaduid, 0, djson5, dfid, djson5, json.dumps(transfer.jsonFlag[1])))
 
         self.conn.commit()
 

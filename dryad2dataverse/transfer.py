@@ -4,6 +4,8 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 from . import constants
 import hashlib
 import copy
+import io
+import json
 
 #TODO Set publication date 
 '''
@@ -22,8 +24,8 @@ class Transfer(object):
         '''
         self.dryad = dryad
         self._fileJson = None
-        #self._files =  [list(f) for f in self.dryad.files]
-        self._files = copy.deepcopy(self.dryad.files)
+        self._files =  [list(f) for f in self.dryad.files]
+        #self._files = copy.deepcopy(self.dryad.files)
         self.fileUpRecord = []
         self.fileDelRecord = []
         self.dvStudy = None
@@ -158,7 +160,7 @@ class Transfer(object):
                 fblock = m.read(blocksize)
         return fmd5.hexdigest()
 
-    def download_file(self, url, filename, tmp=None, maxsize=None, timeout=45):
+    def download_file(self, url, filename, tmp=None, maxsize=None, chk=None,timeout=45):
         #TODO finish max size checking, figure out what to do with the md5
         '''
         Downloads file via requests streaming and saves to constants.TMP
@@ -217,7 +219,7 @@ class Transfer(object):
         except:
             raise
 
-    def upload_file(self, filename, mimetype, size, descr, md5, studyId=None, dest=None, fprefix=None, timeout=300, dryadUrl=None):
+    def upload_file(self, dryadUrl=None, filename=None, mimetype=None, size=None, descr=None, md5=None, studyId=None, dest=None, fprefix=None, timeout=300):
         '''
         Uploads file to Dataverse study. Returns a tuple of the dryadFid (or None) and Dataverse JSON from the POST request.
         Failures produce JSON with different status messages rather than raising an exception.
@@ -263,7 +265,7 @@ class Transfer(object):
             fail = (fid, {'status' : 'Failure: MAX_UPLOAD size exceeded'} )
             self.fileUpRecord.append(fail)
             return fail 
-
+    
         fields = {'file': (filename, open(upfile, 'rb'), mimetype)}
         fields.update({'jsonData': f'{dv4meta}'})
         multi = MultipartEncoder(fields=fields)
@@ -273,14 +275,17 @@ class Transfer(object):
         url = dest + '/api/datasets/:persistentId/add'
         try:
             upload = requests.post(url, params=params, headers=tmphead, data=multi, timeout=timeout)
+            print(upload.text)
             upload.raise_for_status()
             self.fileUpRecord.append((fid, upload.json()))
             upmd5 = upload.json()['data']['files'][0]['dataFile']['checksum']['value']
-            if upmd5 != md5:
+            if md5 and upmd5 != md5:#WTF has happened here
+                print(f'UPMD5 {upmd5}, MD5 from input{md5}')
                 raise
             return (fid, upload.json())
         except:
-            print( upload.text)
+            print(upload.text)
+            print(upload.json())
             raise
             return (fid, {'status' : f'Failure: Reason {upload.reason}'})
 
@@ -299,7 +304,7 @@ class Transfer(object):
             fprefix = constants.TMP
         out = []
         for f in files:
-            out.append(self.upload_file(f[1], f[2], f[3], f[4], f[5], pid, dryadUrl=f[0], fprefix=fprefix))
+            out.append(self.upload_file(f[0],f[1], f[2], f[3], f[4], f[5], pid, fprefix=fprefix))
         return out
 
     def upload_json(self, studyId=None, dest=None):
@@ -312,7 +317,7 @@ class Transfer(object):
             studyId = self.dvpid
         if not dest:
             dest = constants.DVURL
-        if not self.jsonflag:
+        if not self.jsonFlag:
             url = dest + '/api/datasets/:persistentId/add'
             pack = io.StringIO(json.dumps(self.dryad.dryadJson))
             desc = {'description':f'{self.dryad.doi}.json', 'categories':['Documentation', 'Code']} 
@@ -322,7 +327,7 @@ class Transfer(object):
                                      headers=self.auth, 
                                      files={'file':(f'Dryad_{self.doi}.json', pack, 'text/plain;charset=UTF-8'), 
                                             'jsonData':f'{desc}'})
-                self.fileUpRecord.append(0, meta.json())#0 because no dryad fid will be zero
+                self.fileUpRecord.append((0, meta.json()))#0 because no dryad fid will be zero
                 meta.raise_for_status()
                 self.jsonflag = (0, meta.json())
 
