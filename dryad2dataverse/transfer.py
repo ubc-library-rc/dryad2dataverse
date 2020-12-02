@@ -1,11 +1,19 @@
-import requests
-import os
-from requests_toolbelt.multipart.encoder import MultipartEncoder
-from . import constants
-import hashlib
+'''
+This module handles data downloads and uploads from a Dryad instance to a Dataverse instance
+'''
+
 import copy
+import hashlib
 import io
 import json
+import os
+
+import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+
+from dryad2dataverse import constants
+from dryad2dataverse.exceptions import (Dryad2DataverseError, NoTargetError)
+
 
 #TODO Set publication date 
 '''
@@ -103,7 +111,7 @@ class Transfer(object):
             timeout on POST request
 
         KEYWORD ARGUMENTS
-        One of these is required. Supplying both or neither raises an value error 
+        One of these is required. Supplying both or neither raises a NoTargetError
         targetDv : str
             short name of target dataverse. Required if new dataset. specify as targetDV=value
         dvpid = str
@@ -119,7 +127,8 @@ class Transfer(object):
         dvpid = kwargs.get('dvpid')
         dryFid = kwargs.get('dryFid')
         if not targetDv and not dvpid:
-            raise ValueError('You must supply one of targetDv or dvpid')
+            raise NoTargetError('You must supply one of targetDv (target dataverse) \
+                                 or dvpid (Dataverse persistent ID)')
         if targetDv and dvpid:
             raise ValueError('Supply only one of targetDv or dvpid')
         if not dvpid:
@@ -284,8 +293,8 @@ class Transfer(object):
                 raise
             return (fid, upload.json())
         except:
-            print(upload.text)
-            print(upload.json())
+            #print(upload.text)
+            #print(upload.json())
             raise
             return (fid, {'status' : f'Failure: Reason {upload.reason}'})
 
@@ -318,20 +327,29 @@ class Transfer(object):
         if not dest:
             dest = constants.DVURL
         if not self.jsonFlag:
+            print(self.auth)
             url = dest + '/api/datasets/:persistentId/add'
+            print(url)
             pack = io.StringIO(json.dumps(self.dryad.dryadJson))
-            desc = {'description':f'{self.dryad.doi}.json', 'categories':['Documentation', 'Code']} 
+            desc = {'description':f'Original JSON from Dryad', 'categories':['Documentation', 'Code']} 
+            fname = self.doi[self.doi.rfind('/')+1:].replace('.', '_')
+            payload = {'file': (f'{fname}.json', pack, 'text/plain;charset=UTF-8'), 'jsonData':f'{desc}'}
+            print(payload)
+            params ={'persistentId':studyId}
             try:
                 meta = requests.post(f'{url}', 
-                                     params={'persistentId':studyId}, 
+                                     params=params, 
                                      headers=self.auth, 
-                                     files={'file':(f'Dryad_{self.doi}.json', pack, 'text/plain;charset=UTF-8'), 
-                                            'jsonData':f'{desc}'})
+                                     files=payload)
+                print(meta.json())
+                print(meta.reason)
+                print(meta.status_code)
                 self.fileUpRecord.append((0, meta.json()))#0 because no dryad fid will be zero
                 meta.raise_for_status()
                 self.jsonflag = (0, meta.json())
 
             except:
+                print(meta.text)
                 raise
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):

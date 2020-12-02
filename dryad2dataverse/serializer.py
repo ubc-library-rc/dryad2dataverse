@@ -1,9 +1,12 @@
-'''Import and convert dryad metadata'''
-from . import constants
+'''
+Serializes Dryad JSON to Dataverse JSON, with a few other associated file utilities
+'''
+
 import urllib.parse
+
 import requests
 
-#TODO Add generic contact info to required metadata
+from  dryad2dataverse import constants
 
 class Serializer(object):
     def __init__(self, doi):
@@ -163,7 +166,7 @@ class Serializer(object):
         pNotes = kwargs.get('pNotes', '')
         rType = kwargs.get('rType', 'dict')
         if not dvField or not dryField or not inJson:
-            raise TypeError('Incorrect or insufficient fields provided')
+            raise ValueError('Incorrect or insufficient fields provided')
         outfield = inJson.get(dryField)
         if outfield: outfield = outfield.strip()
         '''

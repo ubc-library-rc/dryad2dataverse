@@ -1,23 +1,32 @@
-import sqlite3
-import json
-import os
-from . import constants
-import copy
-import smtplib
-from email.message import EmailMessage as Em
+'''
+Dryad/Dataverse status tracker. Monitor creates a singleton object which 
+writes to a SQLite database. Methods will (generally) take either a 
+dryad2dataverse.serializer.Serializer instance or 
+dryad2dataverse.transfer.Transfer instance
+'''
 
+import copy
+import json
+import sqlite3
+
+from dryad2dataverse import constants
+from dryad2dataverse.exceptions import (Dryad2DataverseError, NoTargetError)
 
 class Monitor(object):
-    '''Singleton'''
-    '''Database object and tracker'''
-    ''''https://stackoverflow.com/questions/12305142/issue-with-singleton-python-call-two-times-init'''
+    '''
+    The Monitor object is a tracker and database updater, so that
+    Dryad files can be monitored and updated over time. Monitor is a singleton,
+    but is not thread-safe.
+    '''
+    ''''https://stackoverflow.com/questions/12305142/
+    issue-with-singleton-python-call-two-times-init'''
     __instance = None
+
     def __new__(cls, dbase=None, *args, **kwargs):
-        if cls.__instance == None:
+        '''Creates a new singleton instance of Monitor'''
+        if cls.__instance is None:
             cls.__instance = super(Monitor, cls).__new__(cls)
             cls.__instance.__initialized = False
-            #cls.dbase = kwargs.get('dbase')
-            #print(f'THIS IS DBASE {cls.dbase}')
             cls.dbase = dbase
             if not cls.dbase:
                 cls.dbase = constants.DBASE
@@ -43,6 +52,13 @@ class Monitor(object):
         return cls.__instance
 
     def __init__(self, dbase=None, *args, **kwargs): #remove args and kwargs when you find out how init interacts with new.
+            '''
+            Initialize the Monitor instance.
+
+            dbase : str
+                Complete path to desired location of tracking database (eg: /tmp/test.db)
+                Defaults to dryad2dataverse.constants.DBASE
+            '''
             if self.__initialized: return
             self.__initialized = True
             if not dbase:
@@ -51,18 +67,21 @@ class Monitor(object):
                 self.dbase = dbase
 
     def __del__(self):
+        '''
+        Commits all database transactions on object deletion
+        '''
         self.conn.commit()
         self.conn.close()
 
     def status(self, serial):
         '''
-        serial : dryad2dataverse.serializer instance
         Returns text output of 'new', 'unchanged', 'updated' or 'filesonly'
         'new' is a completely new file
         'unchanged' is no changes at all
         'updated' is changes to lastModificationDate AND metadata changes
         'filesonly' is changes to lastModificationDate only (which presumably indicates a file change.
 
+        serial : dryad2dataverse.serializerinstance
         '''
         #Last mod date is indicator of change. From email w/Ryan Scherle 10 Nov 2020
         doi = serial.dryadJson['identifier']
@@ -95,6 +114,9 @@ class Monitor(object):
 
     def diff_metadata(self, serial):
         '''
+        Analyzes differences in metadata between current serializer instance and last
+        updated serializer instance. Returns a list of field changes
+        
         serial : dryad2dataverse.serializer.Serializer instance
         '''
         if self.status(serial)['status'] == 'updated':
@@ -128,17 +150,15 @@ class Monitor(object):
         '''
         Returns a dict with additions and deletions from previous Dryad to dataverse upload
 
-        Because checksums are not necessarily included in Dryad file metadata and they're
-        the only way to ensure a file change.
+        Because checksums are not necessarily included in Dryad file metadata, this method uses
+        dryad file IDs, size, etc.
 
-        if dryad2dataverse.monitor.Monitor.status()
-        indicates a change,
+        If dryad2dataverse.monitor.Monitor.status()
+        indicates a change it will produce dictionary output with a list of additions or deletions, as below:
         
         {'add':[dyadfiletuples], 'delete:[dryadfiletuples]}
         
         serial : dryad2dataverse.serializer.Serializer instance
-
-        Only md5 digest supported at this time.
         '''
         diffReport = {}
         if self.status(serial)['status'] == 'new':
@@ -186,9 +206,11 @@ class Monitor(object):
 
     def get_dv_fid(self, url):
         '''
-        Returns str — the Dataverse file ID. Normally used for *deletion* of dataverse files.
+        Returns str — the Dataverse file ID from parsing a Dryad file download link. 
+        Normally used for determining dataverse file ids for *deletion* in case of dryad file changes.
+        
         url : str
-            Dryad file URL in form of 'https://datadryad.org/api/v2/files/385819/download'
+            *Dryad* file URL in form of 'https://datadryad.org/api/v2/files/385819/download'
         '''
         fid = url[url.rfind('/',0,-10)+1:].strip('/download') 
         try:
@@ -202,7 +224,9 @@ class Monitor(object):
         else: return None
 
     def get_dv_fids(self, filelist):
-        '''Returns Dataverse file IDs from a list of Dryad file tuples.
+        '''
+        Returns Dataverse file IDs from a list of Dryad file tuples.
+        
         filelist : list
             list of Dryad file tuples: eg:
             [('https://datadryad.org/api/v2/files/385819/download', 
@@ -220,9 +244,32 @@ class Monitor(object):
         return fids
         #return [self.get_dv_fid(f[0]) for f in filelist]
 
+    def get_json_dvfids(self, serial):
+        '''
+        Return a list of Dataverse file ids for dryad JSONs which were uploaded to Dataverse.
+        Normally used to discover the file IDs to remove Dryad JSONs which have changed.
+
+        serial : dryad2dataverse.serializer.Serializer instance
+        '''
+        self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi=?', (serial.doi,)) 
+        try:
+            uid = self.cursor.fetchone()[0]
+            self.cursor.execute('SELECT dvfid FROM dvFiles WHERE dryaduid = ? AND dryfid=?', (uid, 0))
+            jsonfid = [f[0] for f in self.cursor.fetchall()]
+            return jsonfid
+           
+        except:
+            return []
+
     def update(self, transfer):
         '''
-        You should call update after transfers have completed something, or you will not be adding much useful information.
+        Updates the Monitor database with information from a dryad2dataverse.transfer.Transfer instance 
+        If a Dryad primary metadata record has changes, it will be deleted from the database.
+        This method should be called after all transfers are completed, including Dryad JSON updates,
+        as the last action for transfer.
+
+        
+        transfer : dryad2dataverse.transfer.Transfer instance
         '''
         #get the pre-update dryad uid in case we need it.
         self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi = ?',
@@ -283,13 +330,17 @@ class Monitor(object):
                 self.cursor.execute('DELETE FROM dvFiles WHERE dvfid=? AND dryaduid=?',
                                     (int(rec),dryaduid))#Dryad record ID is int not str
                 print(f'deleted dryfid ={rec}, dryaduid = {dryaduid}')
+
             #And lastly, any JSON metadata updates:
             #NOW WHAT?
             self.cursor.execute('SELECT * FROM dvfiles WHERE dryfid=? and dryaduid=?',
                         (0, dryaduid))#JSON has dryfid==0
             try:
                 exists=self.cursor.fetchone()[0]
-                self.cursor.execute('DELETE FROM dvfiles WHERE dryfid=? and dryaduid=?', (0, dryaduid))
+                #Old metadata must be deleted on a change.
+                shouldDel = self.status(transfer.dryad)['status']
+                if shouldDel == 'updated':
+                    self.cursor.execute('DELETE FROM dvfiles WHERE dryfid=? and dryaduid=?', (0, dryaduid))
             except:
                 pass
 
@@ -302,33 +353,3 @@ class Monitor(object):
 
         self.conn.commit()
 
-    #TODO: delete this
-    def notify(self, user, pwd,  mailserve, port, recipients, serial):
-
-        try:
-            msg = Em()
-            msg['Subject'] = f'Dryad study change notification for {serial.doi}'
-            msg['From'] = user 
-            msg['To'] = recipients
-
-            content = f'Study {serial.dryadJson["title"]}/{serial.doi} \
-                    has changed content. Details:\n\n\
-                    Metadata changes:\n\
-                    {self.diff_metadata(serial)}\n\n\
-                    File changes:\n\
-                    {self.diff_files(serial)}\n\n\
-                    Oversize files:\n\n\
-                    {serial.oversize}'
-            msg.set_content(content)
-            server = smtplib.SMTP(mailserv, port)
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(user, pwd)
-            server.sendmail(msg['From'], msg['To'], msg.as_string())
-            server.close()
-            #logging.info(f'Sent email from {USER} to {RECIPIENTS}.')
-        except Exception as err:
-            #logging.critical('Unable to send email message')
-            #logging.exception(err)
-            raise
