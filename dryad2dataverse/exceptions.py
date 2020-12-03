@@ -3,9 +3,27 @@ Custom exceptions for error handling
 '''
 
 class Dryad2DataverseError(Exception):
-    '''Base exception class for Dryad2Dataverse errors'''
-    pass
+    '''
+    Base exception class for Dryad2Dataverse errors
+    '''
 
 class NoTargetError(Dryad2DataverseError):
-    ''' '''
-    pass
+    '''
+    No dataverse target supplied error
+    '''
+
+class DownloadSizeError(Dryad2DataverseError):
+    '''
+    Raised when download sizes don't match reported
+    Dryad file size.
+    '''
+
+class HashError(Dryad2DataverseError):
+    '''
+    Raised on hex digest mismatch
+    '''
+
+class DatabaseError(Dryad2DataverseError):
+    '''
+    Tracking database error
+    '''
