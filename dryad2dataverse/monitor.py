@@ -6,12 +6,15 @@ dryad2dataverse.transfer.Transfer instance
 '''
 
 import copy
+import logging
 import json
 import sqlite3
+import datetime
 
 from dryad2dataverse import constants
 from dryad2dataverse import exceptions
 
+logger = logging.getLogger(__name__)
 
 class Monitor(object):
     '''
@@ -47,10 +50,13 @@ class Monitor(object):
                       (dryaduid INTEGER references dryadStudy (uid), \
                       dryfid INT, \
                       drymd5 TEXT, dvfid TEXT, dvmd5 TEXT, \
-                      dvfilejson TEXT);']
+                      dvfilejson TEXT);',
+                      'CREATE TABLE IF NOT EXISTS lastcheck \
+                      (checkdate TEXT);']
             for c in create:
                 cls.cursor.execute(c)
             cls.conn.commit()
+            logger.info(f'Using database {cls.dbase}')
 
         return cls.__instance
 
@@ -72,12 +78,23 @@ class Monitor(object):
         else:
             self.dbase = dbase
 
+        #self._last_mod = None
+
     def __del__(self):
         '''
         Commits all database transactions on object deletion
         '''
         self.conn.commit()
         self.conn.close()
+
+    @property
+    def lastmod(self):
+        self.cursor.execute('SELECT checkdate FROM lastcheck ORDER BY rowid DESC;')
+        last_mod = self.cursor.fetchall()
+        if last_mod:
+            return last_mod[0][0]
+        else:
+            return None
 
     def status(self, serial):
         '''
@@ -109,7 +126,13 @@ class Monitor(object):
             dvpid = self.cursor.fetchall()[-1][0]
             serial.dvpid = dvpid
         except TypeError:
-            raise exceptions.DatabaseError('Error finding dataverse PID')
+            try:
+                raise exceptions.DatabaseError
+            except exceptions.DatabaseError as e:
+                logger.exception('Error finding dataverse PID')
+                logger.error(f'Dryad DOI : {doi}')
+                raise
+
         newfile = copy.deepcopy(serial.dryadJson)
         testfile = copy.deepcopy(json.loads(result[-1][3]))
         if newfile == testfile:
@@ -231,8 +254,11 @@ class Monitor(object):
         fid = url[url.rfind('/', 0, -10)+1:].strip('/download')
         try:
             fid = int(fid)
-        except ValueError:
-            raise ValueError('File ID is not an integer')
+        except ValueError as e:
+            logger.error(f'File ID {fid} is not an integer')
+            logger.exception(e)
+            raise
+
         self.cursor.execute('SELECT dvfid FROM dvFiles WHERE \
                              dryfid = ?', (fid,))
         dvfid = self.cursor.fetchall()
@@ -317,7 +343,11 @@ class Monitor(object):
                                  doi = ?', (doi,))
             dryaduid = self.cursor.fetchone()[0]
             if type(dryaduid) != int:
-                raise
+                try:
+                    raise TypeError('Dryad UID is not an integer')
+                except TypeError as e:
+                    logger.error(e)
+                    raise
 
             # Update dryad file json
             self.cursor.execute('INSERT INTO dryadFiles VALUES (?, ?)',
@@ -354,12 +384,15 @@ class Monitor(object):
                 try:
                     dvfid = rec[1]['data']['files'][0]['dataFile']['id']
                     # Screw you for burying the file ID this deep
-                except Exception:
+                except Exception as e:
                     dvfid = rec[1].get('status')
                     if dvfid == 'Failure: MAX_UPLOAD size exceeded':
+                        logger.warning('Monitor: max upload size exceeded. '
+                                       'Unable to get dataverse file ID')
                         continue
                     else:
                         dvfid = 'JSON read error'
+                        logger.warning('JSON read error')
                 recMd5 = rec[1]['data']['files'][0]['dataFile']['checksum']['value']
                 # md5s verified during upload step, so they should
                 # match already
@@ -403,5 +436,24 @@ class Monitor(object):
                                      (?, ?, ?, ?, ?, ?)',
                                     (dryaduid, 0, djson5, dfid,
                                      djson5, json.dumps(transfer.jsonFlag[1])))
+       
+        self.conn.commit()
 
+    def set_timestamp(self, curdate=None):
+        '''
+        Adds current time to the database table. Can be queried and be used for subsequent
+        checking for updates. To query time, use 
+        dataverse2dryad.monitor.Monitor.lastmod attribute.
+
+        curdate : str
+            UTC datetime string in the format suitable for the Dryad API.
+            eg. 2021-01-21T21:42:40Z
+            or .strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        '''
+        #Dryad API uses Zulu time
+        if not curdate:
+            curdate = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.cursor.execute('INSERT INTO lastcheck VALUES (?)', 
+                            (curdate,))
         self.conn.commit()

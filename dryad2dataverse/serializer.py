@@ -3,11 +3,17 @@ Serializes Dryad JSON to Dataverse JSON, with a few other
 associated file utilities
 '''
 
+import logging
 import urllib.parse
 
 import requests
 
 from  dryad2dataverse import constants
+
+logger = logging.getLogger(__name__)
+#Connection monitoring as per
+#https://stackoverflow.com/questions/16337511/log-all-requests-from-the-python-requests-module
+url_logger = logging.getLogger('urllib3')
 
 class Serializer(object):
     '''
@@ -22,6 +28,7 @@ class Serializer(object):
         self.doi = doi
         self._dryadJson = None
         self._fileJson = None
+        self._dvJson = None
         #Serializer objects will be assigned a Dataverse study PID
         #if dryad2Dataverse.transfer.Transfer() is instantiated
         self.dvpid = None
@@ -38,13 +45,19 @@ class Serializer(object):
         '''
         if not url:
             url = constants.DRYURL
-        headers = {'accept':'application/json',
-                   'Content-Type':'application/json'}
-        doiClean = urllib.parse.quote(self.doi, safe='')
-        resp = requests.get(f'{url}/api/v2/datasets/{doiClean}',
-                            headers=headers, timeout=timeout)
-        resp.raise_for_status()
-        self._dryadJson = resp.json()
+        try:
+            headers = {'accept':'application/json',
+                       'Content-Type':'application/json'}
+            doiClean = urllib.parse.quote(self.doi, safe='')
+            resp = requests.get(f'{url}/api/v2/datasets/{doiClean}',
+                                headers=headers, timeout=timeout)
+            resp.raise_for_status()
+            self._dryadJson = resp.json()
+        except Exception as e:
+            logger.error(f'URL error for: {url}')
+            logger.exception(e)
+            raise
+
 
     @property
     def id(self):
@@ -86,14 +99,17 @@ class Serializer(object):
         where the ID is parsed from the Dryad JSON
         '''
         if not self._fileJson:
-            headers = {'accept':'application/json',
-                       'Content-Type':'application/json'}
-            #print(f'{constants.DRYURL}/api/v2/versions/{self.dryad.id}/files')
-            fileList = requests.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
-                                    headers=headers,
-                                    timeout=timeout)
-            fileList.raise_for_status()
-            self._fileJson = fileList.json()
+            try:
+                headers = {'accept':'application/json',
+                           'Content-Type':'application/json'}
+                fileList = requests.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
+                                        headers=headers,
+                                        timeout=timeout)
+                fileList.raise_for_status()
+                self._fileJson = fileList.json()
+            except Exception as e:
+                logger.exception(e)
+                raise
         return self._fileJson
 
     @property
@@ -193,7 +209,11 @@ class Serializer(object):
         pNotes = kwargs.get('pNotes', '')
         rType = kwargs.get('rType', 'dict')
         if not dvField or not dryField or not inJson:
-            raise ValueError('Incorrect or insufficient fields provided')
+            try:
+                raise ValueError('Incorrect or insufficient fields provided')
+            except ValueError as e:
+                logger.exception(e)
+                raise
         outfield = inJson.get(dryField)
         if outfield: outfield = outfield.strip()
         '''
@@ -592,10 +612,11 @@ class Serializer(object):
         #publications
         publications = self._typeclass(typeName='publication', multiple=True, typeClass='compound')
         #quick and dirty lookup table
+        #TODO see https://github.com/CDL-Dryad/dryad-app/blob/31d17d8dab7ea3bab1256063a1e4d0cb706dd5ec/stash/stash_datacite/app/models/stash_datacite/related_identifier.rb
         lookup = {'IsDerivedFrom':'Is derived from',
                   'Cites':'Cites',
                   'IsSupplementTo': 'Is supplement to',
-                  'IsSupplementedBy': 'Is supplmented by'}
+                  'IsSupplementedBy': 'Is supplemented by'}
         out = []
         if dryJson.get('relatedWorks'):
             for r in dryJson.get('relatedWorks'):

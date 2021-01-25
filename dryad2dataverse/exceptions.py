@@ -27,3 +27,13 @@ class DatabaseError(Dryad2DataverseError):
     '''
     Tracking database error
     '''
+
+class DataverseUploadError(Dryad2DataverseError):
+    '''
+    Returned on not OK respose
+    '''
+
+class DataverseDownloadError(Dryad2DataverseError):
+    '''
+    Returned on not OK respose
+    '''

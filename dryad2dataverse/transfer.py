@@ -5,6 +5,7 @@ This module handles data downloads and uploads from a Dryad instance to a Datave
 import hashlib
 import io
 import json
+import logging
 import os
 
 import requests
@@ -12,6 +13,9 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from dryad2dataverse import constants
 from dryad2dataverse import exceptions
+
+logger = logging.getLogger(__name__)
+url_logger = logging.getLogger('urllib3')
 
 #TODO Set publication date
 '''
@@ -153,11 +157,21 @@ class Transfer(object):
         dvpid = kwargs.get('dvpid')
         dryFid = kwargs.get('dryFid')
         if not targetDv and not dvpid:
-            raise exceptions.NoTargetError('You must supply one of targetDv \
-                                (target dataverse) \
-                                 or dvpid (Dataverse persistent ID)')
+            try:
+                raise exceptions.NoTargetError('You must supply one of targetDv \
+                                    (target dataverse) \
+                                     or dvpid (Dataverse persistent ID)')
+            except exceptions.NoTargetError as e:
+                logger.error('No target dataverse or dvpid supplied')
+                logger.exception(e)
+                raise
+
         if targetDv and dvpid:
-            raise ValueError('Supply only one of targetDv or dvpid')
+            try:
+                raise ValueError('Supply only one of targetDv or dvpid')
+            except ValueError as e:
+                logger.exception(e)
+                raise
         if not dvpid:
             endpoint = f'{url}/api/dataverses/{targetDv}/datasets'
             upload = requests.post(endpoint,
@@ -178,7 +192,11 @@ class Transfer(object):
         self.dvStudy = updata
         #probably should raise something specific here
         if updata.get('status') != 'OK':
-            raise
+            try:
+                raise exceptions.DataverseUploadError('Status return is not OK')
+            except exceptions.DataverseUploadError as e:
+                logger.exception(e)
+                raise 
         if targetDv:
             self.dryad.dvpid = updata['data'].get('persistentId')
         if dvpid:
@@ -240,19 +258,27 @@ class Transfer(object):
             if maxsize:
                 checkSize = os.stat(f'{tmp}{os.sep}{filename}').st_size
                 if checkSize != maxsize:
-                    #raise what? I need some custom exceptions
-                    raise exceptions.DownloadSizeError('Download size does not match reported size')
+                    try:
+                        raise exceptions.DownloadSizeError('Download size does not match reported size')
+                    except exceptions.DownloadSizeError as e:
+                        logger.exception(e)
+                        raise
             #now check the md5
             md5 = self._check_md5(f'{tmp}{os.sep}{filename}')
             if chk:
                 if md5 != chk:
-                    raise exceptions.HashError('Hex digest mismatch: {md5} : {chk}')
-                    #is this really what I want to do on a bad checksum?
+                    try:
+                        raise exceptions.HashError('Hex digest mismatch: {md5} : {chk}')
+                        #is this really what I want to do on a bad checksum?
+                    except exceptions.HashError as e:
+                        logger.exception(e)
+                        raise
             for i in self._files:
                 if url == i[0]:
                     i[-1] = md5
             return md5
-        except:
+        except Exception as e:
+            logging.error(e)
             raise
 
     def download_files(self, files=None):
@@ -274,7 +300,8 @@ class Transfer(object):
         try:
             for f in files:
                 self.download_file(f[0], f[1], chk=f[-1])
-        except:
+        except exceptions.DataverseDownloadError as e:
+            logger.exception(f'Unable to download file with info {f}')
             raise
 
     def upload_file(self, dryadUrl=None, filename=None,
@@ -347,9 +374,14 @@ class Transfer(object):
             self.fileUpRecord.append((fid, upload.json()))
             upmd5 = upload.json()['data']['files'][0]['dataFile']['checksum']['value']
             if md5 and upmd5 != md5:
-                raise exceptions.HashError(f'md5sum mismatch:\nlocal: {md5}\nuploaded: {upmd5}')
+                try:
+                    raise exceptions.HashError(f'md5sum mismatch:\nlocal: {md5}\nuploaded: {upmd5}')
+                except exceptions.HashError as e:
+                    logger.exception(e)
+                    raise
             return (fid, upload.json())
-        except:
+        except Exception as e:
+            logger.exception(e)
             raise
             #return (fid, {'status' : f'Failure: Reason {upload.reason}'})
 
@@ -405,7 +437,8 @@ class Transfer(object):
                 self.fileUpRecord.append((0, meta.json()))
                 self.jsonFlag = (0, meta.json())
 
-            except:
+            except Exception as e:
+                logger.error(e)
                 raise
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):

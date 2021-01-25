@@ -1,3 +1,4 @@
+import os
 #serializer
 DRYURL = 'https://datadryad.org'
 TMP = '/tmp'
@@ -11,5 +12,6 @@ DV_CONTACT_NAME = None
 NOTAB = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta', '.rdata']
 
 #monitor
-DBASE = '/tmp/dryad_dataverse_monitor.sqlite3'
+HOME = os.path.expanduser('~')
+DBASE = HOME + os.sep + 'dryad_dataverse_monitor.sqlite3'
 
