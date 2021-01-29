@@ -9,7 +9,7 @@ APIKEY = None
 MAX_UPLOAD = 3221225472 #Max 3GB upload
 DV_CONTACT_EMAIL = None
 DV_CONTACT_NAME = None
-NOTAB = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta', '.rdata']
+NOTAB = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta', '.rdata', '.xslx']
 
 #monitor
 HOME = os.path.expanduser('~')

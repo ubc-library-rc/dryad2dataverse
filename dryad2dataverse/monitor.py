@@ -56,7 +56,7 @@ class Monitor(object):
             for c in create:
                 cls.cursor.execute(c)
             cls.conn.commit()
-            logger.info(f'Using database {cls.dbase}')
+            logger.info(f'Using database %s', cls.dbase)
 
         return cls.__instance
 
@@ -129,8 +129,8 @@ class Monitor(object):
             try:
                 raise exceptions.DatabaseError
             except exceptions.DatabaseError as e:
-                logger.exception('Error finding dataverse PID')
-                logger.error(f'Dryad DOI : {doi}')
+                logger.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
+                logger.exception(e)
                 raise
 
         newfile = copy.deepcopy(serial.dryadJson)
@@ -255,7 +255,7 @@ class Monitor(object):
         try:
             fid = int(fid)
         except ValueError as e:
-            logger.error(f'File ID {fid} is not an integer')
+            logger.error('File ID %s is not an integer', fid)
             logger.exception(e)
             raise
 
@@ -387,8 +387,9 @@ class Monitor(object):
                 except Exception as e:
                     dvfid = rec[1].get('status')
                     if dvfid == 'Failure: MAX_UPLOAD size exceeded':
-                        logger.warning('Monitor: max upload size exceeded. '
-                                       'Unable to get dataverse file ID')
+                        logger.warning('Monitor: max upload size of %s exceeded. '
+                                       'Unable to get dataverse file ID',
+                                       constants.MAX_UPLOAD)
                         continue
                     else:
                         dvfid = 'JSON read error'
@@ -436,13 +437,13 @@ class Monitor(object):
                                      (?, ?, ?, ?, ?, ?)',
                                     (dryaduid, 0, djson5, dfid,
                                      djson5, json.dumps(transfer.jsonFlag[1])))
-       
+
         self.conn.commit()
 
     def set_timestamp(self, curdate=None):
         '''
         Adds current time to the database table. Can be queried and be used for subsequent
-        checking for updates. To query time, use 
+        checking for updates. To query time, use
         dataverse2dryad.monitor.Monitor.lastmod attribute.
 
         curdate : str
@@ -454,6 +455,6 @@ class Monitor(object):
         #Dryad API uses Zulu time
         if not curdate:
             curdate = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-        self.cursor.execute('INSERT INTO lastcheck VALUES (?)', 
+        self.cursor.execute('INSERT INTO lastcheck VALUES (?)',
                             (curdate,))
         self.conn.commit()

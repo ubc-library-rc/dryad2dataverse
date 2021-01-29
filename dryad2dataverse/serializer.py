@@ -32,6 +32,7 @@ class Serializer(object):
         #Serializer objects will be assigned a Dataverse study PID
         #if dryad2Dataverse.transfer.Transfer() is instantiated
         self.dvpid = None
+        logger.debug('Creating Serializer instance object')
 
     def fetch_record(self, url=None, timeout=45):
         '''
@@ -159,8 +160,6 @@ class Serializer(object):
             if f[3] >= maxsize:
                 toobig.append(f)
         return toobig
-
-
 
     def _typeclass(self, typeName, multiple, typeClass):
         '''
@@ -613,18 +612,21 @@ class Serializer(object):
         publications = self._typeclass(typeName='publication', multiple=True, typeClass='compound')
         #quick and dirty lookup table
         #TODO see https://github.com/CDL-Dryad/dryad-app/blob/31d17d8dab7ea3bab1256063a1e4d0cb706dd5ec/stash/stash_datacite/app/models/stash_datacite/related_identifier.rb
+        '''
+        #no longer required
         lookup = {'IsDerivedFrom':'Is derived from',
                   'Cites':'Cites',
                   'IsSupplementTo': 'Is supplement to',
                   'IsSupplementedBy': 'Is supplemented by'}
+        '''
         out = []
         if dryJson.get('relatedWorks'):
             for r in dryJson.get('relatedWorks'):
                 id = r.get('identifier')
                 relationship = r.get('relationship')
                 idType = r.get('identifierType')
-                citation = {'citation': f"{lookup[relationship]}: {id}"}
-
+                #citation = {'citation': f"{lookup[relationship]}: {id}"}
+                citation = {'citation': relationship.capitalize()}
                 pubcite = self._convert_generic(inJson=citation,
                                                 dvField='publicationCitation',
                                                 dryField='citation')
@@ -666,3 +668,4 @@ class Serializer(object):
                                  multiple=True, typeClass='compound')
         agency['value'] = [doi]
         self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(agency)
+

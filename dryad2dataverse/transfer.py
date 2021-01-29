@@ -147,9 +147,9 @@ class Transfer(object):
             This is not required for new uploads, specify as dvpid=value
         OPTIONAL KEYWORD ARGUMENTS
         '''
-        if not url: 
+        if not url:
             url = constants.DVURL
-        if not apikey: 
+        if not apikey:
             apikey = constants.APIKEY
         headers = {'X-Dataverse-key' : apikey}
 
@@ -177,6 +177,7 @@ class Transfer(object):
             upload = requests.post(endpoint,
                                    headers=headers,
                                    json=self.dryad.dvJson)
+            logger.debug(upload.text)
         else:
             endpoint = f'{url}/api/datasets/:persistentId/versions/:draft'
             params = {'persistentId':dvpid}
@@ -186,6 +187,7 @@ class Transfer(object):
                                   json=self.dryad.dvJson['datasetVersion'],
                                   timeout=timeout)
             #self._dvrecord = upload.json()
+            logger.debug(upload.text)
 
         upload.raise_for_status()
         updata = upload.json()
@@ -196,7 +198,7 @@ class Transfer(object):
                 raise exceptions.DataverseUploadError('Status return is not OK')
             except exceptions.DataverseUploadError as e:
                 logger.exception(e)
-                raise 
+                raise
         if targetDv:
             self.dryad.dvpid = updata['data'].get('persistentId')
         if dvpid:
@@ -220,8 +222,7 @@ class Transfer(object):
         return fmd5.hexdigest()
 
     def download_file(self, url, filename, tmp=None,
-                      maxsize=None, chk=None, timeout=45):
-        #TODO finish max size checking, figure out what to do with the md5
+                      size=None, chk=None, timeout=45):
         '''
         Downloads file via requests streaming and saves to constants.TMP
         returns md5sum on success and an exception on failure
@@ -234,18 +235,30 @@ class Transfer(object):
         tmp : str
             Temporary directory for downloads.
             Defaults to dryad2dataverse.constants.TMP
-        maxsize : int
-            Maximum file size in bytes.
+        size : int
+            Reported file size in bytes.
             Defaults to dryad2dataverse.constants.MAX_UPLOAD
         chk : str
             md5 sum of file (if available)
         '''
+        logger.debug('Start download sequence')
+        logger.debug('MAX SIZE = %s', constants.MAX_UPLOAD)
+        logger.debug(f'Filename: %s, size=%s', filename, size)
         if not tmp:
             tmp = constants.TMP
         if tmp.endswith(os.sep): tmp = tmp[:-1]
-        if not maxsize:
-            maxsize = constants.MAX_UPLOAD
 
+        if size:
+            if size > constants.MAX_UPLOAD:
+                logger.warning('%s: File %s exceeds '
+                               'Dataverse MAX_UPLOAD size. Skipping download.',
+                               self.doi, filename)
+                md5 = 'this_file_is_too_big_to_upload__' #HA HA
+                for i in self._files:
+                    if url == i[0]:
+                        i[-1] = md5
+                logger.debug('Stop download sequence with large file skip')
+                return md5
         try:
             down = requests.get(url, timeout=timeout, stream=True)
             down.raise_for_status()
@@ -255,9 +268,9 @@ class Transfer(object):
 
             #verify size
             #https://stackoverflow.com/questions/2104080/how-can-i-check-file-size-in-python'
-            if maxsize:
+            if size:
                 checkSize = os.stat(f'{tmp}{os.sep}{filename}').st_size
-                if checkSize != maxsize:
+                if checkSize != size:
                     try:
                         raise exceptions.DownloadSizeError('Download size does not match reported size')
                     except exceptions.DownloadSizeError as e:
@@ -276,9 +289,10 @@ class Transfer(object):
             for i in self._files:
                 if url == i[0]:
                     i[-1] = md5
+            logger.debug('Complete download sequence')
             return md5
         except Exception as e:
-            logging.error(e)
+            logger.exception(e)
             raise
 
     def download_files(self, files=None):
@@ -289,9 +303,9 @@ class Transfer(object):
             (dryaddownloadurl, filenamewithoutpath, [md5sum])
 
             md5 sum should be the last member of the tuple.
-            
+
             Defaults to self.files
-            
+
             Normally used without arguments to download all the associated
             files with a Dryad study
         '''
@@ -299,9 +313,9 @@ class Transfer(object):
             files = self.files
         try:
             for f in files:
-                self.download_file(f[0], f[1], chk=f[-1])
+                self.download_file(f[0], f[1], size=f[3], chk=f[-1])
         except exceptions.DataverseDownloadError as e:
-            logger.exception(f'Unable to download file with info {f}')
+            logger.exception('Unable to download file with info %s', f)
             raise
 
     def upload_file(self, dryadUrl=None, filename=None,
@@ -353,10 +367,14 @@ class Transfer(object):
         if mimetype == 'application/zip' or badExt in constants.NOTAB:
             mimetype = 'application/octet-stream' # stop unzipping automatically
             filename += 'NOPROCESS' # Also screw with their naming convention
-
+            #TODO debug log about file names to see what is up with XSLX
+            #see doi:10.5061/dryad.z8w9ghxb6
         if size >= constants.MAX_UPLOAD:
             fail = (fid, {'status' : 'Failure: MAX_UPLOAD size exceeded'})
             self.fileUpRecord.append(fail)
+            logger.warning('%s: File %s of '
+                           'size %s exceeds '
+                           'Dataverse MAX_UPLOAD size. Skipping.', self.doi, filename, size)
             return fail
 
         fields = {'file': (filename, open(upfile, 'rb'), mimetype)}
@@ -438,7 +456,7 @@ class Transfer(object):
                 self.jsonFlag = (0, meta.json())
 
             except Exception as e:
-                logger.error(e)
+                logger.exception(e)
                 raise
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):

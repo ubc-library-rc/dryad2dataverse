@@ -7,21 +7,55 @@ Requires Python 3.6+ and request
 
 from  email.message import EmailMessage as Em
 import argparse
+#import datetime
 import logging
+import logging.handlers
+import os
 import shutil
 import smtplib
 import time
-import os
 
 import requests
-
 import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
+
 DRY = 'https://datadryad.org/api/v2'
 
-def notify(serial, monitor,
+def new_content(serial):
+    '''
+    Creates content for new study upload message (potentially redundant
+    with Dataverse emailer).
+    serial : dryad2dataverse.serializer.Serializer instance
+    '''
+    subject = f'Dryad new study notification for {serial.doi}'
+    content = f'Study {serial.dryadJson["title"]} / {serial.doi} is a new Dryad study.\n\
+            \nDetails:\n\
+            \nFiles in study:\n\
+            \n{serial.files}\n\
+            \nOversize files which must be moved manually:\n\
+            \n{serial.oversize}'
+    return (subject, content)
+
+def changed_content(serial, monitor):
+    '''
+    Creates content for file update message.
+    serial : dryad2dataverse.serializer.Serializer instance
+    monitor : dryad2dataverse.monitor.Monitor instance
+    '''
+    subject = f'Dryad study change notification for {serial.doi}'
+    content = f'Study {serial.dryadJson["title"]} / {serial.doi} has changed content.\n\
+            \nDetails:\n\
+            \nMetadata changes:\
+            \n{monitor.diff_metadata(serial)}\n\
+            \nFile changes:\
+            \n{monitor.diff_files(serial)}\n\
+            \nOversize files:\
+            \n{serial.oversize}'
+    return (subject, content)
+
+def notify(msgtxt,
            user=None, pwd=None,
            mailserv='smtp.gmail.com',
            port=None, recipient=None):
@@ -31,23 +65,28 @@ def notify(serial, monitor,
 
     Has only really been tested with Gmail (although it should work with anything,
     and Gmail requires 'Allow less secure apps' or whatever they call it.
+    msgtext : tuple
+        Tuple containing strings of ('subject', 'message content')
+    user : str
+        User name for email account (NOT full email address)
+    pwd : str
+        Password for email account
+    mailserv : str
+        SMTP server for sending mail
+    port : int
+        Mailserver port
+    recipient : str
+        Email address of recipient
     '''
 
     if not port:
         port = 587
     msg = Em()
-    msg['Subject'] = f'Dryad study change notification for {serial.doi}'
+    msg['Subject'] = msgtxt[0] 
     msg['From'] = user
     msg['To'] = [recipient]
 
-    content = f'Study {serial.dryadJson["title"]} / {serial.doi} has changed content.\n\
-            \nDetails:\n\
-            \nMetadata changes:\
-            \n{monitor.diff_metadata(serial)}\n\
-            \nFile changes:\
-            \n{monitor.diff_files(serial)}\n\
-            \nOversize files:\
-            \n{serial.oversize}'
+    content = msgtxt[1]
     msg.set_content(content)
     server = smtplib.SMTP(mailserv, port)
     server.ehlo()
@@ -132,11 +171,13 @@ def argp():
     parser.add_argument('--server',
                         help='Mail server. Eg. smtp.gmail.com',
                         required=False,
+                        default = 'smtp.gmail.com',
                         dest='mailserv')
     parser.add_argument('--port',
                         help='Mail server port',
                         required=False,
                         type=int,
+                        default=587,
                         dest='port')
     parser.add_argument('-c', '--contact',
                         help='Contact email for Dataverse records',
@@ -178,30 +219,76 @@ def set_constants(args):
     if args.dbase:
         dryad2dataverse.constants.DBASE = args.dbase
 
-def main(log='/var/log/dryadd.log'):
+def email_log(mailhost, fromaddr, toaddrs, credentials, secure=None):
+    global elog 
+    subject = 'Dryad to Dataverse transfer error '
+    elog = logging.getLogger()
+    mailer = logging.handlers.SMTPHandler(mailhost=mailhost, fromaddr=fromaddr,
+                                          toaddrs=[toaddrs], subject=subject,
+                                          credentials=credentials, secure=())
+    l_format = logging.Formatter('%(name)s - %(asctime)s'
+                               ' - %(levelname)s - %(funcName)s - '
+                               '%(message)s')
+    mailer.setFormatter(l_format)
+    elog.addHandler(mailer)
+    elog.setLevel(logging.WARNING)
+
+def rotating_log(path, level):
+    '''
+    Create log of transactions
+
+    path : str
+        Complete path to log
+    level : logging.LOGLEVEL
+        logging level (eg, logging.DEBUG)
+
+    '''
+    #global logger
+    #logger = logging.getLogger(__name__)
+    logger = logging.getLogger()#root logger
+    #Set all the logs to the same level:
+    #https://stackoverflow.com/questions/35325042/python-logging-disable-logging-from-imported-modules   
+    for na in ['serializer', 'transfer', 'monitor']:
+        logging.getLogger(na).setLevel(level)
+    logger.setLevel(level)
+    rotator = logging.handlers.RotatingFileHandler(filename=path,
+                                                   maxBytes=10*1024**2,
+                                                   backupCount=10)
+    logger.addHandler(rotator)
+    l_format = logging.Formatter('%(name)s - %(asctime)s'
+                               ' - %(levelname)s - %(funcName)s - '
+                               '%(message)s')
+    rotator.setFormatter(l_format)
+    #This is required to see the error messages from the other modules. WTF.
+    #root_logger = logging.getLogger('')
+    #root_logger.setLevel(level)
+    #root_logger.addHandler(rotator)
+    return logger
+
+def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     '''
     Main Dryad transfer daemon
 
     log : str
-        Full path to dryad log location. Default /var/log/dryadd.log
+        path to logfile
+    level : int
+        log level, usually one of logging.LOGLEVEL (ie, logging.warning)
     '''
+    logger = rotating_log(log, level)
+
     parser = argp()
     args = parser.parse_args()
     set_constants(args)
-    '''
-    dryad2dataverse.constants.DV_CONTACT_EMAIL = args.contact
-    dryad2dataverse.constants.DV_CONTACT_ = args.contact
-    dryad2dataverse.constants.APIKEY = args.key
-    if args.url:
-        dryad2dataverse.constants.DVURL = args.url
-    '''
-    logging.basicConfig(level=logging.DEBUG,
-                        filename=log,
-                        filemode='w',
-                        format='%(name)s - %(asctime)s'
-                               ' - %(levelname)s - %(funcName)s - '
-                               '%(message)s')
+    
+    email_log((args.mailserv, args.port), args.contact, args.recipients,
+              (args.user, args.pwd))
+    #TODO why is xlsx still being processed? 
+    #TODO remove two lines
+    import pickle
+    import sys
+    
 
+    logger.info('Beginning update process')
     #copy the database to make a backup, because paranoia is your friend
     if os.path.exists(dryad2dataverse.constants.DBASE):
         shutil.copyfile(dryad2dataverse.constants.DBASE,
@@ -209,23 +296,30 @@ def main(log='/var/log/dryadd.log'):
 
     monitor = dryad2dataverse.monitor.Monitor(args.dbase)
     #TODO remove line below on release
-    monitor.set_timestamp('1999-01-14T00:00:00Z')
-    logging.info('Last update time: %(monitor.lastmod)s')
+    #monitor.set_timestamp('1999-01-14T00:00:00Z')
+    monitor.set_timestamp('2020-11-30T00:00:00Z')
+    logger.info('Last update time: %s', monitor.lastmod)
 
     #get all updates since the last update check
     updates = get_records(args.ror, monitor.lastmod)
-    import pickle
-    import sys
+    '''
+    #TODO remove also
     with open('/Users/paul/tmp/updates.pickle', 'wb') as f:
            pickle.dump(updates, f)
     print(updates)
     sys.exit()
+    '''
     #update all the new files
     for doi in updates:
         if not updates:
             break #no new files in this case
+        #TODO remove this. it's only here for testing on my home internets
+        if doi[1]['storageSize']/1024**2  > 10:
+            continue #Max 10MB of files
         #Create study object
         study = dryad2dataverse.serializer.Serializer(doi[0])
+        #TODO remove this continue
+        continue
         '''
         with open('/Users/paul/tmp/doi.pickle', 'wb') as f:
             pickle.dump(doi, f)
@@ -234,6 +328,7 @@ def main(log='/var/log/dryadd.log'):
         #it turns out that the Dryad API sends all the metadata
         #from the study in their search, so it's not necessary
         #to download it again
+        #I am aware of the call to a private class variable. Bad me!
         study._dryadJson = doi[1]
 
         #check to see what sort of update it is.
@@ -244,46 +339,63 @@ def main(log='/var/log/dryadd.log'):
 
         #Now start the action
         if update_type == 'new':
-            logging.info('New study: %(doi[0])s')
-            logging.info('Uploading study metadata')
+            logger.info('New study: %s, %s', doi[0], doi[1]['title'])
+            logger.info('Uploading study metadata')
             transfer.upload_study(targetDv=args.target)
-            logging.info('Uploading files to Dataverse')
+            logger.info('Downloading study files')
+            transfer.download_files()
+            logger.info('Uploading files to Dataverse')
             transfer.upload_files()
-            logging.info('Uploading Dryad JSON metadata')
+            logger.info('Uploading Dryad JSON metadata')
             transfer.upload_json()
+            notify(new_content(study),
+                   user=args.user, pwd=args.pwd,
+                   recipient=args.recipients)
 
         if update_type == 'updated':
-            logging.info('Updated metadata: %(doi[0])s')
-            logging.info('Updating metadata')
+            logger.info('Updated metadata: %', doi[0])
+            logger.info('Updating metadata')
             transfer.upload_study(dvpid=study.dvpid)
             #remove old JSON files
             rem = monitor.get_json_dvfids(study)
             transfer.delete_dv_files(rem)
             transfer.upload_json()
+            notify(updated_content(study, monitor), 
+                   user=args.user, pwd=args.pwd,
+                   recipient=args.recipients)
 
         if update_type == 'unchanged':
-            logging.info('Unchanged metadata %(doi[0])s')
+            logger.info('Unchanged metadata %s', doi[0])
             continue
-
+        '''
         if update_type != 'unchanged':
             notify(study, monitor,
                    user=args.user, pwd=args.pwd,
                    recipient=args.recipients)
-
+        '''
         diff = monitor.diff_files(study)
+        print(diff)
         if diff.get('delete'):
             del_these = monitor.get_dv_fids(diff['delete'])
             transfer.delete_dv_files(dvfids=del_these)
-            logging.info('Deleted files %(diff["delete"])s from Dataverse')
+            logger.info('Deleted files %s from '
+                        'Dataverse', diff['delete'])
         if diff.get('add'):
-            logging.info('Adding files %(diff["add"])s to Dataverse')
+            logger.info('Adding files %s '
+                    'to Dataverse', diff['add'])
+            #you need to download them first if they're new
+            transfer.download_files(diff['add'])
+            #now send them to Dataverse
             transfer.upload_files(diff['add'], pid=study.dvpid)
 
         #Update the tracking database for that record
         monitor.update(transfer)
     #and finally, update the time for the next run
     monitor.set_timestamp()
+    logger.info('Completed update process')
 
 if __name__ == '__main__':
     #print(get_records('https://ror.org/03rmrcq20', '2021-01-01'))
-    main(log='/Users/paul/tmp/dry.log')
+    #main(log='/Users/paul/tmp/dry.log')
+    main2(log='/Users/paul/tmp/dry_ignore.log')
+
