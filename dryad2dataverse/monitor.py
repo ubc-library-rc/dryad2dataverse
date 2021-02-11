@@ -3,6 +3,10 @@ Dryad/Dataverse status tracker. Monitor creates a singleton object which
 writes to a SQLite database. Methods will (generally) take either a
 dryad2dataverse.serializer.Serializer instance or
 dryad2dataverse.transfer.Transfer instance
+
+The monitor's primary function is to allow for state checking
+for Dryad studies so that files and studies aren't downloaded
+unneccessarily.
 '''
 
 import copy
@@ -22,12 +26,22 @@ class Monitor(object):
     Dryad files can be monitored and updated over time. Monitor is a singleton,
     but is not thread-safe.
     '''
-    ''''https://stackoverflow.com/questions/12305142/
-    issue-with-singleton-python-call-two-times-init'''
     __instance = None
 
     def __new__(cls, dbase=None, *args, **kwargs):
-        '''Creates a new singleton instance of Monitor'''
+        '''
+        Creates a new singleton instance of Monitor
+
+        Also creates a database if existing database is not present
+
+        ----------------------------------------
+        Parameters:
+
+        dbase : str
+            Path to sqlite3 database.
+            /path/to/file.sqlite3
+        ----------------------------------------
+        '''
         if cls.__instance is None:
             cls.__instance = super(Monitor, cls).__new__(cls)
             cls.__instance.__initialized = False
@@ -53,22 +67,28 @@ class Monitor(object):
                       dvfilejson TEXT);',
                       'CREATE TABLE IF NOT EXISTS lastcheck \
                       (checkdate TEXT);']
-            for c in create:
-                cls.cursor.execute(c)
+            for line in create:
+                cls.cursor.execute(line)
             cls.conn.commit()
-            logger.info(f'Using database %s', cls.dbase)
+            logger.info('Using database %s', cls.dbase)
 
         return cls.__instance
 
     def __init__(self, dbase=None, *args, **kwargs):
         # remove args and kwargs when you find out how init interacts with new.
         '''
-        Initialize the Monitor instance.
+        Initialize the Monitor instance if not instantiated already (ie, Monitor
+        is a singleton.)
+
+        ----------------------------------------
+        Parameters:
 
         dbase : str
             Complete path to desired location of tracking database
             (eg: /tmp/test.db)
+
             Defaults to dryad2dataverse.constants.DBASE
+        ----------------------------------------
         '''
         if self.__initialized:
             return
@@ -78,34 +98,44 @@ class Monitor(object):
         else:
             self.dbase = dbase
 
-        #self._last_mod = None
 
     def __del__(self):
         '''
-        Commits all database transactions on object deletion
+        Commits all database transactions on object deletion and closes database.
         '''
         self.conn.commit()
         self.conn.close()
 
     @property
     def lastmod(self):
+        '''
+        Returns last modification date from monitor.dbase
+        '''
         self.cursor.execute('SELECT checkdate FROM lastcheck ORDER BY rowid DESC;')
         last_mod = self.cursor.fetchall()
         if last_mod:
             return last_mod[0][0]
-        else:
-            return None
+        return None
 
     def status(self, serial):
         '''
-        Returns text output of 'new', 'unchanged', 'updated' or 'filesonly'
-        'new' is a completely new file
-        'unchanged' is no changes at all
-        'updated' is changes to lastModificationDate AND metadata changes
-        'filesonly' is changes to lastModificationDate only
-        (which presumably indicates a file change.
+        Returns a dictionary with keys 'status' and 'dvpid' where
+            status: one of 'new', 'unchanged', 'updated' or 'filesonly'
+
+                'new' is a completely new file
+                'unchanged' is no changes at all
+                'updated' is changes to lastModificationDate AND metadata changes
+                'filesonly' is changes to lastModificationDate only
+                (which presumably indicates a file change.
+
+            dvpid: dataverse persistent identifier.
+            None in the case of status='new'
+
+        ----------------------------------------
+        Parameters:
 
         serial : dryad2dataverse.serializerinstance
+        ----------------------------------------
         '''
         # Last mod date is indicator of change.
         # From email w/Ryan Scherle 10 Nov 2020
@@ -141,16 +171,28 @@ class Monitor(object):
         del testfile['lastModificationDate']
         if newfile == testfile:
             return {'status': 'filesonly', 'dvpid': dvpid}
-        else:
-            return {'status': 'updated', 'dvpid': dvpid}
+        return {'status': 'updated', 'dvpid': dvpid}
 
     def diff_metadata(self, serial):
         '''
         Analyzes differences in metadata between current serializer
         instance and last updated serializer instance.
-        Returns a list of field changes
+        Returns a list of field changes consisting of
+
+        [{key: (old_value, new_value}] or None if no changes
+
+        For example:
+
+        [{'title':
+        ('Cascading effects of algal warming in a freshwater community',
+         'Cascading effects of algal warming in a freshwater community theatre')}
+        ]
+
+        ----------------------------------------
+        Parameters:
 
         serial : dryad2dataverse.serializer.Serializer instance
+        ----------------------------------------
         '''
         if self.status(serial)['status'] == 'updated':
             self.cursor.execute('SELECT dryadjson from dryadStudy \
@@ -162,32 +204,17 @@ class Monitor(object):
                 if serial.dryadJson[k] != oldJson.get(k):
                     out.append({k: (oldJson.get(k), serial.dryadJson[k])})
             return out
-        else:
-            return None
+
+        return None
 
     def diff_files(self, serial):
-        '''https://docs.python.org/3/library/stdtypes.html#frozenset.symmetric_difference
-
-        Also:
-        tuple from string:
-        https://stackoverflow.com/questions/9763116/parse-a-tuple-from-a-string
-
-        needsdel = set(a).superset(set(b))
-        # returns False if all of a not in e
-        if False:
-            if not set(a) - (set(a) & set(b)):
-                return set(a) - (set(a) & set(b))
-
-        needsadd = set(f).issuperset(set(a))
-        if True: return set(f) - (set(f) & set(a))
-
-        '''
         '''
         Returns a dict with additions and deletions from previous Dryad
         to dataverse upload
 
         Because checksums are not necessarily included in Dryad file
-        metadata, this method uses dryad file IDs, size, etc.
+        metadata, this method uses dryad file IDs, size, or
+        whatever is available.
 
         If dryad2dataverse.monitor.Monitor.status()
         indicates a change it will produce dictionary output with a list
@@ -195,8 +222,13 @@ class Monitor(object):
 
         {'add':[dyadfiletuples], 'delete:[dryadfiletuples]}
 
+        ----------------------------------------
+        Parameters:
+
         serial : dryad2dataverse.serializer.Serializer instance
+        ----------------------------------------
         '''
+
         diffReport = {}
         if self.status(serial)['status'] == 'new':
             return {}
@@ -205,7 +237,7 @@ class Monitor(object):
         mostRecent = self.cursor.fetchall()[-1][0]
         self.cursor.execute('SELECT dryfilesjson from dryadFiles WHERE \
                              dryaduid = ?', (mostRecent,))
-        oldFiles = self.cursor.fetchall()[-1][0]
+        oldFileList = self.cursor.fetchall()[-1][0]
         if not oldFiles:
             oldFiles = []
         else:
@@ -243,13 +275,16 @@ class Monitor(object):
     def get_dv_fid(self, url):
         '''
         Returns str — the Dataverse file ID from parsing a Dryad
-        file download link.
-        Normally used for determining dataverse file ids for *deletion*
-        in case of dryad file changes.
+        file download link.  Normally used for determining dataverse
+        file ids for *deletion* in case of dryad file changes.
+
+        ----------------------------------------
+        Parameters:
 
         url : str
             *Dryad* file URL in form of
             'https://datadryad.org/api/v2/files/385819/download'
+        ----------------------------------------
         '''
         fid = url[url.rfind('/', 0, -10)+1:].strip('/download')
         try:
@@ -264,12 +299,17 @@ class Monitor(object):
         dvfid = self.cursor.fetchall()
         if dvfid:
             return dvfid[-1][0]
-        else:
-            return None
+        return None
 
     def get_dv_fids(self, filelist):
         '''
         Returns Dataverse file IDs from a list of Dryad file tuples.
+        Generally, you would use the output from
+        dryad2dataverse.monitor.Monitor.diff_files['delete']
+        to discover Dataverse file ids for deletion.
+
+        ----------------------------------------
+        Parameters:
 
         filelist : list
             list of Dryad file tuples: eg:
@@ -279,8 +319,7 @@ class Monitor(object):
              ('https://datadryad.org/api/v2/files/385820/download',
              'Readme_ACG_Mortality.txt',
              'text/plain', 1350)]
-            Generally, you would use the output from
-            dryad2dataverse.monitor.Monitor.diff_files['delete']
+        ----------------------------------------
         '''
         fids = []
         for f in filelist:
@@ -295,7 +334,11 @@ class Monitor(object):
         Normally used to discover the file IDs to remove Dryad JSONs
         which have changed.
 
+        ----------------------------------------
+        Parameters:
+
         serial : dryad2dataverse.serializer.Serializer instance
+        ----------------------------------------
         '''
         self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi=?',
                             (serial.doi,))
@@ -313,14 +356,18 @@ class Monitor(object):
         '''
         Updates the Monitor database with information from a
         dryad2dataverse.transfer.Transfer instance
+
         If a Dryad primary metadata record has changes, it will be
         deleted from the database.
 
         This method should be called after all transfers are completed,
         including Dryad JSON updates, as the last action for transfer.
 
+        ----------------------------------------
+        Parameters:
 
         transfer : dryad2dataverse.transfer.Transfer instance
+        ----------------------------------------
         '''
         # get the pre-update dryad uid in case we need it.
         self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi = ?',
@@ -342,7 +389,8 @@ class Monitor(object):
             self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE \
                                  doi = ?', (doi,))
             dryaduid = self.cursor.fetchone()[0]
-            if type(dryaduid) != int:
+            #if type(dryaduid) != int:
+            if not isinstance(dryaduid, int):
                 try:
                     raise TypeError('Dryad UID is not an integer')
                 except TypeError as e:
@@ -374,7 +422,7 @@ class Monitor(object):
                                      dryaduid=?', (olduid,))
                 inserter = self.cursor.fetchall()
                 for rec in inserter:
-                    # TODO FIX THIS
+                    # TODO FIX THIS #I think it's fixed 11 Feb 21
                     self.cursor.execute('INSERT INTO dvFiles VALUES \
                                          (?, ?, ?, ?, ?, ?)',
                                         (dryaduid, rec[1], rec[2],
@@ -442,15 +490,18 @@ class Monitor(object):
 
     def set_timestamp(self, curdate=None):
         '''
-        Adds current time to the database table. Can be queried and be used for subsequent
-        checking for updates. To query time, use
-        dataverse2dryad.monitor.Monitor.lastmod attribute.
+        Adds current time to the database table. Can be queried and be used
+        for subsequent checking for updates. To query last modification time,
+        use the dataverse2dryad.monitor.Monitor.lastmod attribute.
+
+        ----------------------------------------
+        Parameters:
 
         curdate : str
             UTC datetime string in the format suitable for the Dryad API.
             eg. 2021-01-21T21:42:40Z
             or .strftime('%Y-%m-%dT%H:%M:%SZ')
-
+        ----------------------------------------
         '''
         #Dryad API uses Zulu time
         if not curdate:

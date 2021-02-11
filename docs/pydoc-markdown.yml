@@ -1,0 +1,34 @@
+loaders:
+  - type: python
+processors:
+  - type: filter
+  - type: smart
+  - type: crossref
+renderer:
+  type: mkdocs
+  pages:
+    - title: Overview
+      name: index
+      source: index.md
+    - title: Installation 
+      name: install  
+      source: installation.md 
+    - title: Reference
+      name: reference
+      source: reference.md 
+    - title: API Reference
+      name: api_ref 
+      source: api_reference.md
+    - title: FAQ   
+      name: faq.md 
+      source: faq.md 
+    - title: Acknowledgements   
+      name:  ack
+      source: acknowledgements.md 
+        #    - title: API Documentation
+        #contents:
+        #- '*'
+  mkdocs_config:
+    mkdocs_config:
+      site_name: Dryad2dataverse  
+      theme: readthedocs

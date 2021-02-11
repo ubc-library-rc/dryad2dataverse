@@ -1,7 +1,7 @@
 The MIT License (MIT)
 =====================
 
-Copyright © 2020 University of British Columbia Library
+Copyright © 2021 University of British Columbia Library
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

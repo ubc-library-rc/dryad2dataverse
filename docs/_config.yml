@@ -1,0 +1,15 @@
+title: dryad2dataverse 
+remote_theme: ubc-library-rc/rc-theme
+color_scheme: rc
+github_repo_url: "https://github.com/ubc-library-rc/dryad2dataverse/" 
+
+# license information for workshop content
+license_name: "MIT License"
+license_url: "https://opensource.org/licenses/MIT"
+#license_image_url: "https://i.creativecommons.org/l/by/4.0/88x31.png"
+
+# required for building jekyll site locally
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+

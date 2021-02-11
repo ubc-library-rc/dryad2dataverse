@@ -1,6 +1,6 @@
 '''
-Serializes Dryad JSON to Dataverse JSON, with a few other
-associated file utilities
+Serializes Dryad study JSON to Dataverse JSON, as well as
+producing associated file information.
 '''
 
 import logging
@@ -21,9 +21,15 @@ class Serializer(object):
     '''
     def __init__(self, doi):
         '''
+        Creates Dryad study metadata instance.
+
+        ----------------------------------------
+        Parameters:
+
         doi : str
             DOI of Dryad study. Required for downloading.
             eg: 'doi:10.5061/dryad.2rbnzs7jp'
+        ----------------------------------------
         '''
         self.doi = doi
         self._dryadJson = None
@@ -39,10 +45,15 @@ class Serializer(object):
         Fetches Dryad study record JSON from Dryad V2 API at
         https://datadryad.org/api/v2/datasets/
         Saves to Dryad._dryadJson
+
+        ----------------------------------------
+        Parameters:
+
         url : str
             Dryad instance base URL (eg: 'https://datadryad.org')
         timeout : int
             timeout in seconds. Default 45
+        ----------------------------------------
         '''
         if not url:
             url = constants.DRYURL
@@ -55,21 +66,19 @@ class Serializer(object):
             resp.raise_for_status()
             self._dryadJson = resp.json()
         except Exception as e:
-            logger.error(f'URL error for: {url}')
+            logger.error('URL error for: %s', url)
             logger.exception(e)
             raise
-
 
     @property
     def id(self):
         '''
-        Returns Dryad unique ID.
+        Returns Dryad unique *database* ID, not the DOI
 
-        The 'id' is not dryadjson['id']
-        It's actually the integer part of
-        testCase._dryadJson['_links']['stash:version']['href']
+        Where the original Dryad JSON is dryadJson, it's the integer
+        trailing portion of:
 
-        The documentation, naturally, is not clear that this is the case.
+        dryadJson['_links']['stash:version']['href']
         '''
         href = self.dryadJson['_links']['stash:version']['href']
         index = href.rfind('/') + 1
@@ -92,22 +101,39 @@ class Serializer(object):
         self._assemble_json()
         return self._dvJson
 
-    #taken from transfer.py
     @property
     def fileJson(self, timeout=45):
         '''
-        Returns JSON from call to Dryad API /files/{id},
-        where the ID is parsed from the Dryad JSON
+        Returns a list of file JSONs from call to Dryad API /files/{id},
+        where the ID is parsed from the Dryad JSON. Dryad file listings
+        are paginated
+
+        ----------------------------------------
+        Parameters:
+        timeout : int
+            request timeout in seconds
+        ----------------------------------------
         '''
         if not self._fileJson:
             try:
+                self._fileJson = []
                 headers = {'accept':'application/json',
                            'Content-Type':'application/json'}
                 fileList = requests.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
                                         headers=headers,
                                         timeout=timeout)
                 fileList.raise_for_status()
-                self._fileJson = fileList.json()
+                total = fileList.json()['total']
+                lastPage = fileList.json()['_links']['last']['href']
+                pages = int(lastPage[lastPage.rfind('=')+1:])
+                self._fileJson.append(fileList.json())
+                for i in range(2, pages+1):
+                    fileCont = requests.get(f'{constants.DRYURL}/api/v2'
+                                            f'/versions/{self.id}/files?page={i}',
+                                            headers=headers,
+                                            timeout=timeout)
+                    fileCont.raise_for_status()
+                    self._fileJson.append(fileCont.json())
             except Exception as e:
                 logger.exception(e)
                 raise
@@ -117,32 +143,35 @@ class Serializer(object):
     def files(self):
         '''
         Returns a list of tuples with:
+
         (Download_location, filename, mimetype, size, description,
         digestType, md5sum)
-        At this time only md5 is supported
+
+        At this time only md5 is supported.
         '''
         out = []
-        files = self.fileJson['_embedded'].get('stash:files')
-        if files:
-            for f in files:
-                downLink = f['_links']['stash:file-download']['href']
-                downLink = f'{constants.DRYURL}{downLink}'
-                name = f['path']
-                mimeType = f['mimeType']
-                size = f['size']
-                #HOW ABOUT PUTTING THIS IN THE DRYAD API PAGE?
-                descr = f.get('description', '')
-                digestType = f.get('digestType')
-                #not all files have a digest
-                digest = f.get('digest')
-                md5 = ''
-                if digestType == 'md5' and digest:
-                    md5 = digest
-                    #nothing in the docs as to algorithms so just picking md5
-                    #Email from Ryan Scherle 30 Nov 20: supported digest type
-                    #('adler-32','crc-32','md2','md5','sha-1','sha-256',
-                    #'sha-384','sha-512')
-                out.append((downLink, name, mimeType, size, descr, md5))
+        for page in self.fileJson:
+            files = page['_embedded'].get('stash:files')
+            if files:
+                for f in files:
+                    downLink = f['_links']['stash:file-download']['href']
+                    downLink = f'{constants.DRYURL}{downLink}'
+                    name = f['path']
+                    mimeType = f['mimeType']
+                    size = f['size']
+                    #HOW ABOUT PUTTING THIS IN THE DRYAD API PAGE?
+                    descr = f.get('description', '')
+                    digestType = f.get('digestType')
+                    #not all files have a digest
+                    digest = f.get('digest')
+                    md5 = ''
+                    if digestType == 'md5' and digest:
+                        md5 = digest
+                        #nothing in the docs as to algorithms so just picking md5
+                        #Email from Ryan Scherle 30 Nov 20: supported digest type
+                        #('adler-32','crc-32','md2','md5','sha-1','sha-256',
+                        #'sha-384','sha-512')
+                    out.append((downLink, name, mimeType, size, descr, md5))
 
         return out
 
@@ -152,6 +181,14 @@ class Serializer(object):
         Returns a list of Dryad files whose size value
         exceeds maxsize. Maximum size defaults to
         dryad2dataverse.constants.MAX_UPLOAD
+
+        ----------------------------------------
+        Parameters:
+
+        maxsize : int
+            size in bytes in which to flag as oversize.
+            Default: constants.MAX_UPLOAD
+        ----------------------------------------
         '''
         if not maxsize:
             maxsize = constants.MAX_UPLOAD
@@ -164,7 +201,10 @@ class Serializer(object):
     def _typeclass(self, typeName, multiple, typeClass):
         '''
         Creates wrapper around single or multiple Dataverse JSON objects.
-        Returns a dict *without* the 'value' key'
+        Returns a dict *without* the  Dataverse 'value' key'
+
+        ----------------------------------------
+        Parameters:
 
         typeName : str
             Dataverse typeName (eg: 'author')
@@ -172,18 +212,22 @@ class Serializer(object):
         typeClass : str
             Dataverse typeClass. Usually one of 'compound', 'primitive,
             'controlledVocabulary')
+        ----------------------------------------
         '''
         return {'typeName':typeName, 'multiple':multiple,
                 'typeClass':typeClass}
 
     def _convert_generic(self, **kwargs):
         '''
-        Generic json creator of form:
+        Generic dataverse json segment creator of form:
             {dvField:
                 {'typeName': dvField,
                   'value': dryField}
         Suitable for generalized conversions. Only provides fields with
         multiple: False and typeclass:Primitive
+
+        ----------------------------------------
+        Parameters:
 
         dvField : str
             Dataverse output field
@@ -199,6 +243,7 @@ class Serializer(object):
         pNotes : str
             Notes to be prepended to list type values.
             No trailing space required.
+        ----------------------------------------
         '''
 
         dvField = kwargs.get('dvField')
@@ -215,12 +260,11 @@ class Serializer(object):
                 raise
         outfield = inJson.get(dryField)
         if outfield: outfield = outfield.strip()
-        '''
-        if not outfield:
-            raise ValueError(f'Dryad field {dryField} not found')
-        '''
+        #if not outfield:
+        #    raise ValueError(f'Dryad field {dryField} not found')
         # If value missing can still concat empty dict
-        if not outfield: return {}
+        if not outfield:
+            return {}
         if rType == 'list':
             if pNotes:
                 outfield = [f'{pNotes} {outfield}']
@@ -241,12 +285,16 @@ class Serializer(object):
         '''
         Produces required author json fields.
         Special case, requires concatenation of several fields
+        ----------------------------------------
+        Parameters:
+
         author : dict
             dryad['author'] JSON segment
+        ----------------------------------------
         '''
         first = author.get('firstName')
         last = author.get('lastName')
-        if first + last == None:
+        if first + last is None:
             return None
         authname = f"{author.get('lastName','')}, {author.get('firstName', '')}"
         return {'authorName':
@@ -255,10 +303,16 @@ class Serializer(object):
 
     def _convert_keywords(self, *args):
         '''
-        Produces the insane keyword structure from a list of words
+        Produces the insane keyword structure Dataverse JSON segment
+        from a list of words
+
+        ----------------------------------------
+        Parameters:
+
         args : list with str elements
             remember to expand with *
         General input is Dryad JSON 'keywords', ie *Dryad['keywords']
+        ----------------------------------------
         '''
         outlist = []
         for arg in args:
@@ -330,8 +384,12 @@ class Serializer(object):
         Makes a Dataverse bounding box from appropriate coordinates.
         Returns Dataverse json segment
 
+        ----------------------------------------
+        Parameters:
+
         north, south, east, west | float
-        Coordinates in decimal degrees.
+            Coordinates in decimal degrees.
+        ----------------------------------------
         '''
         names = ['north', 'south', 'east', 'west']
         points = [str(x) for x in [north, south, east, west]]
@@ -339,22 +397,27 @@ class Serializer(object):
         coords = [(x[0]+'Longitude', {x[0]:x[1]}) for x in zip(names, points)]
         #Yes, everything is longitude in Dataverse
         out = []
-        for c in coords:
-            out.append(self._convert_generic(inJson=c[1],
-                                             dvField=c[0],
+        for coord in coords:
+            out.append(self._convert_generic(inJson=coord[1],
+                                             dvField=coord[0],
                                              #dryField='north'))
-                                             dryField=[k for k in c[1].keys()][0]))
+                                             dryField=[k for k in coord[1].keys()][0]))
         return out
 
     def _convert_geospatial(self, dryJson):
         '''
         Outputs Dataverse geospatial metadata block.
         Requires internet connection to connect to https://geonames.org
+
+        ----------------------------------------
+        Parameters:
+
         dryJson : dict
             Dryad json as dict
+        ----------------------------------------
         '''
         if dryJson.get('locations'):
-            out = {}
+            #out = {}
             coverage = []
             box = []
             otherCov = None
@@ -404,13 +467,16 @@ class Serializer(object):
                 if gbbox:
                     gblock['geospatial']['fields'].append(gbbox)
             return gblock
-        else:
-            return{}
+        return {}
 
     def _assemble_json(self, dryJson=None, dvContact=None,
                        dvEmail=None, defContact=True):
         '''
         Assembles Dataverse json from Dryad JSON components
+
+        Dataverse JSON is a nightmare, so this function is too.
+        ----------------------------------------
+        Parameters:
 
         dryJson : dict
             Dryad json as dict
@@ -420,6 +486,7 @@ class Serializer(object):
             default Dataverse 4 contact email address
         defContact : boolean
             include default contact information with record
+        ----------------------------------------
         '''
         if not dvContact:
             dvContact = constants.DV_CONTACT_NAME
@@ -437,12 +504,10 @@ class Serializer(object):
                                            }
                          }
                         }
-        '''
-        REQUIRED Dataverse fields
+        #REQUIRED Dataverse fields
 
-        Dryad is a general purpose database; it is hard/impossible to get
-        Dataverse required subject tags out of their keywords, so:
-        '''
+        #Dryad is a general purpose database; it is hard/impossible to get
+        #Dataverse required subject tags out of their keywords, so:
         defaultSubj = {'typeName' : 'subject',
                        'typeClass':'controlledVocabulary',
                        'multiple': True,
@@ -455,7 +520,7 @@ class Serializer(object):
 
         self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(reqdTitle)
 
-        ##rewrite as function: authors
+        #authors
         out = []
         for a in dryJson['authors']:
             reqdAuthor = self._convert_author_names(a)
@@ -473,8 +538,10 @@ class Serializer(object):
                                               dvField='authorIdentifier',
                                               dryField='orcid',
                                               addJson=addOrc)
-                if affiliation: reqdAuthor.update(affiliation)
-                if orcid: reqdAuthor.update(orcid)
+                if affiliation:
+                    reqdAuthor.update(affiliation)
+                if orcid:
+                    reqdAuthor.update(orcid)
                 out.append(reqdAuthor)
 
         authors = self._typeclass(typeName='author',
@@ -497,14 +564,16 @@ class Serializer(object):
                 author = self._convert_generic(inJson=author,
                                                dvField='datasetContactName',
                                                dryField='author')
-                if author: reqdContact.update(author)
+                if author:
+                    reqdContact.update(author)
                 affiliation = self._convert_generic(inJson=e,
                                                     dvField='datasetContactAffiliation',
                                                     dryField='affiliation')
-                if affiliation: reqdContact.update(affiliation)
+                if affiliation:
+                    reqdContact.update(affiliation)
                 out.append(reqdContact)
 
-        if defContact: 
+        if defContact:
             #Adds default contact information the tail of the list
             defEmail = self._convert_generic(inJson={'em':dvEmail},
                                              dvField='datasetContactEmail',
@@ -539,19 +608,7 @@ class Serializer(object):
                                                  dryField='lastModificationDate')
                 descrField.update(descDate)
                 out.append(descrField)
-        '''
-        #Add original DOI to description as well
-        #Decided to move it to Agency
-        formattedDoi = '<b>Dryad DOI:</b><br />' + self.dryadJson['identifier']+ '\n'
-        origDoi = self._convert_generic(inJson={'doi':formattedDoi},
-                                       dvField='dsDescriptionValue',
-                                       dryField='doi')
-        descDate = self._convert_generic(inJson=dryJson,
-                                         dvField='dsDescriptionDate',
-                                         dryField='lastModificationDate')
-        origDoi.update(descDate)
-        out.append(origDoi)
-        '''
+
         description['value'] = out
         self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(description)
 
@@ -612,17 +669,17 @@ class Serializer(object):
         publications = self._typeclass(typeName='publication', multiple=True, typeClass='compound')
         #quick and dirty lookup table
         #TODO see https://github.com/CDL-Dryad/dryad-app/blob/31d17d8dab7ea3bab1256063a1e4d0cb706dd5ec/stash/stash_datacite/app/models/stash_datacite/related_identifier.rb
-        '''
         #no longer required
-        lookup = {'IsDerivedFrom':'Is derived from',
-                  'Cites':'Cites',
-                  'IsSupplementTo': 'Is supplement to',
-                  'IsSupplementedBy': 'Is supplemented by'}
-        '''
+        #lookup = {'IsDerivedFrom':'Is derived from',
+        #          'Cites':'Cites',
+        #          'IsSupplementTo': 'Is supplement to',
+        #          'IsSupplementedBy': 'Is supplemented by'}
         out = []
         if dryJson.get('relatedWorks'):
             for r in dryJson.get('relatedWorks'):
-                id = r.get('identifier')
+                #id = r.get('identifier')
+                #TODO Verify that changing id to _id has not broken anything: 11Feb21
+                _id = r.get('identifier')
                 relationship = r.get('relationship')
                 idType = r.get('identifierType')
                 #citation = {'citation': f"{lookup[relationship]}: {id}"}

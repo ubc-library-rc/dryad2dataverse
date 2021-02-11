@@ -30,10 +30,10 @@ class DatabaseError(Dryad2DataverseError):
 
 class DataverseUploadError(Dryad2DataverseError):
     '''
-    Returned on not OK respose
+    Returned on not OK respose (ie, not requests.status_code == 200)
     '''
 
 class DataverseDownloadError(Dryad2DataverseError):
     '''
-    Returned on not OK respose
+    Returned on not OK respose (ie, not requests.status_code == 200)
     '''
