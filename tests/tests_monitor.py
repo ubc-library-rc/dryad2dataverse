@@ -9,7 +9,7 @@ import  dryad2dataverse.monitor
 testCase = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
 with open('./tests/dryad_dummy_metadata.json') as f:
     testCase._dryadJson = json.load(f)
-#montest = dryad2dataverse.monitor.Monitor('/Users/paul/wtf.db')
+#montest = dryad2dataverse.monitor.Monitor('/Users/paul/tmp/wtf.db')
 montest = dryad2dataverse.monitor.Monitor(':memory:')
 with open('tests/dryad_files_orig.json') as f:
     testCase._fileJson=json.load(f)

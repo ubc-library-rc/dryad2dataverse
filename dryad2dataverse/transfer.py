@@ -14,21 +14,11 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 from dryad2dataverse import constants
 from dryad2dataverse import exceptions
 
-logger = logging.getLogger(__name__)
-url_logger = logging.getLogger('urllib3')
+LOGGER = logging.getLogger(__name__)
+URL_LOGGER = logging.getLogger('urllib3')
 
-#TODO Set publication date
-'''
-#whichever date
-date=('dateOfDeposit', depDate[0].text)[0]
-ie, one of distributionDate, productionDate, dateOfDeposit
-params = {'persistentId' : dvn4StdyId}
-            newdate = requests.put(f'{DVN4}/datasets/:persistentId/\
-            citationdate',
-            headers=AUTHHEAD, data=date, params=params)
-'''
 
-class Transfer(object):
+class Transfer():
     '''
     Transfers data from Drayd installation to
     Dataverse installation
@@ -99,7 +89,8 @@ class Transfer(object):
         '''
         return self.dryad.doi
 
-    def _dryad_file_id(self, url):
+    @staticmethod
+    def _dryad_file_id(url):
         '''
         Returns Dryad fileID from dryad file download URL as integer
 
@@ -111,19 +102,62 @@ class Transfer(object):
         fid = int(fid[fid.rfind('/')+1:])
         return fid
 
-    def _make_dv_head(self, apikey):
+    @staticmethod
+    def _make_dv_head(apikey):
         '''
         Returns Dataverse authentication header
         '''
         return {'X-Dataverse-key' : apikey}
 
-    def _set_correct_date(self, url, header, date):
+    def set_correct_date(self, url, dtype='distributionDate', apikey=None):
         '''
         Sets correct publication date for Dataverse
+
+        Note: dryad2dataverse.serializer maps Dryad 'publicationDate'
+        to dataverse 'distributionDate' (~line 675)
+
+        Dataverse citation date default is ":publicationDate". See
+        Dataverse API reference:
+        https://guides.dataverse.org/en/4.20/api/native-api.html#id54
+
+        url : str
+            Base URL to Dataverse installation
+        hdl : str
+            Persistent indentifier for Dataverse study
+        d_type : str
+            Date type. One of  'distributionDate', 'productionDate',
+            'dateOfDeposit'. Note omitted leading colon (':'). Default
+            'distributionDate'
+        apikey : str
+            Default dryad2dataverse.constants.APIKEY
         '''
-        #TODO write this correctly
-        requests.put(f'{url}/datasets/:persistentId/citationdate',
-                     headers=self.auth, data=date, params=params)
+        try:
+            pass
+            if apikey:
+                headers={'X-Dataverse-key' : apikey}
+            else:
+                headers = self.auth
+            #TODO write this correctly
+            #see migrator.py line 1202
+            set_date = requests.put(f'{url}/datasets/:persistentId/citationdate',
+                                    headers=headers, data=date, params=params,
+                                    timeout=45)
+
+
+            '''#For selecting correct date type?
+            #whichever date
+            date=('dateOfDeposit', depDate[0].text)[0]
+            ie, one of distributionDate, productionDate, dateOfDeposit
+            params = {'persistentId' : dvn4StdyId}
+                        newdate = requests.put(f'{DVN4}/datasets/:persistentId/\
+                        citationdate',
+                        headers=AUTHHEAD, data=date, params=params)
+            '''
+        except Exception as err:
+            LOGGER.warning('Unable to set citation date for %s',
+                           hdl)
+            LOGGER.warning(err)
+            LOGGER.warning(set_date.text)
 
     def upload_study(self, url=None, apikey=None, timeout=45, **kwargs):
         '''
@@ -155,29 +189,30 @@ class Transfer(object):
 
         targetDv = kwargs.get('targetDv')
         dvpid = kwargs.get('dvpid')
-        dryFid = kwargs.get('dryFid')
+        #dryFid = kwargs.get('dryFid') #Why did I put this here?
         if not targetDv and not dvpid:
             try:
                 raise exceptions.NoTargetError('You must supply one of targetDv \
                                     (target dataverse) \
                                      or dvpid (Dataverse persistent ID)')
             except exceptions.NoTargetError as e:
-                logger.error('No target dataverse or dvpid supplied')
-                logger.exception(e)
+                LOGGER.error('No target dataverse or dvpid supplied')
+                LOGGER.exception(e)
                 raise
 
         if targetDv and dvpid:
             try:
                 raise ValueError('Supply only one of targetDv or dvpid')
             except ValueError as e:
-                logger.exception(e)
+                LOGGER.exception(e)
                 raise
         if not dvpid:
             endpoint = f'{url}/api/dataverses/{targetDv}/datasets'
             upload = requests.post(endpoint,
                                    headers=headers,
-                                   json=self.dryad.dvJson)
-            logger.debug(upload.text)
+                                   json=self.dryad.dvJson,
+                                   timeout=timeout)
+            LOGGER.debug(upload.text)
         else:
             endpoint = f'{url}/api/datasets/:persistentId/versions/:draft'
             params = {'persistentId':dvpid}
@@ -187,7 +222,7 @@ class Transfer(object):
                                   json=self.dryad.dvJson['datasetVersion'],
                                   timeout=timeout)
             #self._dvrecord = upload.json()
-            logger.debug(upload.text)
+            LOGGER.debug(upload.text)
 
         upload.raise_for_status()
         updata = upload.json()
@@ -197,7 +232,7 @@ class Transfer(object):
             try:
                 raise exceptions.DataverseUploadError('Status return is not OK')
             except exceptions.DataverseUploadError as e:
-                logger.exception(e)
+                LOGGER.exception(e)
                 raise
         if targetDv:
             self.dryad.dvpid = updata['data'].get('persistentId')
@@ -205,7 +240,8 @@ class Transfer(object):
             self.dryad.dvpid = updata['data'].get('datasetPersistentId')
         return self.dvpid
 
-    def _check_md5(self, infile):
+    @staticmethod
+    def _check_md5(infile):
         '''
         Returns md5 checksum of file
 
@@ -241,23 +277,24 @@ class Transfer(object):
         chk : str
             md5 sum of file (if available)
         '''
-        logger.debug('Start download sequence')
-        logger.debug('MAX SIZE = %s', constants.MAX_UPLOAD)
-        logger.debug(f'Filename: %s, size=%s', filename, size)
+        LOGGER.debug('Start download sequence')
+        LOGGER.debug('MAX SIZE = %s', constants.MAX_UPLOAD)
+        LOGGER.debug('Filename: %s, size=%s', filename, size)
         if not tmp:
             tmp = constants.TMP
-        if tmp.endswith(os.sep): tmp = tmp[:-1]
+        if tmp.endswith(os.sep):
+            tmp = tmp[:-1]
 
         if size:
             if size > constants.MAX_UPLOAD:
-                logger.warning('%s: File %s exceeds '
+                LOGGER.warning('%s: File %s exceeds '
                                'Dataverse MAX_UPLOAD size. Skipping download.',
                                self.doi, filename)
                 md5 = 'this_file_is_too_big_to_upload__' #HA HA
                 for i in self._files:
                     if url == i[0]:
                         i[-1] = md5
-                logger.debug('Stop download sequence with large file skip')
+                LOGGER.debug('Stop download sequence with large file skip')
                 return md5
         try:
             down = requests.get(url, timeout=timeout, stream=True)
@@ -272,27 +309,28 @@ class Transfer(object):
                 checkSize = os.stat(f'{tmp}{os.sep}{filename}').st_size
                 if checkSize != size:
                     try:
-                        raise exceptions.DownloadSizeError('Download size does not match reported size')
+                        raise exceptions.DownloadSizeError('Download size does not match '
+                                                           'reported size')
                     except exceptions.DownloadSizeError as e:
-                        logger.exception(e)
+                        LOGGER.exception(e)
                         raise
             #now check the md5
-            md5 = self._check_md5(f'{tmp}{os.sep}{filename}')
+            md5 = Transfer._check_md5(f'{tmp}{os.sep}{filename}')
             if chk:
                 if md5 != chk:
                     try:
                         raise exceptions.HashError('Hex digest mismatch: {md5} : {chk}')
                         #is this really what I want to do on a bad checksum?
                     except exceptions.HashError as e:
-                        logger.exception(e)
+                        LOGGER.exception(e)
                         raise
             for i in self._files:
                 if url == i[0]:
                     i[-1] = md5
-            logger.debug('Complete download sequence')
+            LOGGER.debug('Complete download sequence')
             return md5
         except Exception as e:
-            logger.exception(e)
+            LOGGER.exception(e)
             raise
 
     def download_files(self, files=None):
@@ -315,8 +353,58 @@ class Transfer(object):
             for f in files:
                 self.download_file(f[0], f[1], size=f[3], chk=f[-1])
         except exceptions.DataverseDownloadError as e:
-            logger.exception('Unable to download file with info %s', f)
+            LOGGER.exception('Unable to download file with info %s\n%s', f, e)
             raise
+
+    def force_notab_unlock(self, study, dv_url, fid, apikey=None):
+        '''
+        Checks for a study lock and forcibly unlocks and uningests
+        to prevent tabular file processing. Required if mime and filename
+        spoofing is not sufficient.
+
+        ----------------------------------------
+        Parameters:
+
+        study : str
+            Persistent indentifer of study
+        dv_url : str
+            URL to base Dataverse installation
+        fid : str
+            File ID for file object
+        apikey : str
+            API key for user
+            if not present authorization defaults to self.auth
+        '''
+        if dv_url.endswith('/'):
+            dv_url = dv_url[:-1]
+        if apikey:
+            headers = {'X-Dataverse-key': apikey}
+        else:
+            headers = self.auth
+        params = {'persistentId': study}
+        lock_status = requests.get(f'{dv_url}/api/datasets/:persistentId/locks', headers=headers,
+                                   params=params, timeout=300)
+        lock_status.raise_for_status()
+        if lock_status.json()['data']:
+            LOGGER.warning('Study %s has been locked', study)
+            LOGGER.warning('Lock info:\n%s', lock_status.json())
+            force_unlock = requests.delete(f'{dv_url}/api/datasets/:persistentId/locks',
+                                           params=params, headers=headers,
+                                           timeout=300)
+            LOGGER.warning('Lock removed for %s', study)
+            LOGGER.warning('Lock status:\n %s', force_unlock.json())
+            #According to Harvard, you can't remove the progress bar
+            #for uploaded tab files that squeak through unless you
+            #let them ingest first then reingest them. Oh well.
+            #See:
+            #https://groups.google.com/d/msgid/dataverse-community/
+            #74caa708-e39b-4259-874d-5b6b74ef9723n%40googlegroups.com
+
+            uningest = requests.post(f'{dv_url}/api/files/{fid}/uningest',
+                                     headers=headers,
+                                     timeout=300)
+            LOGGER.warning('Ingest halted for file %s for study %s', fid, study)
+            uningest.raise_for_status()
 
     def upload_file(self, dryadUrl=None, filename=None,
                     mimetype=None, size=None, descr=None,
@@ -349,7 +437,8 @@ class Transfer(object):
         dryadUrl : str
             Dryad download URL if you want to include a dryad file id
         '''
-        if not studyId: studyId = self.dvpid
+        if not studyId:
+            studyId = self.dvpid
         if not dest:
             dest = constants.DVURL
         if not fprefix:
@@ -366,13 +455,14 @@ class Transfer(object):
         #if mimetype == 'application/zip' or filename.lower().endswith('.zip'):
         if mimetype == 'application/zip' or badExt in constants.NOTAB:
             mimetype = 'application/octet-stream' # stop unzipping automatically
-            filename += 'NOPROCESS' # Also screw with their naming convention
-            #TODO debug log about file names to see what is up with XSLX
+            filename += '.NOPROCESS' # Also screw with their naming convention
+            #debug log about file names to see what is up with XSLX
             #see doi:10.5061/dryad.z8w9ghxb6
+            LOGGER.debug('File renamed to %s for upload', filename)
         if size >= constants.MAX_UPLOAD:
             fail = (fid, {'status' : 'Failure: MAX_UPLOAD size exceeded'})
             self.fileUpRecord.append(fail)
-            logger.warning('%s: File %s of '
+            LOGGER.warning('%s: File %s of '
                            'size %s exceeds '
                            'Dataverse MAX_UPLOAD size. Skipping.', self.doi, filename, size)
             return fail
@@ -395,11 +485,21 @@ class Transfer(object):
                 try:
                     raise exceptions.HashError(f'md5sum mismatch:\nlocal: {md5}\nuploaded: {upmd5}')
                 except exceptions.HashError as e:
-                    logger.exception(e)
+                    LOGGER.exception(e)
                     raise
+
+            #Make damn sure that the study isn't locked because of
+            #tab file processing
+            ##SPSS files still process despite spoofing MIME and extension
+            ##so there's also a forcible unlock check
+
+            fid = upload.json()['data']['files'][0]['dataFile']['id']
+            self.force_notab_unlock(studyId, dest, fid)
+
             return (fid, upload.json())
+
         except Exception as e:
-            logger.exception(e)
+            LOGGER.exception(e)
             raise
             #return (fid, {'status' : f'Failure: Reason {upload.reason}'})
 
@@ -456,7 +556,7 @@ class Transfer(object):
                 self.jsonFlag = (0, meta.json())
 
             except Exception as e:
-                logger.exception(e)
+                LOGGER.exception(e)
                 raise
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):
@@ -483,7 +583,8 @@ class Transfer(object):
         if not key:
             key = constants.APIKEY
 
-        delme = requests.delete(f'{dvurl}/dvn/api/data-deposit/v1.1/swordv2/edit-media/file/{dvfid}',
+        delme = requests.delete(f'{dvurl}/dvn/api/data-deposit/v1.1/swordv2/edit-media'
+                                f'/file/{dvfid}',
                                 auth=(key, ''))
         if delme.status_code == 204:
             self.fileDelRecord.append(dvfid)

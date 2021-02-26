@@ -18,9 +18,9 @@ import datetime
 from dryad2dataverse import constants
 from dryad2dataverse import exceptions
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
-class Monitor(object):
+class Monitor():
     '''
     The Monitor object is a tracker and database updater, so that
     Dryad files can be monitored and updated over time. Monitor is a singleton,
@@ -70,7 +70,7 @@ class Monitor(object):
             for line in create:
                 cls.cursor.execute(line)
             cls.conn.commit()
-            logger.info('Using database %s', cls.dbase)
+            LOGGER.info('Using database %s', cls.dbase)
 
         return cls.__instance
 
@@ -159,8 +159,8 @@ class Monitor(object):
             try:
                 raise exceptions.DatabaseError
             except exceptions.DatabaseError as e:
-                logger.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
-                logger.exception(e)
+                LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
+                LOGGER.exception(e)
                 raise
 
         newfile = copy.deepcopy(serial.dryadJson)
@@ -238,24 +238,28 @@ class Monitor(object):
         self.cursor.execute('SELECT dryfilesjson from dryadFiles WHERE \
                              dryaduid = ?', (mostRecent,))
         oldFileList = self.cursor.fetchall()[-1][0]
-        if not oldFiles:
-            oldFiles = []
+        if not oldFileList:
+            oldFileList = []
         else:
-            oldFiles = json.loads(oldFiles)['_embedded'].get('stash:files')
             out = []
-            # comparing file tuples from dryad2dataverse.serializer.
-            # Maybe JSON is better?
-            # because of code duplication below.
-            for f in oldFiles:
-                downLink = f['_links']['stash:file-download']['href']
-                downLink = f'{constants.DRYURL}{downLink}'
-                name = f['path']
-                mimeType = f['mimeType']
-                size = f['size']
-                descr = f.get('description', '')
-                md5 = f.get('md5', '')
-                out.append((downLink, name, mimeType, size, descr, md5))
-            oldFiles = out
+            #With Dryad API change, files are paginated
+            #now stored as list
+            for old in json.loads(oldFileList):
+            #for old in oldFileList:
+                oldFiles = old['_embedded'].get('stash:files')
+                # comparing file tuples from dryad2dataverse.serializer.
+                # Maybe JSON is better?
+                # because of code duplication below.
+                for f in oldFiles:
+                    downLink = f['_links']['stash:file-download']['href']
+                    downLink = f'{constants.DRYURL}{downLink}'
+                    name = f['path']
+                    mimeType = f['mimeType']
+                    size = f['size']
+                    descr = f.get('description', '')
+                    md5 = f.get('md5', '')
+                    out.append((downLink, name, mimeType, size, descr, md5))
+                oldFiles = out
 
         newFiles = serial.files
         # Tests go here
@@ -290,8 +294,8 @@ class Monitor(object):
         try:
             fid = int(fid)
         except ValueError as e:
-            logger.error('File ID %s is not an integer', fid)
-            logger.exception(e)
+            LOGGER.error('File ID %s is not an integer', fid)
+            LOGGER.exception(e)
             raise
 
         self.cursor.execute('SELECT dvfid FROM dvFiles WHERE \
@@ -394,7 +398,7 @@ class Monitor(object):
                 try:
                     raise TypeError('Dryad UID is not an integer')
                 except TypeError as e:
-                    logger.error(e)
+                    LOGGER.error(e)
                     raise
 
             # Update dryad file json
@@ -435,13 +439,13 @@ class Monitor(object):
                 except Exception as e:
                     dvfid = rec[1].get('status')
                     if dvfid == 'Failure: MAX_UPLOAD size exceeded':
-                        logger.warning('Monitor: max upload size of %s exceeded. '
+                        LOGGER.warning('Monitor: max upload size of %s exceeded. '
                                        'Unable to get dataverse file ID',
                                        constants.MAX_UPLOAD)
                         continue
                     else:
                         dvfid = 'JSON read error'
-                        logger.warning('JSON read error')
+                        LOGGER.warning('JSON read error')
                 recMd5 = rec[1]['data']['files'][0]['dataFile']['checksum']['value']
                 # md5s verified during upload step, so they should
                 # match already
@@ -457,7 +461,7 @@ class Monitor(object):
                 self.cursor.execute('DELETE FROM dvFiles WHERE dvfid=? \
                                      AND dryaduid=?',
                                     (int(rec), dryaduid))
-                print(f'deleted dryfid ={rec}, dryaduid = {dryaduid}')
+                LOGGER.debug('deleted dryfid = %s, dryaduid = %s', rec, dryaduid)
 
             # And lastly, any JSON metadata updates:
             # NOW WHAT?
