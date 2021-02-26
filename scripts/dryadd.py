@@ -352,8 +352,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         #it turns out that the Dryad API sends all the metadata
         #from the study in their search, so it's not necessary
         #to download it again
-        #I am aware of the call to a private class variable. Bad me!
-        study._dryadJson = doi[1]
+        study.dryadJson = doi[1]
 
         #check to see what sort of update it is.
         update_type = monitor.status(study)['status']

@@ -94,6 +94,25 @@ class Serializer():
             self.fetch_record()
         return self._dryadJson
 
+    @dryadJson.setter
+    def dryadJson(self, value=None):
+        '''
+        Fetches Dryad JSON from Dryad website if not supplied.
+
+        If supplying it, make sure it's correct or you will run into trouble.
+
+        ----------------------------------------
+        Parameters:
+
+        value : dict
+            Dryad json as dict
+
+        '''
+        if value:
+           self._dryadJson = value
+        else:
+            self.fetch_record()
+                
     @property
     def dvJson(self):
         '''
