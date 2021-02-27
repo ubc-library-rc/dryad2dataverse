@@ -104,7 +104,8 @@ def get_records(ror: 'str', mod_date=None):
     study metadata from the search, surprisingly.
 
     ror : str
-        ROR string including http
+        ROR string including http. To find your ROR, see
+        https://ror.org/
 
     mod_date : str
             UTC datetime string in the format suitable for the Dryad API.
@@ -342,6 +343,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
             continue #Max 10MB of files
         #Create study object
         study = dryad2dataverse.serializer.Serializer(doi[0])
+        if study.embargo:
+            continue
         #TODO remove this continue
         continue
 

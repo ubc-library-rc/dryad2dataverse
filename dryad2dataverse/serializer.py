@@ -112,7 +112,16 @@ class Serializer():
            self._dryadJson = value
         else:
             self.fetch_record()
-                
+
+    @property
+    def embargo(self):
+        '''
+        Check embargo status. Returns boolean True if embargoed.
+        '''
+        if self.dryadJson.get('curationStatus') == 'Embargoed':
+            return True
+        return False
+
     @property
     def dvJson(self):
         '''
