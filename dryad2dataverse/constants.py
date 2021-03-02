@@ -1,8 +1,9 @@
 '''
 This module contains the information that configures all the parameters
-required to transfer data from Dryad to Dataverse
+required to transfer data from Dryad to Dataverse.
 
-"Constants" may be a bit strong.
+"Constants" may be a bit strong, but the only constant is the
+presence of change.
 '''
 
 import os

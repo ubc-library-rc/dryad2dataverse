@@ -7,12 +7,12 @@ will work, but will have no effect.
 
 Modules included:
 
-    dryad2dataverse.constants : "Constants" for all modules. URLs, API keys, 
+    dryad2dataverse.constants : "Constants" for all modules. URLs, API keys,
     etc are all here.
-    
-    dryad2dataverse.serializer : Download and serialize Dryad 
+
+    dryad2dataverse.serializer : Download and serialize Dryad
     JSON to Dataverse JSON.
-    
+
     dryad2dataverse.transfer : metadata and file transfer
     utilities.
 

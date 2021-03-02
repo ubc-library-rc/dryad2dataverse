@@ -12,10 +12,7 @@ This page covers material that isn't automatically generated from the source cod
 ## dryad2dataverse.constants  
 <a name="dryad2dataverse.constants"></a>
 
-And by "constants", you should change these as required.  
-it's possible that this is misnamed. . .  
-
-This module contains the information that configures all the parameters required to transfer data from Dryad to Dataverse
+And by "constants", you should change these as required. This module contains the information that configures all the parameters required to transfer data from Dryad to Dataverse. As 'constants' don't generally change, there's a non-zero chance that the name of this module will change.
 
 ### General variables  
 <a name="General variables"></a>
@@ -41,7 +38,7 @@ This is configured for \*nix style environments. Windows does not, by default, h
 Obviously, if you are not transferring your data to the [Scholars Portal](https://dataverse.scholarsportal.info), you will need to change this.
 
 **APIKEY**   
-	+ Dataverse API key for user performing transfer. Sufficient privileges for upload and metadata manipulation must be attached to the user. See [Dataverse API documentation] (https://guides.dataverse.org/en/latest/api/index.html) for an explanation of the privilege level required.   
+	+ Dataverse API key for user performing transfer. Sufficient privileges for upload and metadata manipulation must be attached to the user. See [Dataverse API documentation](https://guides.dataverse.org/en/latest/api/index.html) for an explanation of the privilege level required.   
 	+ Default = None  
 
 To avoid issues, using an API key which has administrator privileges for the target dataverse is the easiest apprach.
@@ -70,7 +67,8 @@ As with contact email addresses, contact names are required in Dataverse, but no
 	+ Files may be converted to .tab format after upload using Dataverse's `reingest` endpoint: <https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file>  
 	+ Default = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta', '.rdata', '.xslx']  
 
-If one of the files in the upload triggers tabular processing the upload will suddenly cease and fail. This behaviour is built into Dataverse (unfortunately), and can be only overcome through workarounds such as double-zipping files, or, in this case, spoofing MIME types and extensions.
+
+If one of the files in the upload triggers tabular processing the upload will suddenly cease and fail. This behaviour is built into Dataverse (unfortunately), and can be only overcome through workarounds such as double-zipping files, or, in this case, spoofing MIME types and extensions. Because Dataverse's tabular file processing capabilities are subject to change, this is not an exhaustive list and some files may be processed regardless. See also dryad2dataverse.transfer.Transfer.force_notab_unlock().
 
 #Monitoring database variables
 <a name="Monitoring database variables"></a>

@@ -20,12 +20,17 @@ URL_LOGGER = logging.getLogger('urllib3')
 
 class Transfer():
     '''
-    Transfers data from Drayd installation to
-    Dataverse installation
+    Transfers metadata and data files from a
+    Drayd installation to Dataverse installation.
     '''
     def __init__(self, dryad):
         '''
-        dryad : dryad.Dryad object
+        Creates a dryad2dataverse.transfer.Transfer instance.
+
+        ----------------------------------------
+        Parameters:
+            dryad : dryad2dataverse.serializer.Serializer instance
+        ----------------------------------------
         '''
         self.dryad = dryad
         self._fileJson = None
@@ -37,7 +42,7 @@ class Transfer():
         self.jsonFlag = None #Whether or not new json uploaded
 
     def _del(self): #Change name to __del__ to make a destructor
-        '''Clears crap from constants.TMP on deletion'''
+        '''Expunges files from constants.TMP on deletion'''
         for f in self.files:
             if os.path.exists(f'{constants.TMP}{os.sep}{f[1]}'):
                 os.remove(f'{constants.TMP}{os.sep}{f[1]}')
@@ -45,23 +50,24 @@ class Transfer():
     @property
     def dvpid(self):
         '''
-        Returns Dataverse study persistent ID
+        Returns Dataverse study persistent ID as str.
         '''
         return self.dryad.dvpid
 
     @property
     def auth(self):
-        '''Returns datavese authentication header'''
+        '''
+        Returns datavese authentication header dict.
+        ie: `{X-Dataverse-key' : 'APIKEYSTRING'}`
+        '''
         return {'X-Dataverse-key' : constants.APIKEY}
 
     @property
     def fileJson(self):
         '''
-        Despite what you may think, the uniquely identifying integer
-        describing a dataset is not dryadJson['id']
-
-        It's actually the integer part of
-        testCase._dryadJson['_links']['stash:version']['href']
+        Returns a list of file JSONs from call to Dryad API /files/{id},
+        where the ID is parsed from the Dryad JSON. Dryad file listings
+        are paginated.
         '''
         return self.dryad.fileJson.copy()
 
@@ -69,8 +75,10 @@ class Transfer():
     def files(self):
         '''
         Returns a list of lists with:
+
         [Download_location, filename, mimetype, size, description, md5digest]
-        This is mutable; downloading a file will add md5 info if not available
+
+        This is mutable; downloading a file will add md5 info if not available.
         '''
         return self._files
 
@@ -78,25 +86,28 @@ class Transfer():
     def oversize(self):
         '''
         Returns list of files exceeding Dataverse ingest limit
-        dryad2dataverse.constants.MAX_UPLOAD
+        dryad2dataverse.constants.MAX_UPLOAD.
         '''
         return self.dryad.oversize
 
     @property
     def doi(self):
         '''
-        Returns Dryad DOI
+        Returns Dryad DOI.
         '''
         return self.dryad.doi
 
     @staticmethod
     def _dryad_file_id(url):
         '''
-        Returns Dryad fileID from dryad file download URL as integer
+        Returns Dryad fileID from dryad file download URL as integer.
+        ----------------------------------------
+        Parameters:
 
         url : str
-            Dryad file URL in format
-            'https://datadryad.org/api/v2/files/385820/download'
+            — Dryad file URL in format
+            'https://datadryad.org/api/v2/files/385820/download'.
+        ----------------------------------------
         '''
         fid = url.strip('/download')
         fid = int(fid[fid.rfind('/')+1:])
@@ -105,7 +116,14 @@ class Transfer():
     @staticmethod
     def _make_dv_head(apikey):
         '''
-        Returns Dataverse authentication header
+        Returns Dataverse authentication header as dict.
+
+        ----------------------------------------
+        Parameters:
+
+        apikey : str
+            — Dataverse API key.
+        ----------------------------------------
         '''
         return {'X-Dataverse-key' : apikey}
 
@@ -114,24 +132,31 @@ class Transfer():
                          d_type='distributionDate',
                          apikey=None):
         '''
-        Sets correct publication date for Dataverse
+        Sets "correct" publication date for Dataverse.
 
         Note: dryad2dataverse.serializer maps Dryad 'publicationDate'
-        to dataverse 'distributionDate' (~line 675)
+        to Dataverse 'distributionDate' (see serializer.py ~line 675).
 
         Dataverse citation date default is ":publicationDate". See
         Dataverse API reference:
-        https://guides.dataverse.org/en/4.20/api/native-api.html#id54
+        https://guides.dataverse.org/en/4.20/api/native-api.html#id54.
+
+        ----------------------------------------
+        Parameters:
 
         url : str
-            Base URL to Dataverse installation
+            — Base URL to Dataverse installation.
+
         hdl : str
-            Persistent indentifier for Dataverse study
+            — Persistent indentifier for Dataverse study.
+
         d_type : str
-            Date type. One of  'distributionDate', 'productionDate',
+            — Date type. One of  'distributionDate', 'productionDate',
             'dateOfDeposit'. Default 'distributionDate'.
+
         apikey : str
-            Default dryad2dataverse.constants.APIKEY
+            — Default dryad2dataverse.constants.APIKEY.
+        ----------------------------------------
         '''
         try:
             headers = {'X-Dataverse-key' : apikey}
@@ -157,25 +182,35 @@ class Transfer():
 
     def upload_study(self, url=None, apikey=None, timeout=45, **kwargs):
         '''
-        Uploads Dryad study metadata to target dataverse or updates existing.
-        targetDv kwarg creates new, dvpid kwarg updates.
+        Uploads Dryad study metadata to target Dataverse or updates existing.
+        Supplying a `targetDv` kwarg creates a new study and supplying a
+        `dvpid` kwarg updates a currently existing Dataverse study.
+
+        ----------------------------------------
+        Parameters:
 
         url : str
-            URL of Dataverse instance. Defaults to constants.DVURL
-        apikey : str
-            API key of user. Defaults to contants.APIKEY
-        timeout : int
-            timeout on POST request
+            — URL of Dataverse instance. Defaults to constants.DVURL.
 
-        KEYWORD ARGUMENTS
+        apikey : str
+            — API key of user. Defaults to contants.APIKEY.
+
+        timeout : int
+            — timeout on POST request.
+
+        **KEYWORD ARGUMENTS**
+
         One of these is required. Supplying both or neither raises a NoTargetError
+
         targetDv : str
-            short name of target dataverse. Required if new dataset.
-            Specify as targetDV=value
+            — Short name of target dataverse. Required if new dataset.
+            Specify as targetDV=value.
+
         dvpid = str
-            Dataverse persistent ID (for updating metadata)
+            — Dataverse persistent ID (for updating metadata).
             This is not required for new uploads, specify as dvpid=value
-        OPTIONAL KEYWORD ARGUMENTS
+
+        **OPTIONAL KEYWORD ARGUMENTS**
         '''
         if not url:
             url = constants.DVURL
@@ -239,10 +274,14 @@ class Transfer():
     @staticmethod
     def _check_md5(infile):
         '''
-        Returns md5 checksum of file
+        Returns the md5 checksum of a file.
+
+        ----------------------------------------
+        Parameters:
 
         infile : str
-            complete path to file
+            — Complete path to target file.
+        ----------------------------------------
         '''
         blocksize = 2**16
         with open(infile, 'rb') as m:
@@ -256,22 +295,31 @@ class Transfer():
     def download_file(self, url, filename, tmp=None,
                       size=None, chk=None, timeout=45):
         '''
-        Downloads file via requests streaming and saves to constants.TMP
-        returns md5sum on success and an exception on failure
+        Downloads a file via requests streaming and saves to constants.TMP.
+        returns md5sum on success and an exception on failure.
+
+        ----------------------------------------
+        Parameters:
+
         url : str
-            URL of download
+            — URL of download.
+
         filename : str
-            Output file name
+            — Output file name.
+
         timeout: int
-            Requests timeout
+            — Requests timeout.
+
         tmp : str
-            Temporary directory for downloads.
-            Defaults to dryad2dataverse.constants.TMP
+            — Temporary directory for downloads.
+              Defaults to dryad2dataverse.constants.TMP.
+
         size : int
-            Reported file size in bytes.
-            Defaults to dryad2dataverse.constants.MAX_UPLOAD
+            — Reported file size in bytes.
+              Defaults to dryad2dataverse.constants.MAX_UPLOAD.
         chk : str
-            md5 sum of file (if available)
+            - md5 sum of file (if available and known).
+        ----------------------------------------
         '''
         LOGGER.debug('Start download sequence')
         LOGGER.debug('MAX SIZE = %s', constants.MAX_UPLOAD)
@@ -332,16 +380,20 @@ class Transfer():
     def download_files(self, files=None):
         '''
         Bulk downloader for files.
+        ----------------------------------------
+        Parameters:
+
         files: list
-            items in list can be tuples or list with a minimum of:
-            (dryaddownloadurl, filenamewithoutpath, [md5sum])
+            — Items in list can be tuples or list with a minimum of:
 
-            md5 sum should be the last member of the tuple.
+              (dryaddownloadurl, filenamewithoutpath, [md5sum])
 
-            Defaults to self.files
+              The md5 sum should be the last member of the tuple.
 
-            Normally used without arguments to download all the associated
-            files with a Dryad study
+              Defaults to self.files.
+
+              Normally used without arguments to download all the associated
+              files with a Dryad study.
         '''
         if not files:
             files = self.files
@@ -362,14 +414,18 @@ class Transfer():
         Parameters:
 
         study : str
-            Persistent indentifer of study
+            — Persistent indentifer of study.
+
         dv_url : str
-            URL to base Dataverse installation
+            — URL to base Dataverse installation.
+
         fid : str
-            File ID for file object
+            — File ID for file object.
+
         apikey : str
-            API key for user
-            if not present authorization defaults to self.auth
+            — API key for user.
+              If not present authorization defaults to self.auth.
+        ----------------------------------------
         '''
         if dv_url.endswith('/'):
             dv_url = dv_url[:-1]
@@ -412,26 +468,38 @@ class Transfer():
         Failures produce JSON with different status messages
         rather than raising an exception.
 
+        ----------------------------------------
+        Parameters:
+
         filename : str
-            Filename (not including path)
+            — Filename (not including path).
+
         mimetype : str
-            Mimetype of file
+            — Mimetype of file.
+
         size : int
-            Size in bytes
+            — Size in bytes.
+
         studyId : str
-            Persistent study identifier for dataverse.
-            Defaults to Transfer.dvpid
+            — Persistent Dataverse study identifier.
+              Defaults to Transfer.dvpid.
+
         dest : str
-            Destination dataverse installation url.
-            Defaults to constants.DVURL
+            — Destination dataverse installation url.
+              Defaults to constants.DVURL.
+
         md5 : str
-            md5 checksum for file
+            — md5 checksum for file.
+
         fprefix : str
-            Path to file, not including a trailing slash
+            — Path to file, not including a trailing slash.
+
         timeout : int
-            Timeout in seconds for POST request
+            - Timeout in seconds for POST request. Default 300.
+
         dryadUrl : str
-            Dryad download URL if you want to include a dryad file id
+            - Dryad download URL if you want to include a Dryad file id.
+        ----------------------------------------
         '''
         if not studyId:
             studyId = self.dvpid
@@ -506,12 +574,17 @@ class Transfer():
         Uploads multiple files to study with persistentId pid.
         Returns a list of the original tuples plus JSON responses.
 
+        ----------------------------------------
+        Parameters:
+
         files: list
-            list contains a tuple with
-            (dryadDownloadURL, filename, mimetype, size)
+            — List contains tuples with
+            (dryadDownloadURL, filename, mimetype, size).
+
         pid : str
-            defaults to self.dvpid, which is generated by calling
-            dryad2dataverse.transfer.Transfer.upload_study()
+            — Defaults to self.dvpid, which is generated by calling
+              dryad2dataverse.transfer.Transfer.upload_study().
+        ----------------------------------------
         '''
         if not files:
             files = self.files
@@ -526,9 +599,14 @@ class Transfer():
 
     def upload_json(self, studyId=None, dest=None):
         '''
-        Uploads Dryad json as a separate file for archival purposes
+        Uploads Dryad json as a separate file for archival purposes.
+
+        ----------------------------------------
+        Parameters:
+
         pid : str
-            Dataverse pid
+            — Dataverse persistent identifier.
+        ----------------------------------------
         '''
         if not studyId:
             studyId = self.dvpid
@@ -568,13 +646,16 @@ class Transfer():
 
         Returns 1 on success (204 response), or 0 on other response.
 
+        ----------------------------------------
+        Parameters:
+
         dvurl : str
-            Base URL of dataverse instance.
-            Defaults to dryad2dataverse.constants.DVURL
+            — Base URL of dataverse instance.
+              Defaults to dryad2dataverse.constants.DVURL.
 
-        dvfid :
-            Dataverse file ID number
-
+        dvfid : str
+            — Dataverse file ID number.
+        ----------------------------------------
         '''
         if not dvurl:
             dvurl = constants.DVURL
@@ -591,14 +672,22 @@ class Transfer():
 
     def delete_dv_files(self, dvfids=None, dvurl=None, key=None):
         '''
-        Deletes all files in list of dataverese file file ids from dataverse.
+        Deletes all files in list of Dataverse file ids from
+        a Dataverse installation.
+
+        ----------------------------------------
+        Parameters:
+
         dvfids : list
-            List of dataverse fids.
-            Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord
+            — List of Dataverse file ids.
+              Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.
+
         dvurl : str
-            Base URL of Dataverse. Defaults to dryad2dataverse.constants.DVURL
+            — Base URL of Dataverse. Defaults to dryad2dataverse.constants.DVURL.
+
         key : str
-            API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY
+            — API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY.
+        ----------------------------------------
         '''
         #if not dvfids:
         #   dvfids = self.fileDelRecord

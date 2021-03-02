@@ -11,15 +11,19 @@ nav_order: 1
 
 ## Introduction
 
-**dryad2dataverse** is a set of oddly specific tools which allow easier transfer of metadata and data from a Dryad repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository. 
+**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
+
+With these tools it's possible to: 
 
 a) Serialize Dryad JSON to Dataverse JSON
 
 b) Transfer Dryad studies to Dataverse without any knowledge of the somewhat complex Dataverse API
 
-c) Monitor changes in status.
+c) Monitor changes in status
 
-The minimum required Python version for **dryad2dataverse** is Python **3.6**, as it is the earliest version which supports f-strings. You can find Python at <https://www.python.org/downloads/>. It was developed using 3.7.2, and it runs just fine under the [now current] 3.9.1.
+The minimum required Python version for **dryad2dataverse** is Python **3.6**, as it is the earliest version which supports f-strings. You can find Python at <https://www.python.org/downloads/>. It was developed using 3.7.2, and it runs just fine under the [now current] 3.9.2.
+
+The **dryad2dataverse** library is free and open source, released under the MIT license.
 
 ### Why would I need this?
 
@@ -48,6 +52,8 @@ pip install .
 >>> i_heart_dryad = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
 >>> with open('dataverse_json.json', 'w') as f:
 	f.write(f'{i_heart_dryad.dvJson}')
+>>> #Or just view it this way in a Python session
+>>> i_heard_dryad.dvJson
 ```
 
 #### Transferring data
@@ -71,7 +77,9 @@ Note: a number of variables must be set [correctly] for this to work, such as yo
 
 Because monitoring the status of something over time requires persistence, the dryad2dataverse.monitor.Monitor object uses an [SQLite3](https://sqlite.org), which is a single file, portable database. This allows monitoring without laborious database configuration on a host system, and updates can be run on any system that has sufficient storage space to act as an intermediary between Dryad and Dataverse.
 
-In theory you could run it from a Raspberry Pi Zero that you have in a desk drawer, although that may not be the wisest idea. 
+If you need to change systems just swap the database to the new system.
+
+In theory you could run it from a Raspberry Pi Zero that you have in a desk drawer, although that may not be the wisest idea. Maybe use your cell phone.
 
 Monitoring changes requires both the serializer and transfer objects from above.
 

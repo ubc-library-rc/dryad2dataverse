@@ -23,9 +23,3 @@ To circumvent this, dryad2dataverse attempts to fool Dataverse into not processi
 **Why is a file which should be a tabular file not a tabular file?**
 
 As a direct result of (3) above, tabular file processing has (hopefully) been eliminated. It's still possible to create a tabular file by [reingesting it.](https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file "Reingest via API")
-
-**Why does the code use camel case instead of snake case for variables?**
-
-By the time I realized I should be using snake case, it was too late and I was already consistently using camel case. <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>
-
- 

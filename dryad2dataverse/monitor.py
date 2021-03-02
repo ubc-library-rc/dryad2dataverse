@@ -30,16 +30,16 @@ class Monitor():
 
     def __new__(cls, dbase=None, *args, **kwargs):
         '''
-        Creates a new singleton instance of Monitor
+        Creates a new singleton instance of Monitor.
 
-        Also creates a database if existing database is not present
+        Also creates a database if existing database is not present.
 
         ----------------------------------------
         Parameters:
 
         dbase : str
-            Path to sqlite3 database.
-            /path/to/file.sqlite3
+            — Path to sqlite3 database. That is:
+              /path/to/file.sqlite3
         ----------------------------------------
         '''
         if cls.__instance is None:
@@ -78,16 +78,16 @@ class Monitor():
         # remove args and kwargs when you find out how init interacts with new.
         '''
         Initialize the Monitor instance if not instantiated already (ie, Monitor
-        is a singleton.)
+        is a singleton).
 
         ----------------------------------------
         Parameters:
 
         dbase : str
-            Complete path to desired location of tracking database
-            (eg: /tmp/test.db)
+            — Complete path to desired location of tracking database
+              (eg: /tmp/test.db).
 
-            Defaults to dryad2dataverse.constants.DBASE
+            Defaults to dryad2dataverse.constants.DBASE.
         ----------------------------------------
         '''
         if self.__initialized:
@@ -109,7 +109,7 @@ class Monitor():
     @property
     def lastmod(self):
         '''
-        Returns last modification date from monitor.dbase
+        Returns last modification date from monitor.dbase.
         '''
         self.cursor.execute('SELECT checkdate FROM lastcheck ORDER BY rowid DESC;')
         last_mod = self.cursor.fetchall()
@@ -119,22 +119,27 @@ class Monitor():
 
     def status(self, serial):
         '''
-        Returns a dictionary with keys 'status' and 'dvpid' where
-            status: one of 'new', 'unchanged', 'updated' or 'filesonly'
+        Returns a dictionary with keys 'status' and 'dvpid'.
+        `{status :'updated', 'dvpid':'doi://some/ident'}`.
 
-                'new' is a completely new file
-                'unchanged' is no changes at all
-                'updated' is changes to lastModificationDate AND metadata changes
+        `status` is one of 'new', 'unchanged', 'updated' or 'filesonly'.
+
+                'new' is a completely new file.
+
+                'unchanged' is no changes at all.
+
+                'updated' is changes to lastModificationDate AND metadata changes.
+
                 'filesonly' is changes to lastModificationDate only
                 (which presumably indicates a file change.
 
-            dvpid: dataverse persistent identifier.
-            None in the case of status='new'
+        `dvpid` is a Dataverse persistent identifier.
+        `None` in the case of status='new'
 
         ----------------------------------------
         Parameters:
 
-        serial : dryad2dataverse.serializerinstance
+        serial : dryad2dataverse.serializer instance
         ----------------------------------------
         '''
         # Last mod date is indicator of change.
@@ -177,17 +182,18 @@ class Monitor():
         '''
         Analyzes differences in metadata between current serializer
         instance and last updated serializer instance.
-        Returns a list of field changes consisting of
+        Returns a list of field changes consisting of:
 
-        [{key: (old_value, new_value}] or None if no changes
+        [{key: (old_value, new_value}] or None if no changes.
 
         For example:
 
+        ```
         [{'title':
         ('Cascading effects of algal warming in a freshwater community',
          'Cascading effects of algal warming in a freshwater community theatre')}
         ]
-
+        ```
         ----------------------------------------
         Parameters:
 
@@ -210,7 +216,7 @@ class Monitor():
     def diff_files(self, serial):
         '''
         Returns a dict with additions and deletions from previous Dryad
-        to dataverse upload
+        to dataverse upload.
 
         Because checksums are not necessarily included in Dryad file
         metadata, this method uses dryad file IDs, size, or
@@ -220,7 +226,7 @@ class Monitor():
         indicates a change it will produce dictionary output with a list
         of additions or deletions, as below:
 
-        {'add':[dyadfiletuples], 'delete:[dryadfiletuples]}
+        `{'add':[dyadfiletuples], 'delete:[dryadfiletuples]}`
 
         ----------------------------------------
         Parameters:
@@ -286,8 +292,8 @@ class Monitor():
         Parameters:
 
         url : str
-            *Dryad* file URL in form of
-            'https://datadryad.org/api/v2/files/385819/download'
+            — *Dryad* file URL in form of
+              'https://datadryad.org/api/v2/files/385819/download'.
         ----------------------------------------
         '''
         fid = url[url.rfind('/', 0, -10)+1:].strip('/download')
@@ -316,13 +322,16 @@ class Monitor():
         Parameters:
 
         filelist : list
-            list of Dryad file tuples: eg:
+            — List of Dryad file tuples: eg:
+
+            ```
             [('https://datadryad.org/api/v2/files/385819/download',
               'GCB_ACG_Mortality_2020.zip',
               'application/x-zip-compressed', 23787587),
              ('https://datadryad.org/api/v2/files/385820/download',
              'Readme_ACG_Mortality.txt',
              'text/plain', 1350)]
+             ```
         ----------------------------------------
         '''
         fids = []
@@ -333,7 +342,7 @@ class Monitor():
 
     def get_json_dvfids(self, serial):
         '''
-        Return a list of Dataverse file ids for dryad JSONs which were
+        Return a list of Dataverse file ids for Dryad JSONs which were
         uploaded to Dataverse.
         Normally used to discover the file IDs to remove Dryad JSONs
         which have changed.
@@ -359,7 +368,7 @@ class Monitor():
     def update(self, transfer):
         '''
         Updates the Monitor database with information from a
-        dryad2dataverse.transfer.Transfer instance
+        dryad2dataverse.transfer.Transfer instance.
 
         If a Dryad primary metadata record has changes, it will be
         deleted from the database.
@@ -503,9 +512,9 @@ class Monitor():
         Parameters:
 
         curdate : str
-            UTC datetime string in the format suitable for the Dryad API.
-            eg. 2021-01-21T21:42:40Z
-            or .strftime('%Y-%m-%dT%H:%M:%SZ')
+            — UTC datetime string in the format suitable for the Dryad API.
+              eg. 2021-01-21T21:42:40Z
+              or .strftime('%Y-%m-%dT%H:%M:%SZ').
         ----------------------------------------
         '''
         #Dryad API uses Zulu time
