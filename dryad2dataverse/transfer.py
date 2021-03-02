@@ -109,7 +109,10 @@ class Transfer():
         '''
         return {'X-Dataverse-key' : apikey}
 
-    def set_correct_date(self, url, dtype='distributionDate', apikey=None):
+    @staticmethod
+    def set_correct_date(url, hdl,
+                         d_type='distributionDate',
+                         apikey=None):
         '''
         Sets correct publication date for Dataverse
 
@@ -126,38 +129,31 @@ class Transfer():
             Persistent indentifier for Dataverse study
         d_type : str
             Date type. One of  'distributionDate', 'productionDate',
-            'dateOfDeposit'. Note omitted leading colon (':'). Default
-            'distributionDate'
+            'dateOfDeposit'. Default 'distributionDate'.
         apikey : str
             Default dryad2dataverse.constants.APIKEY
         '''
         try:
-            pass
+            headers = {'X-Dataverse-key' : apikey}
             if apikey:
-                headers={'X-Dataverse-key' : apikey}
+                headers = {'X-Dataverse-key' : apikey}
             else:
-                headers = self.auth
-            #TODO write this correctly
-            #see migrator.py line 1202
-            set_date = requests.put(f'{url}/datasets/:persistentId/citationdate',
-                                    headers=headers, data=date, params=params,
+                headers = {'X-Dataverse-key' : constants.APIKEY}
+
+            params = {'persistentId': hdl}
+            set_date = requests.put(f'{url}/api/datasets/:persistentId/citationdate',
+                                    headers=headers,
+                                    data=d_type,
+                                    params=params,
                                     timeout=45)
+            set_date.raise_for_status()
 
-
-            '''#For selecting correct date type?
-            #whichever date
-            date=('dateOfDeposit', depDate[0].text)[0]
-            ie, one of distributionDate, productionDate, dateOfDeposit
-            params = {'persistentId' : dvn4StdyId}
-                        newdate = requests.put(f'{DVN4}/datasets/:persistentId/\
-                        citationdate',
-                        headers=AUTHHEAD, data=date, params=params)
-            '''
-        except Exception as err:
+        except requests.exceptions.HTTPError as err:
             LOGGER.warning('Unable to set citation date for %s',
                            hdl)
             LOGGER.warning(err)
             LOGGER.warning(set_date.text)
+
 
     def upload_study(self, url=None, apikey=None, timeout=45, **kwargs):
         '''
@@ -446,6 +442,8 @@ class Transfer():
         if dryadUrl:
             fid = dryadUrl.strip('/download')
             fid = int(fid[fid.rfind('/')+1:])
+        else:
+            fid = 0 #dummy fid for non-Dryad use
         params = {'persistentId' : studyId}
         upfile = fprefix + os.sep + filename[:]
         badExt = filename[filename.rfind('.'):].lower()

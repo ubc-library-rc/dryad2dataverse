@@ -426,7 +426,7 @@ class Monitor():
                                      dryaduid=?', (olduid,))
                 inserter = self.cursor.fetchall()
                 for rec in inserter:
-                    # TODO FIX THIS #I think it's fixed 11 Feb 21
+                    # TODONE FIX THIS #I think it's fixed 11 Feb 21
                     self.cursor.execute('INSERT INTO dvFiles VALUES \
                                          (?, ?, ?, ?, ?, ?)',
                                         (dryaduid, rec[1], rec[2],
@@ -436,12 +436,13 @@ class Monitor():
                 try:
                     dvfid = rec[1]['data']['files'][0]['dataFile']['id']
                     # Screw you for burying the file ID this deep
-                except Exception as e:
+                except (KeyError, IndexError) as err:
                     dvfid = rec[1].get('status')
                     if dvfid == 'Failure: MAX_UPLOAD size exceeded':
                         LOGGER.warning('Monitor: max upload size of %s exceeded. '
                                        'Unable to get dataverse file ID',
                                        constants.MAX_UPLOAD)
+                        LOGGER.warning('Error:\n$%s', err)
                         continue
                     else:
                         dvfid = 'JSON read error'

@@ -66,9 +66,9 @@ class Serializer():
                                 headers=headers, timeout=timeout)
             resp.raise_for_status()
             self._dryadJson = resp.json()
-        except Exception as e:
+        except requests.exceptions.HTTPError as err:
             LOGGER.error('URL error for: %s', url)
-            LOGGER.exception(e)
+            LOGGER.exception(err)
             raise
 
     @property
@@ -109,7 +109,7 @@ class Serializer():
 
         '''
         if value:
-           self._dryadJson = value
+            self._dryadJson = value
         else:
             self.fetch_record()
 
