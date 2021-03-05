@@ -1,63 +1,6 @@
-# Table of Contents
-
-* [dryad2dataverse](#dryad2dataverse)
-* [dryad2dataverse.constants](#dryad2dataverse.constants)
-* [dryad2dataverse.serializer](#dryad2dataverse.serializer)
-  * [Serializer](#dryad2dataverse.serializer.Serializer)
-    * [\_\_init\_\_](#dryad2dataverse.serializer.Serializer.__init__)
-    * [fetch\_record](#dryad2dataverse.serializer.Serializer.fetch_record)
-    * [id](#dryad2dataverse.serializer.Serializer.id)
-    * [dryadJson](#dryad2dataverse.serializer.Serializer.dryadJson)
-    * [dryadJson](#dryad2dataverse.serializer.Serializer.dryadJson)
-    * [embargo](#dryad2dataverse.serializer.Serializer.embargo)
-    * [dvJson](#dryad2dataverse.serializer.Serializer.dvJson)
-    * [fileJson](#dryad2dataverse.serializer.Serializer.fileJson)
-    * [files](#dryad2dataverse.serializer.Serializer.files)
-    * [oversize](#dryad2dataverse.serializer.Serializer.oversize)
-* [dryad2dataverse.transfer](#dryad2dataverse.transfer)
-  * [Transfer](#dryad2dataverse.transfer.Transfer)
-    * [\_\_init\_\_](#dryad2dataverse.transfer.Transfer.__init__)
-    * [dvpid](#dryad2dataverse.transfer.Transfer.dvpid)
-    * [auth](#dryad2dataverse.transfer.Transfer.auth)
-    * [fileJson](#dryad2dataverse.transfer.Transfer.fileJson)
-    * [files](#dryad2dataverse.transfer.Transfer.files)
-    * [oversize](#dryad2dataverse.transfer.Transfer.oversize)
-    * [doi](#dryad2dataverse.transfer.Transfer.doi)
-    * [set\_correct\_date](#dryad2dataverse.transfer.Transfer.set_correct_date)
-    * [upload\_study](#dryad2dataverse.transfer.Transfer.upload_study)
-    * [download\_file](#dryad2dataverse.transfer.Transfer.download_file)
-    * [download\_files](#dryad2dataverse.transfer.Transfer.download_files)
-    * [force\_notab\_unlock](#dryad2dataverse.transfer.Transfer.force_notab_unlock)
-    * [upload\_file](#dryad2dataverse.transfer.Transfer.upload_file)
-    * [upload\_files](#dryad2dataverse.transfer.Transfer.upload_files)
-    * [upload\_json](#dryad2dataverse.transfer.Transfer.upload_json)
-    * [delete\_dv\_file](#dryad2dataverse.transfer.Transfer.delete_dv_file)
-    * [delete\_dv\_files](#dryad2dataverse.transfer.Transfer.delete_dv_files)
-* [dryad2dataverse.monitor](#dryad2dataverse.monitor)
-  * [Monitor](#dryad2dataverse.monitor.Monitor)
-    * [\_\_new\_\_](#dryad2dataverse.monitor.Monitor.__new__)
-    * [\_\_init\_\_](#dryad2dataverse.monitor.Monitor.__init__)
-    * [\_\_del\_\_](#dryad2dataverse.monitor.Monitor.__del__)
-    * [lastmod](#dryad2dataverse.monitor.Monitor.lastmod)
-    * [status](#dryad2dataverse.monitor.Monitor.status)
-    * [diff\_metadata](#dryad2dataverse.monitor.Monitor.diff_metadata)
-    * [diff\_files](#dryad2dataverse.monitor.Monitor.diff_files)
-    * [get\_dv\_fid](#dryad2dataverse.monitor.Monitor.get_dv_fid)
-    * [get\_dv\_fids](#dryad2dataverse.monitor.Monitor.get_dv_fids)
-    * [get\_json\_dvfids](#dryad2dataverse.monitor.Monitor.get_json_dvfids)
-    * [update](#dryad2dataverse.monitor.Monitor.update)
-    * [set\_timestamp](#dryad2dataverse.monitor.Monitor.set_timestamp)
-* [dryad2dataverse.exceptions](#dryad2dataverse.exceptions)
-  * [Dryad2DataverseError](#dryad2dataverse.exceptions.Dryad2DataverseError)
-  * [NoTargetError](#dryad2dataverse.exceptions.NoTargetError)
-  * [DownloadSizeError](#dryad2dataverse.exceptions.DownloadSizeError)
-  * [HashError](#dryad2dataverse.exceptions.HashError)
-  * [DatabaseError](#dryad2dataverse.exceptions.DatabaseError)
-  * [DataverseUploadError](#dryad2dataverse.exceptions.DataverseUploadError)
-  * [DataverseDownloadError](#dryad2dataverse.exceptions.DataverseDownloadError)
-
+# Complete API reference
 <a name="dryad2dataverse"></a>
-# dryad2dataverse
+## dryad2dataverse
 
 Dryad to Dataverse utilities. No modules are loaded by default, so
 
@@ -83,7 +26,7 @@ Modules included:
     dryad2dataverse.exceptions : Custom exceptions.
 
 <a name="dryad2dataverse.constants"></a>
-# dryad2dataverse.constants
+## dryad2dataverse.constants
 
 This module contains the information that configures all the parameters
 required to transfer data from Dryad to Dataverse.
@@ -92,13 +35,13 @@ required to transfer data from Dryad to Dataverse.
 presence of change.
 
 <a name="dryad2dataverse.serializer"></a>
-# dryad2dataverse.serializer
+## dryad2dataverse.serializer
 
 Serializes Dryad study JSON to Dataverse JSON, as well as
 producing associated file information.
 
 <a name="dryad2dataverse.serializer.Serializer"></a>
-## Serializer Objects
+### Serializer Objects
 
 ```python
 class Serializer()
@@ -107,7 +50,7 @@ class Serializer()
 Serializes Dryad JSON to Dataverse JSON
 
 <a name="dryad2dataverse.serializer.Serializer.__init__"></a>
-#### \_\_init\_\_
+##### \_\_init\_\_
 
 ```python
  | __init__(doi)
@@ -126,7 +69,7 @@ Creates Dryad study metadata instance.
   ----------------------------------------
 
 <a name="dryad2dataverse.serializer.Serializer.fetch_record"></a>
-#### fetch\_record
+##### fetch\_record
 
 ```python
  | fetch_record(url=None, timeout=45)
@@ -150,7 +93,7 @@ will call this function automatically.
   ----------------------------------------
 
 <a name="dryad2dataverse.serializer.Serializer.id"></a>
-#### id
+##### id
 
 ```python
  | @property
@@ -165,7 +108,7 @@ trailing portion of:
 `self.dryadJson['_links']['stash:version']['href']`
 
 <a name="dryad2dataverse.serializer.Serializer.dryadJson"></a>
-#### dryadJson
+##### dryadJson
 
 ```python
  | @property
@@ -176,7 +119,7 @@ Returns Dryad study JSON. Will call Serializer.fetch_record() if
 no JSON is present.
 
 <a name="dryad2dataverse.serializer.Serializer.dryadJson"></a>
-#### dryadJson
+##### dryadJson
 
 ```python
  | @dryadJson.setter
@@ -197,7 +140,7 @@ with processing later.
   — Dryad JSON.
 
 <a name="dryad2dataverse.serializer.Serializer.embargo"></a>
-#### embargo
+##### embargo
 
 ```python
  | @property
@@ -207,7 +150,7 @@ with processing later.
 Check embargo status. Returns boolean True if embargoed.
 
 <a name="dryad2dataverse.serializer.Serializer.dvJson"></a>
-#### dvJson
+##### dvJson
 
 ```python
  | @property
@@ -217,7 +160,7 @@ Check embargo status. Returns boolean True if embargoed.
 Returns Dataverse study JSON as dict.
 
 <a name="dryad2dataverse.serializer.Serializer.fileJson"></a>
-#### fileJson
+##### fileJson
 
 ```python
  | @property
@@ -239,7 +182,7 @@ per page.
   ----------------------------------------
 
 <a name="dryad2dataverse.serializer.Serializer.files"></a>
-#### files
+##### files
 
 ```python
  | @property
@@ -254,7 +197,7 @@ digestType, md5sum)
 At this time only md5 is supported.
 
 <a name="dryad2dataverse.serializer.Serializer.oversize"></a>
-#### oversize
+##### oversize
 
 ```python
  | @property
@@ -276,12 +219,12 @@ dryad2dataverse.constants.MAX_UPLOAD
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer"></a>
-# dryad2dataverse.transfer
+## dryad2dataverse.transfer
 
 This module handles data downloads and uploads from a Dryad instance to a Dataverse instance
 
 <a name="dryad2dataverse.transfer.Transfer"></a>
-## Transfer Objects
+### Transfer Objects
 
 ```python
 class Transfer()
@@ -291,7 +234,7 @@ Transfers metadata and data files from a
 Drayd installation to Dataverse installation.
 
 <a name="dryad2dataverse.transfer.Transfer.__init__"></a>
-#### \_\_init\_\_
+##### \_\_init\_\_
 
 ```python
  | __init__(dryad)
@@ -307,7 +250,7 @@ Creates a dryad2dataverse.transfer.Transfer instance.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.dvpid"></a>
-#### dvpid
+##### dvpid
 
 ```python
  | @property
@@ -317,7 +260,7 @@ Creates a dryad2dataverse.transfer.Transfer instance.
 Returns Dataverse study persistent ID as str.
 
 <a name="dryad2dataverse.transfer.Transfer.auth"></a>
-#### auth
+##### auth
 
 ```python
  | @property
@@ -328,7 +271,7 @@ Returns datavese authentication header dict.
 ie: `{X-Dataverse-key' : 'APIKEYSTRING'}`
 
 <a name="dryad2dataverse.transfer.Transfer.fileJson"></a>
-#### fileJson
+##### fileJson
 
 ```python
  | @property
@@ -340,7 +283,7 @@ where the ID is parsed from the Dryad JSON. Dryad file listings
 are paginated.
 
 <a name="dryad2dataverse.transfer.Transfer.files"></a>
-#### files
+##### files
 
 ```python
  | @property
@@ -354,7 +297,7 @@ Returns a list of lists with:
 This is mutable; downloading a file will add md5 info if not available.
 
 <a name="dryad2dataverse.transfer.Transfer.oversize"></a>
-#### oversize
+##### oversize
 
 ```python
  | @property
@@ -365,7 +308,7 @@ Returns list of files exceeding Dataverse ingest limit
 dryad2dataverse.constants.MAX_UPLOAD.
 
 <a name="dryad2dataverse.transfer.Transfer.doi"></a>
-#### doi
+##### doi
 
 ```python
  | @property
@@ -375,7 +318,7 @@ dryad2dataverse.constants.MAX_UPLOAD.
 Returns Dryad DOI.
 
 <a name="dryad2dataverse.transfer.Transfer.set_correct_date"></a>
-#### set\_correct\_date
+##### set\_correct\_date
 
 ```python
  | @staticmethod
@@ -411,7 +354,7 @@ https://guides.dataverse.org/en/4.20/api/native-api.html#id54.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.upload_study"></a>
-#### upload\_study
+##### upload\_study
 
 ```python
  | upload_study(url=None, apikey=None, timeout=45, **kwargs)
@@ -450,7 +393,7 @@ Supplying a `targetDv` kwarg creates a new study and supplying a
   **OPTIONAL KEYWORD ARGUMENTS**
 
 <a name="dryad2dataverse.transfer.Transfer.download_file"></a>
-#### download\_file
+##### download\_file
 
 ```python
  | download_file(url, filename, tmp=None, size=None, chk=None, timeout=45)
@@ -485,13 +428,14 @@ returns md5sum on success and an exception on failure.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.download_files"></a>
-#### download\_files
+##### download\_files
 
 ```python
  | download_files(files=None)
 ```
 
 Bulk downloader for files.
+
 ----------------------------------------
 
 **Arguments**:
@@ -510,7 +454,7 @@ Bulk downloader for files.
   files with a Dryad study.
 
 <a name="dryad2dataverse.transfer.Transfer.force_notab_unlock"></a>
-#### force\_notab\_unlock
+##### force\_notab\_unlock
 
 ```python
  | force_notab_unlock(study, dv_url, fid, apikey=None)
@@ -540,7 +484,7 @@ spoofing is not sufficient.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.upload_file"></a>
-#### upload\_file
+##### upload\_file
 
 ```python
  | upload_file(dryadUrl=None, filename=None, mimetype=None, size=None, descr=None, md5=None, studyId=None, dest=None, fprefix=None, timeout=300)
@@ -587,7 +531,7 @@ rather than raising an exception.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.upload_files"></a>
-#### upload\_files
+##### upload\_files
 
 ```python
  | upload_files(files=None, pid=None, fprefix=None)
@@ -611,7 +555,7 @@ Returns a list of the original tuples plus JSON responses.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.upload_json"></a>
-#### upload\_json
+##### upload\_json
 
 ```python
  | upload_json(studyId=None, dest=None)
@@ -624,12 +568,19 @@ Uploads Dryad json as a separate file for archival purposes.
 **Arguments**:
 
   
-  pid : str
+  studyId : str
   — Dataverse persistent identifier.
+  Default dryad2dataverse.transfer.Transfer.dvpid,
+  which is only generated on
+  dryad2dataverse.transfer.Transfer.upload_study()
+  
+  dest : str
+  — Base URL for transfer.
+  Default dryad2datavese.constants.DVURL
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.delete_dv_file"></a>
-#### delete\_dv\_file
+##### delete\_dv\_file
 
 ```python
  | delete_dv_file(dvfid, dvurl=None, key=None)
@@ -655,7 +606,7 @@ Returns 1 on success (204 response), or 0 on other response.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.delete_dv_files"></a>
-#### delete\_dv\_files
+##### delete\_dv\_files
 
 ```python
  | delete_dv_files(dvfids=None, dvurl=None, key=None)
@@ -681,7 +632,7 @@ a Dataverse installation.
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor"></a>
-# dryad2dataverse.monitor
+## dryad2dataverse.monitor
 
 Dryad/Dataverse status tracker. Monitor creates a singleton object which
 writes to a SQLite database. Methods will (generally) take either a
@@ -693,7 +644,7 @@ for Dryad studies so that files and studies aren't downloaded
 unneccessarily.
 
 <a name="dryad2dataverse.monitor.Monitor"></a>
-## Monitor Objects
+### Monitor Objects
 
 ```python
 class Monitor()
@@ -704,7 +655,7 @@ Dryad files can be monitored and updated over time. Monitor is a singleton,
 but is not thread-safe.
 
 <a name="dryad2dataverse.monitor.Monitor.__new__"></a>
-#### \_\_new\_\_
+##### \_\_new\_\_
 
 ```python
  | __new__(cls, dbase=None, *args, **kwargs)
@@ -725,7 +676,7 @@ Also creates a database if existing database is not present.
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.__init__"></a>
-#### \_\_init\_\_
+##### \_\_init\_\_
 
 ```python
  | __init__(dbase=None, *args, **kwargs)
@@ -747,7 +698,7 @@ is a singleton).
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.__del__"></a>
-#### \_\_del\_\_
+##### \_\_del\_\_
 
 ```python
  | __del__()
@@ -756,7 +707,7 @@ is a singleton).
 Commits all database transactions on object deletion and closes database.
 
 <a name="dryad2dataverse.monitor.Monitor.lastmod"></a>
-#### lastmod
+##### lastmod
 
 ```python
  | @property
@@ -766,7 +717,7 @@ Commits all database transactions on object deletion and closes database.
 Returns last modification date from monitor.dbase.
 
 <a name="dryad2dataverse.monitor.Monitor.status"></a>
-#### status
+##### status
 
 ```python
  | status(serial)
@@ -798,7 +749,7 @@ Returns a dictionary with keys 'status' and 'dvpid'.
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.diff_metadata"></a>
-#### diff\_metadata
+##### diff\_metadata
 
 ```python
  | diff_metadata(serial)
@@ -827,7 +778,7 @@ For example:
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.diff_files"></a>
-#### diff\_files
+##### diff\_files
 
 ```python
  | diff_files(serial)
@@ -855,7 +806,7 @@ of additions or deletions, as below:
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.get_dv_fid"></a>
-#### get\_dv\_fid
+##### get\_dv\_fid
 
 ```python
  | get_dv_fid(url)
@@ -876,7 +827,7 @@ file ids for *deletion* in case of dryad file changes.
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.get_dv_fids"></a>
-#### get\_dv\_fids
+##### get\_dv\_fids
 
 ```python
  | get_dv_fids(filelist)
@@ -906,7 +857,7 @@ to discover Dataverse file ids for deletion.
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.get_json_dvfids"></a>
-#### get\_json\_dvfids
+##### get\_json\_dvfids
 
 ```python
  | get_json_dvfids(serial)
@@ -926,7 +877,7 @@ which have changed.
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.update"></a>
-#### update
+##### update
 
 ```python
  | update(transfer)
@@ -950,7 +901,7 @@ including Dryad JSON updates, as the last action for transfer.
   ----------------------------------------
 
 <a name="dryad2dataverse.monitor.Monitor.set_timestamp"></a>
-#### set\_timestamp
+##### set\_timestamp
 
 ```python
  | set_timestamp(curdate=None)
@@ -972,12 +923,12 @@ use the dataverse2dryad.monitor.Monitor.lastmod attribute.
   ----------------------------------------
 
 <a name="dryad2dataverse.exceptions"></a>
-# dryad2dataverse.exceptions
+## dryad2dataverse.exceptions
 
 Custom exceptions for error handling.
 
 <a name="dryad2dataverse.exceptions.Dryad2DataverseError"></a>
-## Dryad2DataverseError Objects
+### Dryad2DataverseError Objects
 
 ```python
 class Dryad2DataverseError(Exception)
@@ -986,7 +937,7 @@ class Dryad2DataverseError(Exception)
 Base exception class for Dryad2Dataverse errors.
 
 <a name="dryad2dataverse.exceptions.NoTargetError"></a>
-## NoTargetError Objects
+### NoTargetError Objects
 
 ```python
 class NoTargetError(Dryad2DataverseError)
@@ -995,7 +946,7 @@ class NoTargetError(Dryad2DataverseError)
 No dataverse target supplied error.
 
 <a name="dryad2dataverse.exceptions.DownloadSizeError"></a>
-## DownloadSizeError Objects
+### DownloadSizeError Objects
 
 ```python
 class DownloadSizeError(Dryad2DataverseError)
@@ -1005,7 +956,7 @@ Raised when download sizes don't match reported
 Dryad file size.
 
 <a name="dryad2dataverse.exceptions.HashError"></a>
-## HashError Objects
+### HashError Objects
 
 ```python
 class HashError(Dryad2DataverseError)
@@ -1014,7 +965,7 @@ class HashError(Dryad2DataverseError)
 Raised on hex digest mismatch.
 
 <a name="dryad2dataverse.exceptions.DatabaseError"></a>
-## DatabaseError Objects
+### DatabaseError Objects
 
 ```python
 class DatabaseError(Dryad2DataverseError)
@@ -1023,7 +974,7 @@ class DatabaseError(Dryad2DataverseError)
 Tracking database error.
 
 <a name="dryad2dataverse.exceptions.DataverseUploadError"></a>
-## DataverseUploadError Objects
+### DataverseUploadError Objects
 
 ```python
 class DataverseUploadError(Dryad2DataverseError)
@@ -1032,7 +983,7 @@ class DataverseUploadError(Dryad2DataverseError)
 Returned on not OK respose (ie, not requests.status_code == 200).
 
 <a name="dryad2dataverse.exceptions.DataverseDownloadError"></a>
-## DataverseDownloadError Objects
+### DataverseDownloadError Objects
 
 ```python
 class DataverseDownloadError(Dryad2DataverseError)

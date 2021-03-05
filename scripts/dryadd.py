@@ -144,7 +144,10 @@ def argp():
     '''
     Argument parser
     '''
-    parser = argparse.ArgumentParser(description='Dryad to Dataverse import daemon')
+    description = ('Dryad to Dataverse import daemon. '
+                   'Arguments shown in square brackets (ie. []) are '
+                   'REQUIRED, despite being shown as optional.')
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-u', '--dv-url',
                         help='Destination dataverse root url. '
                         'Eg: https://dataverse.scholarsportal.info',
@@ -204,7 +207,7 @@ def argp():
                         required=False,
                         dest='tmp')
     parser.add_argument('--db',
-                        help='Tracking database location and name if not'
+                        help='Tracking database location and name if not '
                         '$HOME/dryad_dataverse_monitor.sqlite3',
                         required=False,
                         dest='dbase')

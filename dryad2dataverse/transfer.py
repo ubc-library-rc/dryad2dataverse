@@ -380,6 +380,7 @@ class Transfer():
     def download_files(self, files=None):
         '''
         Bulk downloader for files.
+
         ----------------------------------------
         Parameters:
 
@@ -604,8 +605,15 @@ class Transfer():
         ----------------------------------------
         Parameters:
 
-        pid : str
+        studyId : str
             — Dataverse persistent identifier.
+              Default dryad2dataverse.transfer.Transfer.dvpid,
+              which is only generated on 
+              dryad2dataverse.transfer.Transfer.upload_study()
+
+        dest : str
+            — Base URL for transfer. 
+              Default dryad2datavese.constants.DVURL
         ----------------------------------------
         '''
         if not studyId:
