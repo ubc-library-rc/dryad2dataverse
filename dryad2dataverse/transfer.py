@@ -9,6 +9,8 @@ import logging
 import os
 
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from dryad2dataverse import constants
@@ -17,6 +19,19 @@ from dryad2dataverse import exceptions
 LOGGER = logging.getLogger(__name__)
 URL_LOGGER = logging.getLogger('urllib3')
 
+#https://findwork.dev/blog/advanced-usage-python-requests-
+#timeouts-retries-hooks/#retry-on-failure
+#and 
+#https://stackoverflow.com/questions/15431044/
+#can-i-set-max-retries-for-requests-request'
+#TODO rewrite to use sessions
+RETRY_STRATEGY = Retry(total=10,
+                        status_forcelist=[429, 500, 502, 503, 504],
+                        method_whitelist=['HEAD', 'GET', 'OPTIONS', 
+                                          'POST', 'PUT'],
+                        backoff_factor=1)
+S = requests.Session()
+S.mount('https://', HTTPAdapter(max_retries=RETRY_STRATEGY))
 
 class Transfer():
     '''
@@ -373,8 +388,9 @@ class Transfer():
                     i[-1] = md5
             LOGGER.debug('Complete download sequence')
             return md5
-        except Exception as e:
-            LOGGER.exception(e)
+        except requests.exceptions.HTTPError as err:
+            LOGGER.critical('Unable to download %s', url)
+            LOGGER.exception(err)
             raise
 
     def download_files(self, files=None):
@@ -452,12 +468,14 @@ class Transfer():
             #See:
             #https://groups.google.com/d/msgid/dataverse-community/
             #74caa708-e39b-4259-874d-5b6b74ef9723n%40googlegroups.com
-
-            uningest = requests.post(f'{dv_url}/api/files/{fid}/uningest',
-                                     headers=headers,
-                                     timeout=300)
-            LOGGER.warning('Ingest halted for file %s for study %s', fid, study)
-            uningest.raise_for_status()
+            #Also, you can't uningest it because it hasn't been
+            #ingested once it's been unlocked. So the commented
+            #code below is useless (for now)
+            #uningest = requests.post(f'{dv_url}/api/files/{fid}/uningest',
+            #                         headers=headers,
+            #                         timeout=300)
+            #LOGGER.warning('Ingest halted for file %s for study %s', fid, study)
+            #uningest.raise_for_status()
 
     def upload_file(self, dryadUrl=None, filename=None,
                     mimetype=None, size=None, descr=None,
@@ -608,11 +626,11 @@ class Transfer():
         studyId : str
             — Dataverse persistent identifier.
               Default dryad2dataverse.transfer.Transfer.dvpid,
-              which is only generated on 
+              which is only generated on
               dryad2dataverse.transfer.Transfer.upload_study()
 
         dest : str
-            — Base URL for transfer. 
+            — Base URL for transfer.
               Default dryad2datavese.constants.DVURL
         ----------------------------------------
         '''

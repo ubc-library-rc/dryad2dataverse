@@ -63,10 +63,22 @@ def notify(msgtxt,
            port=None, recipient=None):
     '''
     Basic email change notifier. Will sent email outlining metadata changes
-    to recipient.
+    to recipient. Uses SSL.
 
     Has only really been tested with Gmail (although it should work with anything,
     and Gmail requires 'Allow less secure apps' or whatever they call it.
+    If you are having troubles with GMail:
+
+    1. Enable less secure access
+
+    2. Disable the CAPTCHA:
+       https://accounts.google.com/DisplayUnlockCaptcha
+
+    Note: Google will automatically revert settings after some arbitrary period of time. You have been warned.
+
+    If your application worked before but suddenly it crashes with authenication
+    errors, this is why.
+
     msgtext : tuple
         Tuple containing strings of ('subject', 'message content')
     user : str
@@ -82,7 +94,8 @@ def notify(msgtxt,
     '''
 
     if not port:
-        port = 587
+        #port = 587
+        port = 465 
     msg = Em()
     msg['Subject'] = msgtxt[0]
     msg['From'] = user
@@ -90,10 +103,11 @@ def notify(msgtxt,
 
     content = msgtxt[1]
     msg.set_content(content)
-    server = smtplib.SMTP(mailserv, port)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
+    #server = smtplib.SMTP(mailserv, port)
+    #server.ehlo()
+    #server.starttls()
+    #server.ehlo()
+    server = smtplib.SMTP_SSL(mailserv, port)
     server.login(user, pwd)
     server.sendmail(msg['From'], msg['To'], msg.as_string())
     server.close()
@@ -274,7 +288,9 @@ def rotating_log(path, level):
     #Set all the logs to the same level:
     #https://stackoverflow.com/questions/35325042/
     #python-logging-disable-logging-from-imported-modules
-    for na in ['serializer', 'transfer', 'monitor']:
+    for na in ['dryad2dataverse.serializer', 
+               'dryad2dataverse.transfer',
+               'dryad2dataverse.monitor']:
         logging.getLogger(na).setLevel(level)
     logger.setLevel(level)
     rotator = logging.handlers.RotatingFileHandler(filename=path,
