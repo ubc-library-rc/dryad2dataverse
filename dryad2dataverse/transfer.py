@@ -10,7 +10,6 @@ import os
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from dryad2dataverse import constants
@@ -19,19 +18,6 @@ from dryad2dataverse import exceptions
 LOGGER = logging.getLogger(__name__)
 URL_LOGGER = logging.getLogger('urllib3')
 
-#https://findwork.dev/blog/advanced-usage-python-requests-
-#timeouts-retries-hooks/#retry-on-failure
-#and 
-#https://stackoverflow.com/questions/15431044/
-#can-i-set-max-retries-for-requests-request'
-#TODO rewrite to use sessions
-RETRY_STRATEGY = Retry(total=10,
-                        status_forcelist=[429, 500, 502, 503, 504],
-                        method_whitelist=['HEAD', 'GET', 'OPTIONS', 
-                                          'POST', 'PUT'],
-                        backoff_factor=1)
-S = requests.Session()
-S.mount('https://', HTTPAdapter(max_retries=RETRY_STRATEGY))
 
 class Transfer():
     '''
@@ -55,6 +41,8 @@ class Transfer():
         self.fileDelRecord = []
         self.dvStudy = None
         self.jsonFlag = None #Whether or not new json uploaded
+        self.session = requests.Session()
+        self.session.mount('https://', HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
 
     def _del(self): #Change name to __del__ to make a destructor
         '''Expunges files from constants.TMP on deletion'''
@@ -142,8 +130,8 @@ class Transfer():
         '''
         return {'X-Dataverse-key' : apikey}
 
-    @staticmethod
-    def set_correct_date(url, hdl,
+    #@staticmethod
+    def set_correct_date(self, url, hdl,
                          d_type='distributionDate',
                          apikey=None):
         '''
@@ -181,19 +169,19 @@ class Transfer():
                 headers = {'X-Dataverse-key' : constants.APIKEY}
 
             params = {'persistentId': hdl}
-            set_date = requests.put(f'{url}/api/datasets/:persistentId/citationdate',
-                                    headers=headers,
-                                    data=d_type,
-                                    params=params,
-                                    timeout=45)
+            set_date = self.session.put(f'{url}/api/datasets/:persistentId/citationdate',
+                                        headers=headers,
+                                        data=d_type,
+                                        params=params,
+                                        timeout=45)
             set_date.raise_for_status()
 
-        except requests.exceptions.HTTPError as err:
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as err:
             LOGGER.warning('Unable to set citation date for %s',
                            hdl)
             LOGGER.warning(err)
             LOGGER.warning(set_date.text)
-
 
     def upload_study(self, url=None, apikey=None, timeout=45, **kwargs):
         '''
@@ -254,19 +242,19 @@ class Transfer():
                 raise
         if not dvpid:
             endpoint = f'{url}/api/dataverses/{targetDv}/datasets'
-            upload = requests.post(endpoint,
-                                   headers=headers,
-                                   json=self.dryad.dvJson,
-                                   timeout=timeout)
+            upload = self.session.post(endpoint,
+                                       headers=headers,
+                                       json=self.dryad.dvJson,
+                                       timeout=timeout)
             LOGGER.debug(upload.text)
         else:
             endpoint = f'{url}/api/datasets/:persistentId/versions/:draft'
             params = {'persistentId':dvpid}
             #Yes, dataverse uses *different* json for edits
-            upload = requests.put(endpoint, params=params,
-                                  headers=headers,
-                                  json=self.dryad.dvJson['datasetVersion'],
-                                  timeout=timeout)
+            upload = self.session.put(endpoint, params=params,
+                                      headers=headers,
+                                      json=self.dryad.dvJson['datasetVersion'],
+                                      timeout=timeout)
             #self._dvrecord = upload.json()
             LOGGER.debug(upload.text)
 
@@ -356,7 +344,7 @@ class Transfer():
                 LOGGER.debug('Stop download sequence with large file skip')
                 return md5
         try:
-            down = requests.get(url, timeout=timeout, stream=True)
+            down = self.session.get(url, timeout=timeout, stream=True)
             down.raise_for_status()
             with open(f'{tmp}{os.sep}{filename}', 'wb') as fi:
                 for chunk in down.iter_content(chunk_size=8192):
@@ -388,7 +376,8 @@ class Transfer():
                     i[-1] = md5
             LOGGER.debug('Complete download sequence')
             return md5
-        except requests.exceptions.HTTPError as err:
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as err:
             LOGGER.critical('Unable to download %s', url)
             LOGGER.exception(err)
             raise
@@ -421,7 +410,7 @@ class Transfer():
             LOGGER.exception('Unable to download file with info %s\n%s', f, e)
             raise
 
-    def force_notab_unlock(self, study, dv_url, fid, apikey=None):
+    def force_notab_unlock(self, study, dv_url, apikey=None):
         '''
         Checks for a study lock and forcibly unlocks and uningests
         to prevent tabular file processing. Required if mime and filename
@@ -436,9 +425,6 @@ class Transfer():
         dv_url : str
             — URL to base Dataverse installation.
 
-        fid : str
-            — File ID for file object.
-
         apikey : str
             — API key for user.
               If not present authorization defaults to self.auth.
@@ -451,17 +437,20 @@ class Transfer():
         else:
             headers = self.auth
         params = {'persistentId': study}
-        lock_status = requests.get(f'{dv_url}/api/datasets/:persistentId/locks', headers=headers,
-                                   params=params, timeout=300)
+        lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+                                       headers=headers,
+                                       params=params, timeout=300)
         lock_status.raise_for_status()
         if lock_status.json()['data']:
             LOGGER.warning('Study %s has been locked', study)
             LOGGER.warning('Lock info:\n%s', lock_status.json())
-            force_unlock = requests.delete(f'{dv_url}/api/datasets/:persistentId/locks',
-                                           params=params, headers=headers,
-                                           timeout=300)
+            force_unlock = self.session.delete(f'{dv_url}/api/datasets/:persistentId/locks',
+                                               params=params, headers=headers,
+                                               timeout=300)
             LOGGER.warning('Lock removed for %s', study)
             LOGGER.warning('Lock status:\n %s', force_unlock.json())
+            #This is what the file ID was for, in case it can
+            #be implemented again.
             #According to Harvard, you can't remove the progress bar
             #for uploaded tab files that squeak through unless you
             #let them ingest first then reingest them. Oh well.
@@ -560,8 +549,9 @@ class Transfer():
         tmphead.update(ctype)
         url = dest + '/api/datasets/:persistentId/add'
         try:
-            upload = requests.post(url, params=params, headers=tmphead,
-                                   data=multi, timeout=timeout)
+            upload = self.session.post(url, params=params,
+                                       headers=tmphead,
+                                       data=multi, timeout=timeout)
             #print(upload.text)
             upload.raise_for_status()
             self.fileUpRecord.append((fid, upload.json()))
@@ -578,8 +568,10 @@ class Transfer():
             ##SPSS files still process despite spoofing MIME and extension
             ##so there's also a forcible unlock check
 
-            fid = upload.json()['data']['files'][0]['dataFile']['id']
-            self.force_notab_unlock(studyId, dest, fid)
+            #fid = upload.json()['data']['files'][0]['dataFile']['id']
+            #fid not required for unlock
+            #self.force_notab_unlock(studyId, dest, fid)
+            self.force_notab_unlock(studyId, dest)
 
             return (fid, upload.json())
 
@@ -648,10 +640,10 @@ class Transfer():
                        'jsonData':f'{desc}'}
             params = {'persistentId':studyId}
             try:
-                meta = requests.post(f'{url}',
-                                     params=params,
-                                     headers=self.auth,
-                                     files=payload)
+                meta = self.session.post(f'{url}',
+                                         params=params,
+                                         headers=self.auth,
+                                         files=payload)
                 #0 because no dryad fid will be zero
                 meta.raise_for_status()
                 self.fileUpRecord.append((0, meta.json()))
@@ -688,9 +680,9 @@ class Transfer():
         if not key:
             key = constants.APIKEY
 
-        delme = requests.delete(f'{dvurl}/dvn/api/data-deposit/v1.1/swordv2/edit-media'
-                                f'/file/{dvfid}',
-                                auth=(key, ''))
+        delme = self.session.delete(f'{dvurl}/dvn/api/data-deposit/v1.1/swordv2/edit-media'
+                                    f'/file/{dvfid}',
+                                    auth=(key, ''))
         if delme.status_code == 204:
             self.fileDelRecord.append(dvfid)
             return 1

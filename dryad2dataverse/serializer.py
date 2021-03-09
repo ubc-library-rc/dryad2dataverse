@@ -8,6 +8,7 @@ import logging
 import urllib.parse
 
 import requests
+from requests.adapters import HTTPAdapter
 
 from  dryad2dataverse import constants
 
@@ -39,6 +40,9 @@ class Serializer():
         #Serializer objects will be assigned a Dataverse study PID
         #if dryad2Dataverse.transfer.Transfer() is instantiated
         self.dvpid = None
+        self.session = requests.Session()
+        self.session.mount('https://',
+                           HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
         LOGGER.debug('Creating Serializer instance object')
 
     def fetch_record(self, url=None, timeout=45):
@@ -64,11 +68,12 @@ class Serializer():
             headers = {'accept':'application/json',
                        'Content-Type':'application/json'}
             doiClean = urllib.parse.quote(self.doi, safe='')
-            resp = requests.get(f'{url}/api/v2/datasets/{doiClean}',
-                                headers=headers, timeout=timeout)
+            resp = self.session.get(f'{url}/api/v2/datasets/{doiClean}',
+                                    headers=headers, timeout=timeout)
             resp.raise_for_status()
             self._dryadJson = resp.json()
-        except requests.exceptions.HTTPError as err:
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as err:
             LOGGER.error('URL error for: %s', url)
             LOGGER.exception(err)
             raise
@@ -90,7 +95,7 @@ class Serializer():
     @property
     def dryadJson(self):
         '''
-        Returns Dryad study JSON. Will call Serializer.fetch_record() if 
+        Returns Dryad study JSON. Will call Serializer.fetch_record() if
         no JSON is present.
         '''
         if not self._dryadJson:
@@ -139,7 +144,7 @@ class Serializer():
         '''
         Returns a list of file JSONs from call to Dryad API /files/{id},
         where the ID is parsed from the Dryad JSON. Dryad file listings
-        are paginated, so the return consists of a list of dicts, one 
+        are paginated, so the return consists of a list of dicts, one
         per page.
 
         ----------------------------------------
@@ -154,19 +159,19 @@ class Serializer():
                 self._fileJson = []
                 headers = {'accept':'application/json',
                            'Content-Type':'application/json'}
-                fileList = requests.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
-                                        headers=headers,
-                                        timeout=timeout)
+                fileList = self.session.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
+                                            headers=headers,
+                                            timeout=timeout)
                 fileList.raise_for_status()
                 #total = fileList.json()['total'] #Not needed
                 lastPage = fileList.json()['_links']['last']['href']
                 pages = int(lastPage[lastPage.rfind('=')+1:])
                 self._fileJson.append(fileList.json())
                 for i in range(2, pages+1):
-                    fileCont = requests.get(f'{constants.DRYURL}/api/v2'
-                                            f'/versions/{self.id}/files?page={i}',
-                                            headers=headers,
-                                            timeout=timeout)
+                    fileCont = self.session.get(f'{constants.DRYURL}/api/v2'
+                                                f'/versions/{self.id}/files?page={i}',
+                                                headers=headers,
+                                                timeout=timeout)
                     fileCont.raise_for_status()
                     self._fileJson.append(fileCont.json())
             except Exception as e:
