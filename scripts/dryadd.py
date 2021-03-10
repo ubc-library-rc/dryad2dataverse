@@ -23,8 +23,6 @@ import dryad2dataverse.transfer
 
 DRY = 'https://datadryad.org/api/v2'
 
-global elog
-
 def new_content(serial):
     '''
     Creates content for new study upload message (potentially redundant
@@ -74,7 +72,8 @@ def notify(msgtxt,
     2. Disable the CAPTCHA:
        https://accounts.google.com/DisplayUnlockCaptcha
 
-    Note: Google will automatically revert settings after some arbitrary period of time. You have been warned.
+    Note: Google will automatically revert settings after some arbitrary period
+    of time. You have been warned.
 
     If your application worked before but suddenly it crashes with authenication
     errors, this is why.
@@ -95,7 +94,7 @@ def notify(msgtxt,
 
     if not port:
         #port = 587
-        port = 465 
+        port = 465
     msg = Em()
     msg['Subject'] = msgtxt[0]
     msg['From'] = user
@@ -239,7 +238,8 @@ def set_constants(args):
     if args.dbase:
         dryad2dataverse.constants.DBASE = args.dbase
 
-def email_log(mailhost, fromaddr, toaddrs, credentials, secure=()):
+def email_log(mailhost, fromaddr, toaddrs, credentials, secure=(),
+              level=logging.WARNING):
     '''
     Emails log error messages to recipient
 
@@ -256,11 +256,11 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, secure=()):
         the name of a keyfile, or a 2-value tuple with the names of the keyfile
         and certificate file.
         See https://docs.python.org/3/library/logging.handlers.html
-
+    level : int
+        logging level. Default logging.WARNING
     '''
-    #global elog
-    subject = 'Dryad to Dataverse transfer error '
-    elog = logging.getLogger()
+    subject = 'Dryad to Dataverse transfer error'
+    elog = logging.getLogger('email_log')
     mailer = logging.handlers.SMTPHandler(mailhost=mailhost, fromaddr=fromaddr,
                                           toaddrs=[toaddrs], subject=subject,
                                           credentials=credentials, secure=secure)
@@ -269,7 +269,7 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, secure=()):
                                  '%(message)s')
     mailer.setFormatter(l_format)
     elog.addHandler(mailer)
-    elog.setLevel(logging.WARNING)
+    elog.setLevel(level)
     return elog
 
 def rotating_log(path, level):
@@ -288,7 +288,7 @@ def rotating_log(path, level):
     #Set all the logs to the same level:
     #https://stackoverflow.com/questions/35325042/
     #python-logging-disable-logging-from-imported-modules
-    for na in ['dryad2dataverse.serializer', 
+    for na in ['dryad2dataverse.serializer',
                'dryad2dataverse.transfer',
                'dryad2dataverse.monitor']:
         logging.getLogger(na).setLevel(level)
@@ -322,8 +322,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     args = parser.parse_args()
     set_constants(args)
 
-    email_log((args.mailserv, args.port), args.contact, args.recipients,
-              (args.user, args.pwd))
+    elog = email_log((args.mailserv, args.port), args.contact, args.recipients,
+                     (args.user, args.pwd))
 
 
     logger.info('Beginning update process')
@@ -333,112 +333,94 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                         dryad2dataverse.constants.DBASE+'.bak')
 
     monitor = dryad2dataverse.monitor.Monitor(args.dbase)
-    #TODO remove line below on release
-    #monitor.set_timestamp('1999-01-14T00:00:00Z')
-    monitor.set_timestamp('2020-11-30T00:00:00Z')
     logger.info('Last update time: %s', monitor.lastmod)
 
     #get all updates since the last update check
     updates = get_records(args.ror, monitor.lastmod)
-    #updates = get_records(args.ror)#all
-    #15% sample
-    #import random
-    #updates = tuple(random.sample(list(updates), len(updates)//6.66)
-
-    #TODO remove also
-    #import pickle
-    #with open('/Users/paul/tmp/updates.pickle', 'wb') as f:
-    #       pickle.dump(updates, f)
-    #print(updates)
-    #import sys
-    #sys.exit()
 
     #update all the new files
-    for doi in updates:
-        if not updates:
-            break #no new files in this case
-        #TODO remove this. it's only here for testing on my home internets
-        if doi[1]['storageSize']/1024**2 > 10:
-            continue #Max 10MB of files
-        #Create study object
-        study = dryad2dataverse.serializer.Serializer(doi[0])
-        if study.embargo:
-            continue
-        #TODO remove this continue
-        continue
+    try:
+        count = 0
+        for doi in updates:
+            count += 1
+            logger.info('Processing %s of %s', count, len(updates))
+            if not updates:
+                break #no new files in this case
+            #Create study object
+            study = dryad2dataverse.serializer.Serializer(doi[0])
+            if study.embargo:
+                logger.warning('Study %s embargoed. Skipping', study.doi)
+                elog.warning('Study %s is embargoed. Skipping', study.doi)
+                continue
 
-        #with open('/Users/paul/tmp/doi.pickle', 'wb') as f:
-        #    pickle.dump(doi, f)
-        #sys.exit()
+            #it turns out that the Dryad API sends all the metadata
+            #from the study in their search, so it's not necessary
+            #to download it again
+            study.dryadJson = doi[1]
 
-        #it turns out that the Dryad API sends all the metadata
-        #from the study in their search, so it's not necessary
-        #to download it again
-        study.dryadJson = doi[1]
+            #check to see what sort of update it is.
+            update_type = monitor.status(study)['status']
 
-        #check to see what sort of update it is.
-        update_type = monitor.status(study)['status']
+            #create a transfer object to copy the files over
+            transfer = dryad2dataverse.transfer.Transfer(study)
 
-        #create a transfer object to copy the files over
-        transfer = dryad2dataverse.transfer.Transfer(study)
+            #Now start the action
+            if update_type == 'new':
+                logger.info('New study: %s, %s', doi[0], doi[1]['title'])
+                logger.info('Uploading study metadata')
+                transfer.upload_study(targetDv=args.target)
+                logger.info('Downloading study files')
+                transfer.download_files()
+                logger.info('Uploading files to Dataverse')
+                transfer.upload_files()
+                logger.info('Uploading Dryad JSON metadata')
+                transfer.upload_json()
+                notify(new_content(study),
+                       user=args.user, pwd=args.pwd,
+                       recipient=args.recipients)
 
-        #Now start the action
-        if update_type == 'new':
-            logger.info('New study: %s, %s', doi[0], doi[1]['title'])
-            logger.info('Uploading study metadata')
-            transfer.upload_study(targetDv=args.target)
-            logger.info('Downloading study files')
-            transfer.download_files()
-            logger.info('Uploading files to Dataverse')
-            transfer.upload_files()
-            logger.info('Uploading Dryad JSON metadata')
-            transfer.upload_json()
-            notify(new_content(study),
-                   user=args.user, pwd=args.pwd,
-                   recipient=args.recipients)
+            if update_type == 'updated':
+                logger.info('Updated metadata: %s', doi[0])
+                logger.info('Updating metadata')
+                transfer.upload_study(dvpid=study.dvpid)
+                #remove old JSON files
+                rem = monitor.get_json_dvfids(study)
+                transfer.delete_dv_files(rem)
+                transfer.upload_json()
+                notify(changed_content(study, monitor),
+                       user=args.user, pwd=args.pwd,
+                       recipient=args.recipients)
 
-        if update_type == 'updated':
-            logger.info('Updated metadata: %s', doi[0])
-            logger.info('Updating metadata')
-            transfer.upload_study(dvpid=study.dvpid)
-            #remove old JSON files
-            rem = monitor.get_json_dvfids(study)
-            transfer.delete_dv_files(rem)
-            transfer.upload_json()
-            notify(changed_content(study, monitor),
-                   user=args.user, pwd=args.pwd,
-                   recipient=args.recipients)
+            if update_type == 'unchanged':
+                logger.info('Unchanged metadata %s', doi[0])
+                continue
 
-        if update_type == 'unchanged':
-            logger.info('Unchanged metadata %s', doi[0])
-            continue
+            diff = monitor.diff_files(study)
+            print(diff)
+            if diff.get('delete'):
+                del_these = monitor.get_dv_fids(diff['delete'])
+                transfer.delete_dv_files(dvfids=del_these)
+                logger.info('Deleted files %s from '
+                            'Dataverse', diff['delete'])
+            if diff.get('add'):
+                logger.info('Adding files %s '
+                            'to Dataverse', diff['add'])
+                #you need to download them first if they're new
+                transfer.download_files(diff['add'])
+                #now send them to Dataverse
+                transfer.upload_files(diff['add'], pid=study.dvpid)
 
-        #TODO delete this
-        #if update_type != 'unchanged':
-        #    notify(study, monitor,
-        #           user=args.user, pwd=args.pwd,
-        #           recipient=args.recipients)
+            #Update the tracking database for that record
+            monitor.update(transfer)
+        #and finally, update the time for the next run
+        monitor.set_timestamp()
+        logger.info('Completed update process')
+        elog.info('Completed update process')
 
-        diff = monitor.diff_files(study)
-        print(diff)
-        if diff.get('delete'):
-            del_these = monitor.get_dv_fids(diff['delete'])
-            transfer.delete_dv_files(dvfids=del_these)
-            logger.info('Deleted files %s from '
-                        'Dataverse', diff['delete'])
-        if diff.get('add'):
-            logger.info('Adding files %s '
-                        'to Dataverse', diff['add'])
-            #you need to download them first if they're new
-            transfer.download_files(diff['add'])
-            #now send them to Dataverse
-            transfer.upload_files(diff['add'], pid=study.dvpid)
-
-        #Update the tracking database for that record
-        monitor.update(transfer)
-    #and finally, update the time for the next run
-    monitor.set_timestamp()
-    logger.info('Completed update process')
+    except Exception as err:
+        logger.critical(err)
+        elog.critical(err)
+        raise
 
 if __name__ == '__main__':
     #print(get_records('https://ror.org/03rmrcq20', '2021-01-01'))

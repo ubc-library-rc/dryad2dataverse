@@ -1,17 +1,21 @@
 from nose.tools import *
-import sqlite3
 import json
+import os
 import pickle
+import sqlite3
 import  dryad2dataverse.serializer
 import  dryad2dataverse.transfer
 import  dryad2dataverse.monitor
 
+#Don't rely on relative path for loading files 
+fprefix = os.path.dirname(os.path.realpath(__file__))+os.sep
+
 testCase = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
-with open('./tests/dryad_dummy_metadata.json') as f:
+with open(f'{fprefix}dryad_dummy_metadata.json') as f:
     testCase._dryadJson = json.load(f)
 #montest = dryad2dataverse.monitor.Monitor('/Users/paul/tmp/wtf.db')
 montest = dryad2dataverse.monitor.Monitor(':memory:')
-with open('tests/dryad_files_orig.json') as f:
+with open(f'{fprefix}dryad_files_orig.json') as f:
     testCase._fileJson=json.load(f)
 def setup():
     print( "Start test")
@@ -69,7 +73,7 @@ def test_unchanged_files():
     assert_equal({}, diff, True)
 
 def test_added_files():
-    with open('tests/dryad_files_added.json') as f:
+    with open(f'{fprefix}dryad_files_added.json') as f:
         new = json.load(f)
     testCase._fileJson = new
     diff = montest.diff_files(testCase)
@@ -83,7 +87,7 @@ def test_added_files():
     assert_equal(expect, diff)
     
 def test_deleted_files():
-    with open('tests/dryad_files_deleted.json') as f:
+    with open(f'{fprefix}dryad_files_deleted.json') as f:
         new = json.load(f)
         testCase._fileJson = new
     diff = montest.diff_files(testCase)

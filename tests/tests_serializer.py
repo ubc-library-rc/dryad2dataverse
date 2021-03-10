@@ -1,4 +1,5 @@
 from nose.tools import *
+import os
 import sqlite3
 import json
 import pickle
@@ -188,4 +189,32 @@ def test_title():
         addJson=None,
         ), out)
 
+def test_bad_url():
+    '''
+    Dryad doesn't do validation checking on URLs, but may later
+    So this reads a [currently] badly formatted URL and checks it.
+    '''
+    fprefix = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{fprefix}{os.sep}badUrl.json') as f:
+        dry = json.load(f)
+    badJson = dryad.Serializer('irrelevant')
+    badJson._dryadJson = dry
+    dvurl = badJson.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'][9]['value'][0]['publicationURL']['value']
+    #URL with https:// prepended
+    url = 'https://www.github.com/wood-lab/Quinn_et_al_2021_Proc_B'
+    assert_equal(dvurl, url)
 
+#def test_worse_url():
+#    '''
+#    Dryad doesn't do validation checking on URLs, but may later.
+#    This record has a URL with no data. 
+#    '''
+#    fprefix = os.path.dirname(os.path.realpath(__file__))
+#    with open(f'{fprefix}{os.sep}nullField.json') as f:
+#        dry = json.load(f)
+#    badJson = dryad.Serializer('irrelevant')
+#    badJson._dryadJson = dry
+#    dvurl = badJson.dvJson['datasetVersion']['metadataBlocks']['citation']['fields'][9]['value'][0]['publicationURL']['value']
+#    #URL with https:// prepended
+#    url = 'https://www.github.com/wood-lab/Quinn_et_al_2021_Proc_B'
+#    assert_equal(dvurl, url)

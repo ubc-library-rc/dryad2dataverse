@@ -17,6 +17,11 @@ And by "constants", you should change these as required. This module contains th
 ### General variables  
 <a name="General variables"></a>
 
+**RETRY_STRATEGY**  
+	+ This is a `urllib3.util` `Retry` object which controls the connection attemps of a `requests.Session` object. Not all connections are guaranteed to be successful the first time round, and the `Retry` object will allow multiple connection attempts before raising an exception.  
+	+ Default: 10 attempts, with exponentially increased times between attempts.  
+	+ For more information/a tutorial on how to use the Retry object, please see <https://findwork.dev/blog/advanced-usage-python-requests-timeouts-retries-hooks/#retry-on-failure>  
+
 **DRYURL**  
 	+ Base URL for the Dryad data repository.  
 	+ Default = 'https://datadryad.org'  

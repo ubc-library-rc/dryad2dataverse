@@ -750,6 +750,9 @@ class Serializer():
                 #id = r.get('identifier')
                 #TODONE Verify that changing id to _id has not broken anything: 11Feb21
                 _id = r.get('identifier')
+                #Note:10 Feb 2021 : some records have identifier = ''. BAD DRYAD.
+                if not _id:
+                    continue
                 relationship = r.get('relationship')
                 #idType = r.get('identifierType') #not required in _convert_generic
                 #citation = {'citation': f"{lookup[relationship]}: {id}"}
@@ -772,7 +775,12 @@ class Serializer():
                 if pubUrl['publicationURL']['value'].lower().startswith('doi:'):
                     fixurl = 'https://doi.org/' + pubUrl['publicationURL']['value'][4:]
                     pubUrl['publicationURL']['value'] = fixurl
-                    LOGGER.debug(fixurl)
+                    LOGGER.debug('Rewrote URLs to be %s', fixurl)
+
+                #Dryad doesn't validate URL fields to start with http or https. Assume https
+                if not pubUrl['publicationURL']['value'].lower().startswith('htt'):
+                    pubUrl['publicationURL']['value'] = ('https://' + 
+                                                          pubUrl['publicationURL']['value'])
                 pubcite.update(pubIdType)
                 pubcite.update(pubUrl)
                 out.append(pubcite)
