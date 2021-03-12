@@ -227,7 +227,7 @@ class Serializer():
 
         maxsize : int
             — Size in bytes in which to flag as oversize.
-              Default: constants.MAX_UPLOAD.
+              Defaults to constants.MAX_UPLOAD.
         ----------------------------------------
         '''
         if not maxsize:

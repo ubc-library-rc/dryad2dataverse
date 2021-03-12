@@ -22,7 +22,7 @@ URL_LOGGER = logging.getLogger('urllib3')
 class Transfer():
     '''
     Transfers metadata and data files from a
-    Drayd installation to Dataverse installation.
+    Dryad installation to Dataverse installation.
     '''
     def __init__(self, dryad):
         '''
@@ -213,7 +213,7 @@ class Transfer():
             — Dataverse persistent ID (for updating metadata).
             This is not required for new uploads, specify as dvpid=value
 
-        **OPTIONAL KEYWORD ARGUMENTS**
+        ----------------------------------------
         '''
         if not url:
             url = constants.DVURL
@@ -310,7 +310,7 @@ class Transfer():
         filename : str
             — Output file name.
 
-        timeout: int
+        timeout : int
             — Requests timeout.
 
         tmp : str
@@ -320,6 +320,7 @@ class Transfer():
         size : int
             — Reported file size in bytes.
               Defaults to dryad2dataverse.constants.MAX_UPLOAD.
+
         chk : str
             - md5 sum of file (if available and known).
         ----------------------------------------
@@ -389,7 +390,7 @@ class Transfer():
         ----------------------------------------
         Parameters:
 
-        files: list
+        files : list
             — Items in list can be tuples or list with a minimum of:
 
               (dryaddownloadurl, filenamewithoutpath, [md5sum])
@@ -588,7 +589,7 @@ class Transfer():
         ----------------------------------------
         Parameters:
 
-        files: list
+        files : list
             — List contains tuples with
             (dryadDownloadURL, filename, mimetype, size).
 

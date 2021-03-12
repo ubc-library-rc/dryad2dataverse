@@ -1,0 +1,70 @@
+
+I've discovered what potentially could be an issue with the Dryad API (although it's never unwise to rule out user error). Unfortunately, this email is quite lengthy but I hope it makes sense in the end.
+
+While attempting to use the API to download Dryad content, I've encountered 404 errors, but not consistently; that is, not all records are affected, but only some. I haven't examined all of the records in detail, but at a minimum I'm encountering this error with one record which I will use as an example:
+
+doi:10.5061/dryad.kh1893248, Data from: Divergence of Arctic shrub growth associated with sea ice decline
+
+Having a look at the file info (ie, the returned json from the /files endpoint):
+
+curl -H 'accept:application/json' -H 'Content-type:application/json' -X GET T https://datadryad.org/api/v2/versions/96253/files
+
+For referencing the file version: the API call to /datasets/{doi} yields the json
+['_links']['stash:version'] shows {'href': '/api/v2/versions/96253'} 
+
+The files contained from that output,(ie ["path"]and ["_links"]["stash:file-download"]["href"]) yields the following, which is seemingly straightforward:
+
+[['BS_BGL.rwl', 'https://datadryad.org/api/v2/files/812010/download'],
+ ['AF_SAR.rwl', 'https://datadryad.org/api/v2/files/812011/download'],
+ ['BL_BGL.rwl', 'https://datadryad.org/api/v2/files/812012/download'],
+ ['DE_SGL.rwl', 'https://datadryad.org/api/v2/files/812013/download'],
+ ['BT_BGL.rwl', 'https://datadryad.org/api/v2/files/812014/download'],
+ ['DK_BNA.rwl', 'https://datadryad.org/api/v2/files/812015/download'],
+ ['EB_SPO.rwl', 'https://datadryad.org/api/v2/files/812016/download'],
+ ['GR_BGL.rwl', 'https://datadryad.org/api/v2/files/812017/download'],
+ ['HE_SAR.rwl', 'https://datadryad.org/api/v2/files/812018/download'],
+ ['HE_SRI.rwl', 'https://datadryad.org/api/v2/files/812019/download']]
+
+However, on attempting to download:
+
+BS_BGL.rwl 404 Not Found
+AF_SAR.rwl 404 Not Found
+BL_BGL.rwl 404 Not Found
+DE_SGL.rwl 404 Not Found
+BT_BGL.rwl 404 Not Found
+DK_BNA.rwl 404 Not Found
+EB_SPO.rwl 404 Not Found
+GR_BGL.rwl 404 Not Found
+HE_SAR.rwl 404 Not Found
+HE_SRI.rwl 404 Not Found
+
+I do note that the API documentation says "Only files that have been stored in the storage repository may be downloaded (and ability to download may depend on the user)". However, the files above are downloadable without authentication from the web interface of dryad (ie, at https://datadryad.org/stash/dataset/doi:10.5061/dryad.kh1893248). I am not sure if the condition applies in this instance.
+
+There may also be an omission from the API documentation at https://datadryad.org/api/v2/docs/#/default/get_versions__id__files.
+ 
+The call to https://datadryad.org/api/v2/versions/96253/files:
+
+curl -H 'accept:application/json' -H 'Content-type:application/json' -X GET https://datadryad.org/api/v2/versions/96253/files
+
+yields a json with json['count'] of 10, but there are clearly more than 10 files at https://datadryad.org/stash/dataset/doi:10.5061/dryad.kh1893248, as is indicated by the ['total'] value of 25
+
+It appears that the full list of 25 files is presented in a paginated form, as listed by the ['_links'] value, which has `?page=#` additions for first, last, and next, so that actually getting the complete list of files would require multiple json downloads. ie,  https://datadryad.org/api/v2/versions/96253/files?page=[0-n], where n is up to the value of page in ['last']. 
+
+There is no mention of a 'page' parameter in the documentation for the /versions/{id}/files endpoint, so I thought that I should check if this assertion is true, and that iterating over multiple pages is required.  Alternately, if there was a way to obtain a complete list of files from /versions/{id}/files with only one call.
+
+Note that it is still possible to obtain the files associated with doi:10.5061/dryad.kh1893248 using the API:
+
+Downloading the zip package from the /datasets/{doi}/download endpoint yields 25 files, as expected. Unfortunately, this method doesn't yield the descriptive metadata that's available from the /files endpoint, and requires extra space to unzip files, nor is it desirable in the case where only one file is required. I would prefer to avoid the /download endpoint if possible.
+
+So, to summarize (or in case you've skipped to the end):
+
+1. Some records appear to have incorrect URLs for downloads
+2. Is it true that iteration over the /versions/{version}/files endpoint is required?
+
+I hope my email makes sense. If you require any clarification, please don't hesitate to contact me.
+
+Sincerely,
+
+
+
+

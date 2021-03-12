@@ -1,11 +1,12 @@
-site_name: Local Preview Dryad2dataverse
+site_name: Dryad2dataverse
 docs_dir: 'docs'
 nav:
   - Overview: index.md
   - Installation: installation.md
-  - Sample Files: samples.md
+  - Scripts: scripts.md
   - General Reference: reference.md
   - API Reference: api_reference.md
+  - Tracking Database Structure: dbase_structure/index.html
   - FAQ: faq.md
-  - Acknowledgements: acknowledgements.md
+  - Credits: credits.md
 theme: readthedocs 

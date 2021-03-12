@@ -423,8 +423,9 @@ returns md5sum on success and an exception on failure.
   size : int
   — Reported file size in bytes.
   Defaults to dryad2dataverse.constants.MAX_UPLOAD.
+  
   chk : str
-  - md5 sum of file (if available and known).
+  — md5 sum of file (if available and known).
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.download_files"></a>

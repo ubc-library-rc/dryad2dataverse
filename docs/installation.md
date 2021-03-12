@@ -9,7 +9,7 @@ nav_order: 5
 
 This is not a complete list of installation methods. For a complete guide to Python package installation, please see <https://packaging.python.org/tutorials/installing-packages/>.
 
-### Requirements
+## Requirements
 
 * requests >= 2.21.0  
 * requests-toolbelt >= 0.9.1
@@ -17,15 +17,17 @@ This is not a complete list of installation methods. For a complete guide to Pyt
 
 Actually, it will probably work just fine with earlier versions, but that's what development started with.
 
-### Pip from source
+## Pip from source
 
+### Download
 The source code for this project is available at <https://github.com/ubc-library-rc/dryad2dataverse>
 
 To install, first clone the repository:
 
 `git clone https://github.com/ubc-library-rc/dryad2dataverse.git`
 
-Depending on your needs, you may wish to keep dryad2dataverse in a virtual environment.
+### Intermediate (optional) step: using a virtual environment
+Depending on your needs, you may wish to keep dryad2dataverse in a virtual environment. This step is completely optional.
 
 In this case, you will need to perform the following steps to create your virtual environment. First, create a directory to hold your virtual environment:
 
@@ -41,7 +43,9 @@ Finally, enable the virtual environment:
 
 Creating the virtual environment is not required if you don't mind having the prerequisites installed. More information on virtual environments can be found on the Python website: <https://docs.python.org/3.6/tutorial/venv.html>
 
-Once it's downloaded:
+### Installation
+
+Once you've cloned the files and optionally used `venv`:
 
 ```
 cd dryad2dataverse

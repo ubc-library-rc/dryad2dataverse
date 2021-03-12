@@ -13,18 +13,24 @@ renderer:
     - title: Installation 
       name: installation
       source: installation.md 
-    - title: Reference
+    - title: Scripts
+      name: scripts 
+      source: scripts.md 
+    - title: General Reference
       name: reference
       source: reference.md 
     - title: API Reference
       name: api_ref 
       source: api_reference.md
+    - title: Tracking Database Structure
+      name: dbase_structure
+      source: dbase_structure/index.html 
     - title: FAQ   
       name: faq.md 
       source: faq.md 
-    - title: Acknowledgements   
-      name:  ack
-      source: acknowledgements.md 
+    - title: Credits 
+      name: credits 
+      source: credits.md 
         #    - title: API Documentation
         #contents:
         #- '*'

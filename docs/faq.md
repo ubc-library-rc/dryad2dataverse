@@ -3,27 +3,62 @@ layout: default
 title: FAQ
 nav_order: 20
 ---
+# Frequently asked questions
 
-**Why is my transfer to Dataverse not showing up as published?**
+#### **Why is the upload script (dryadd.py) constantly crashing with SMTP errors?**
+
+If you are using Gmail to send messages about your migration, there are a few potential hurdles.
+
+1. You *must* enable [**less secure app access**](https://support.google.com/accounts/answer/6010255?hl=en).
+
+2. Even when you do that, it can still crash with no obvious explanation or a mysterious authentication error. In this case, the script may be encountering a Captcha security measure. You can remove this by going to <https://accounts.google.com/DisplayUnlockCaptcha> before running your script (when logged into the account which you are using, of course).
+
+3. The settings revert back to normal after some period of time of which I am not aware. Daily or weekly updates *should* be OK, but monthly ones will probably fail with SMTP errors as the service reverts to defaults.
+
+Your other option is to not use Gmail.
+
+**smtplib** exceptions will cause a script crash, so if you are experiencing persistent mail problems and still wish to use the script, you may wish disable emailing log messages.
+
+This is easily accomplished by commenting out the section starting with `elog = email_log(` in `scripts/dryadd.py`. Obviously you can't do this if you're using a binary dryadd.
+
+More advanced mail handling may be available in later releases.
+
+_All error messages are written to the log anyway,_ so if you disable emailing of log messages you can still see them in the transfer log.
+
+#### **Why is my transfer to Dataverse not showing up as published?**
 
 **dryad2dataverse** does not _publish_ the dataset. That must still be done via the Dataverse GUI or API. 
 
-Publication functionality has been intentionally omitted as there are file size limits within a default Dataverse installation that do not apply to Dryad, and Dataverse installations are [more] often subject to manual data curation.
+Publication functionality has been omitted _by design_:
 
-**Why does my large file download/upload fail?**
+* File size limits within a default Dataverse installation that do not apply to Dryad, so it's possible that some files need to be moved with the assistance of a Datverse system administrator
+
+* Although every attempt has been made to map metadata schemas appropriately, it's undoubtedly not perfect. A quick once-over by a human can notice any unusual or unforeseen errors
+
+* Metadata quality standards can vary between Dryad and a Dataverse installations. A manual curation step is sometimes desirable to ensure that all published records meet the same standards.
+
+#### **But I don't want to manually curate my data**
+
+It's possible to publish via the Dataverse API. If you *really* want to publish automatically, you can obtain a list of unpublished studies from Dataverse and publish them programatically. This is left as an exercise for the reader.
+
+#### **Why does my large file download/upload fail?**
 
 By default, Dataverse limits file sizes to 3 Gb, but that can vary by installation. `dryad2dataverse.constants.MAX_UPLOAD` contains the value which should correspond to the maximum upload size in Dataverse. If you don't know *what* the upload size is, contact the system administrator of your target Dataverse installation to find out.
 
-**Why does my upload fail halfway?**
+To upload files exceeding the API upload limit, you will need to speak to a Dataverse administrator.
+
+#### **Why does my upload of files fail halfway?**
 
 Dataverse will automatically cease ingest and lock a study when encountering a file which is suitable for tabular processing. The only way to stop this behaviour is to prohibit ingest in the Dataverse configuration, which is probably not possible for many users of the software.
 
-To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. This process, unfortunately, is not foolproof.
+To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn't work and tabular processing starts anyway, the study is forcibly unlocked to allow uploads to continue. This process, unfortunately, is [probably] not foolproof.
 
-**Why is a file which should be a tabular file not a tabular file?**
+#### **Why is a file which should be a tabular file not a tabular file?**
 
-As a direct result of (3) above, tabular file processing has (hopefully) been eliminated. It's still possible to create a tabular file by [reingesting it.](https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file "Reingest via API")
+As a direct result of the above, tabular file processing has (hopefully) been eliminated. It's still possible to create a tabular file by [reingesting it.](https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file "Reingest via API")
 
-**Why does the code use camel case instead of snake case for variables?**
+Unless you are are the administrator of a Dataverse installation, you likely don't have control over what is or is not considered a tabular file. **dryad2dataverse** attempts to block all tabular file processing, but the process is imperfect. _Sic vita._
+
+#### **Why does the code use camel case instead of snake case for variables?**
 
 By the time I realized I should be using snake case, it was too late and I was already consistently using camel case. <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>

@@ -1,0 +1,6 @@
+dryadjson
+authors
+license
+size
+title
+versions

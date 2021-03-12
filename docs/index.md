@@ -5,25 +5,34 @@ nav_order: 1
 ---
 
 
-# dryad2dataverse
+# dryad2dataverse -  translate, transfer and track
 
 ---
 
 ## Introduction
 
-**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
+**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library and an associated application which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
 
 With these tools it's possible to: 
 
-a) Serialize Dryad JSON to Dataverse JSON
+a) Serialize Dryad metadata to Dataverse JSON
 
 b) Transfer Dryad studies to Dataverse without any knowledge of the somewhat complex Dataverse API
 
 c) Monitor changes in status
 
-The minimum required Python version for **dryad2dataverse** is Python **3.6**, as it is the earliest version which supports f-strings. You can find Python at <https://www.python.org/downloads/>. It was developed using 3.7.2, and it runs just fine under the [now current] 3.9.2.
+The minimum required Python version for **dryad2dataverse** is Python **3.6**, as it is the earliest version which supports [f-strings](https://www.python.org/dev/peps/pep-0498/). It was developed using version 3.7.2, and it runs just fine under the [now current] 3.9.2. You can find Python at <https://www.python.org/downloads/>. _No testing was done with Anaconda, only stock Python_. That said, it probably works fine with Anaconda.
 
-The **dryad2dataverse** library is free and open source, released under the MIT license.
+### Not just a library - no programming required
+----
+
+If you hate programming, are pressed for time and/or don't want to read any documentation, **dryad2dataverse** also comes with a [command line tool](scripts.md) to do all of these things without requiring any knowledge of Python or programming.
+
+----
+
+The **dryad2dataverse** library is free and open source, released under the MIT license. It's also not written by anyone with a degree in computer science, so as the MIT license says: 
+
+	Software is provided "as is", without warranty of any kind
 
 ### Why would I need this?
 
@@ -31,7 +40,7 @@ There are a few reasons why you might find this product useful.
 
 * You are a researcher and you wish to deposit via API into Dataverse repository. You've used Dryad, but the Dataverse JSON and API is unfamiliar and [complex](https://guides.dataverse.org/en/latest/_downloads/dataset-create-new-all-default-fields.json "Complex Dataverse JSON"). You can write your Dryad JSON and convert automatically.
 
-* Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution's research data (for example, the Dataverse repository at <https://dataverse.scholarsportal.info>)
+* Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution's research data (for example, the Dataverse repository at <https://dataverse.scholarsportal.info>).
 
 * And on top of that, you don't want to keep checking to see if there were any updates, so you wish to automate the process.
 
@@ -75,16 +84,16 @@ Note: a number of variables must be set [correctly] for this to work, such as yo
 
 #### Change monitoring
 
-Because monitoring the status of something over time requires persistence, the dryad2dataverse.monitor.Monitor object uses an [SQLite3](https://sqlite.org), which is a single file, portable database. This allows monitoring without laborious database configuration on a host system, and updates can be run on any system that has sufficient storage space to act as an intermediary between Dryad and Dataverse.
+Because monitoring the status of something over time requires persistence, the dryad2dataverse.monitor.Monitor object uses an [SQLite3](https://sqlite.org) database, which has the enormous advantage of being a single file that is portable between systems. This allows monitoring without laborious database configuration on a host system, and updates can be run on any system that has sufficient storage space to act as an intermediary between Dryad and Dataverse. This is quite a simple database, as the [documentation on its structure](dbase_structure/index.html) shows.
 
 If you need to change systems just swap the database to the new system.
 
 In theory you could run it from a Raspberry Pi Zero that you have in a desk drawer, although that may not be the wisest idea. Maybe use your cell phone.
 
-Monitoring changes requires both the serializer and transfer objects from above.
+Monitoring changes requires both the `Serializer` and `Transfer` objects from above.
 
 ```
->>> # Create the monitor instance
+>>> # Create the Monitor instance
 >>> monitor = dryad2dataverse.monitor.Monitor()
 >>> # Check status of your serializer object
 >>> monitor.status(i_heart_dryad)

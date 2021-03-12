@@ -1,0 +1,9 @@
+DOI: doi:10.5061/dryad.jh3kk
+Pre-Christmas metadata:
+
+relatedWorks
+[{'identifier': 'https://doi.org/10.1093/jhered/esx094', 'identifierType': 'DOI', 'relationship': 'Cites'}, {'identifier': 'https://github.com/kgturner/BluebonnetGBS', 'identifierType': 'URL', 'relationship': 'IsDerivedFrom'}]
+
+As of 22 Jan 2021
+
+[{'relationship': 'article', 'identifierType': 'DOI', 'identifier': 'https://doi.org/10.1093/jhered/esx094'}, {'relationship': 'software', 'identifierType': 'URL', 'identifier': 'https://github.com/kgturner/BluebonnetGBS'}]

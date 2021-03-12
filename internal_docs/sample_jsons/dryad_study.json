@@ -1,0 +1,110 @@
+{'_links': {'curies': [{'href': 'https://github.com/CDL-Dryad/stash/blob/main/stash_api/link-relations.md#{rel}',
+                        'name': 'stash',
+                        'templated': 'true'}],
+            'self': {'href': '/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1896v'},
+            'stash:download': {'href': '/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1896v/download'},
+            'stash:version': {'href': '/api/v2/versions/83646'},
+            'stash:versions': {'href': '/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1896v/versions'}},
+ 'abstract': '<section data-lang="en" id="section-1-en" lang="en">\r\n'
+             '<p>Aside from polyploidy, transposable elements are the major '
+             'drivers of genome size increases in plants. Thus, understanding '
+             'the diversity and evolutionary dynamics of transposable elements '
+             'in sunflower (<i>Helianthus annuus</i>\xa0L.), especially given '
+             'its large genome size (∼3.5\u2003Gb) and the well‐documented '
+             'cases of amplification of certain transposons within the genus, '
+             'is of considerable importance for understanding the evolutionary '
+             'history of this emerging model species. By analyzing '
+             'approximately 25% of the sunflower genome from random sequence '
+             'reads and assembled bacterial artificial chromosome (BAC) '
+             'clones, we show that it is composed of over 81% transposable '
+             'elements, 77% of which are long terminal repeat (LTR) '
+             'retrotransposons. Moreover, the LTR retrotransposon fraction in '
+             'BAC clones harboring genes is disproportionately composed of '
+             'chromodomain‐containing\xa0<i>Gypsy</i>\xa0LTR retrotransposons '
+             '(‘chromoviruses’), and the majority of the intact chromoviruses '
+             'contain tandem chromodomain duplications. We show that there is '
+             'a bias in the efficacy of homologous recombination in removing '
+             'LTR retrotransposon DNA, thereby providing insight into the '
+             'mechanisms associated with transposable element (TE) composition '
+             'in the sunflower genome. We also show that the vast majority of '
+             'observed LTR retrotransposon insertions have likely occurred '
+             'since the origin of this species, providing further evidence '
+             'that biased LTR retrotransposon activity has played a major role '
+             'in shaping the chromatin and DNA landscape of the sunflower '
+             'genome. Although our findings on LTR retrotransposon age and '
+             'structure could be influenced by the selection of the BAC clones '
+             'analyzed, a global analysis of random sequence reads indicates '
+             'that the evolutionary patterns described herein apply to the '
+             'sunflower genome as a whole.</p>\r\n'
+             '</section>\r\n',
+ 'authors': [{'affiliation': 'University of Georgia',
+              'affiliationROR': 'https://ror.org/00te3t702',
+              'email': 'statonse@biodiversity.ubc.ca',
+              'firstName': 'S. Evan',
+              'lastName': 'Staton'},
+             {'affiliation': 'Kansas State University',
+              'affiliationROR': 'https://ror.org/05p1j8758',
+              'email': '',
+              'firstName': 'Bradley H.',
+              'lastName': 'Bakken'},
+             {'affiliation': 'Indiana University',
+              'affiliationROR': 'https://ror.org/01kg8sb98',
+              'email': '',
+              'firstName': 'Benjamin K.',
+              'lastName': 'Blackman'},
+             {'affiliation': 'University of Georgia',
+              'affiliationROR': 'https://ror.org/00te3t702',
+              'email': '',
+              'firstName': 'Mark A.',
+              'lastName': 'Chapman'},
+             {'affiliation': 'University of British Columbia',
+              'affiliationROR': 'https://ror.org/03rmrcq20',
+              'email': '',
+              'firstName': 'Nolan C.',
+              'lastName': 'Kane'},
+             {'affiliation': 'University of Georgia',
+              'affiliationROR': 'https://ror.org/00te3t702',
+              'email': '',
+              'firstName': 'Shunxue',
+              'lastName': 'Tang'},
+             {'affiliation': 'Kansas State University',
+              'affiliationROR': 'https://ror.org/05p1j8758',
+              'email': '',
+              'firstName': 'Mark C.',
+              'lastName': 'Ungerer'},
+             {'affiliation': 'University of Georgia',
+              'affiliationROR': 'https://ror.org/00te3t702',
+              'email': '',
+              'firstName': 'Steven J.',
+              'lastName': 'Knapp'},
+             {'affiliation': 'University of British Columbia',
+              'affiliationROR': 'https://ror.org/03rmrcq20',
+              'email': '',
+              'firstName': 'Loren H.',
+              'lastName': 'Rieseberg'},
+             {'affiliation': 'University of Georgia',
+              'affiliationROR': 'https://ror.org/00te3t702',
+              'email': 'jmburke@uga.edu',
+              'firstName': 'John M.',
+              'lastName': 'Burke',
+              'orcid': '0000-0002-1412-5539'}],
+ 'curationStatus': 'Published',
+ 'funders': [{'awardNumber': 'DBI‐0820451',
+              'organization': 'National Science Foundation*'},
+             {'awardNumber': 'DEB‐0742993',
+              'organization': 'National Science Foundation*'},
+             {'awardNumber': '2008‐35300‐19263',
+              'organization': 'National Institute of Food and Agriculture'}],
+ 'id': 54447,
+ 'identifier': 'doi:10.5061/dryad.bzkh1896v',
+ 'publicationDate': '2020-09-21',
+ 'relatedWorks': [{'identifier': 'https://doi.org/10.1111/j.1365-313X.2012.05072.x',
+                   'identifierType': 'DOI',
+                   'relationship': 'Cites'}],
+ 'sharingLink': 'https://datadryad.org/stash/share/T-jofQQCw8lfXR8Ou6Fm4VjgNazMOxaxYjPfKXWa9gw',
+ 'storage_size': 499193301,
+ 'title': 'The sunflower (Helianthus annuusL.) genome reflects a recent '
+          'history of biased accumulation of transposable elements',
+ 'userId': 61561,
+ 'versionNumber': 4,
+ 'versionStatus': 'submitted'}

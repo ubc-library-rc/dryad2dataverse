@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="/Users/paul/Documents/Work/Projects/dryad2dataverse/analysis/dryadInfo.db" schema="dryadInfo" type="SQLite - 3.32.3">
+   <tables>
+      <table name="authors" numRows="3468" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="doi" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="dryadjson"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="lastName" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="2" name="firstName" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="3" name="affiliation" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="4" name="affiliationROR" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="5" name="orcid" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+      </table>
+      <table name="dryadjson" numRows="523" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="doi" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <child column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="authors"/>
+            <child column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="license"/>
+            <child column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="size"/>
+            <child column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="title"/>
+            <child column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="versions"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="json" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <primaryKey column="doi" sequenceNumberInPK="1"/>
+         <index name="dryadjson_s_pk" unique="true">
+            <column ascending="true" name="doi"/>
+         </index>
+         <index name="sqlite_autoindex_dryadjson_1" unique="true">
+            <column ascending="true" name="doi"/>
+         </index>
+      </table>
+      <table name="license" numRows="523" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="doi" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="dryadjson"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="license" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+      </table>
+      <table name="size" numRows="523" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="doi" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="dryadjson"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="sizeByte" nullable="true" remarks="" size="2000000000" type="INT" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="2" name="sizeMb" nullable="true" remarks="" size="2000000000" type="INT" typeCode="4"/>
+      </table>
+      <table name="title" numRows="523" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="doi" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="dryadjson"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="title" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+      </table>
+      <table name="versions" numRows="523" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="doi" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="doi" foreignKey="" implied="false" onDeleteCascade="false" table="dryadjson"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="version" nullable="true" remarks="" size="2000000000" type="REAL" typeCode="6"/>
+      </table>
+   </tables>
+</database>
