@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>API Reference - Dryad2dataverse</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "API Reference";
+    var mkdocs_page_input_path = "api_reference.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Dryad2dataverse</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Scripts</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../reference/">General Reference</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">API Reference</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverse">dryad2dataverse</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverseconstants">dryad2dataverse.constants</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverseserializer">dryad2dataverse.serializer</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#serializer-objects">Serializer Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__init__">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fetch_record">fetch_record</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#id">id</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryadjson">dryadJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryadjson_1">dryadJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#embargo">embargo</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dvjson">dvJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#filejson">fileJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#files">files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#oversize">oversize</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataversetransfer">dryad2dataverse.transfer</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#transfer-objects">Transfer Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__init___1">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dvpid">dvpid</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#auth">auth</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#filejson_1">fileJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#files_1">files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#oversize_1">oversize</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#doi">doi</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#set_correct_date">set_correct_date</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#upload_study">upload_study</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#download_file">download_file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#download_files">download_files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#force_notab_unlock">force_notab_unlock</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#upload_file">upload_file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#upload_files">upload_files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#upload_json">upload_json</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#delete_dv_file">delete_dv_file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#delete_dv_files">delete_dv_files</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataversemonitor">dryad2dataverse.monitor</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#monitor-objects">Monitor Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__new__">__new__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#__init___2">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#__del__">__del__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#lastmod">lastmod</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#status">status</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#diff_metadata">diff_metadata</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#diff_files">diff_files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_dv_fid">get_dv_fid</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_dv_fids">get_dv_fids</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_json_dvfids">get_json_dvfids</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#update">update</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#set_timestamp">set_timestamp</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverseexceptions">dryad2dataverse.exceptions</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dryad2dataverseerror-objects">Dryad2DataverseError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#notargeterror-objects">NoTargetError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#downloadsizeerror-objects">DownloadSizeError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#hasherror-objects">HashError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#databaseerror-objects">DatabaseError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dataverseuploaderror-objects">DataverseUploadError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dataversedownloaderror-objects">DataverseDownloadError Objects</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../dbase_structure/">Tracking Database Structure</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Dryad2dataverse</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>API Reference</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="complete-api-reference">Complete API reference</h1>
+<p><a name="dryad2dataverse"></a></p>
+<h2 id="dryad2dataverse">dryad2dataverse</h2>
+<p>Dryad to Dataverse utilities. No modules are loaded by default, so</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>import dryad2dataverse</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>will work, but will have no effect.</p>
+<p>Modules included:</p>
+<pre><code>dryad2dataverse.constants : "Constants" for all modules. URLs, API keys,
+etc are all here.
+
+dryad2dataverse.serializer : Download and serialize Dryad
+JSON to Dataverse JSON.
+
+dryad2dataverse.transfer : metadata and file transfer
+utilities.
+
+dryad2dataverse.monitor : Monitoring and database tools
+for maintaining a pipeline to Dataverse without unnecessary
+downloading and file duplication.
+
+dryad2dataverse.exceptions : Custom exceptions.
+</code></pre>
+<p><a name="dryad2dataverse.constants"></a></p>
+<h2 id="dryad2dataverseconstants">dryad2dataverse.constants</h2>
+<p>This module contains the information that configures all the parameters
+required to transfer data from Dryad to Dataverse.</p>
+<p>"Constants" may be a bit strong, but the only constant is the
+presence of change.</p>
+<p><a name="dryad2dataverse.serializer"></a></p>
+<h2 id="dryad2dataverseserializer">dryad2dataverse.serializer</h2>
+<p>Serializes Dryad study JSON to Dataverse JSON, as well as
+producing associated file information.</p>
+<p><a name="dryad2dataverse.serializer.Serializer"></a></p>
+<h3 id="serializer-objects">Serializer Objects</h3>
+<pre><code class="language-python">class Serializer()
+</code></pre>
+<p>Serializes Dryad JSON to Dataverse JSON</p>
+<p><a name="dryad2dataverse.serializer.Serializer.__init__"></a></p>
+<h5 id="__init__">__init__</h5>
+<pre><code class="language-python"> | __init__(doi)
+</code></pre>
+<p>Creates Dryad study metadata instance.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>doi : str
+  — DOI of Dryad study. Required for downloading.
+- <code>eg</code> - 'doi:10.5061/dryad.2rbnzs7jp'</p>
+<hr />
+<p><a name="dryad2dataverse.serializer.Serializer.fetch_record"></a></p>
+<h5 id="fetch_record">fetch_record</h5>
+<pre><code class="language-python"> | fetch_record(url=None, timeout=45)
+</code></pre>
+<p>Fetches Dryad study record JSON from Dryad V2 API at
+https://datadryad.org/api/v2/datasets/.
+Saves to self._dryadJson. Querying Serializer.dryadJson
+will call this function automatically.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>url : str
+  — Dryad instance base URL (eg: 'https://datadryad.org').</p>
+<p>timeout : int
+  — Timeout in seconds. Default 45.</p>
+<hr />
+<p><a name="dryad2dataverse.serializer.Serializer.id"></a></p>
+<h5 id="id">id</h5>
+<pre><code class="language-python"> | @property
+ | id()
+</code></pre>
+<p>Returns Dryad unique <em>database</em> ID, not the DOI.</p>
+<p>Where the original Dryad JSON is dryadJson, it's the integer
+trailing portion of:</p>
+<p><code>self.dryadJson['_links']['stash:version']['href']</code></p>
+<p><a name="dryad2dataverse.serializer.Serializer.dryadJson"></a></p>
+<h5 id="dryadjson">dryadJson</h5>
+<pre><code class="language-python"> | @property
+ | dryadJson()
+</code></pre>
+<p>Returns Dryad study JSON. Will call Serializer.fetch_record() if 
+no JSON is present.</p>
+<p><a name="dryad2dataverse.serializer.Serializer.dryadJson"></a></p>
+<h5 id="dryadjson_1">dryadJson</h5>
+<pre><code class="language-python"> | @dryadJson.setter
+ | dryadJson(value=None)
+</code></pre>
+<p>Fetches Dryad JSON from Dryad website if not supplied.</p>
+<p>If supplying it, make sure it's correct or you will run into trouble
+with processing later.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>value : dict
+  — Dryad JSON.</p>
+<p><a name="dryad2dataverse.serializer.Serializer.embargo"></a></p>
+<h5 id="embargo">embargo</h5>
+<pre><code class="language-python"> | @property
+ | embargo()
+</code></pre>
+<p>Check embargo status. Returns boolean True if embargoed.</p>
+<p><a name="dryad2dataverse.serializer.Serializer.dvJson"></a></p>
+<h5 id="dvjson">dvJson</h5>
+<pre><code class="language-python"> | @property
+ | dvJson()
+</code></pre>
+<p>Returns Dataverse study JSON as dict.</p>
+<p><a name="dryad2dataverse.serializer.Serializer.fileJson"></a></p>
+<h5 id="filejson">fileJson</h5>
+<pre><code class="language-python"> | @property
+ | fileJson(timeout=45)
+</code></pre>
+<p>Returns a list of file JSONs from call to Dryad API /files/{id},
+where the ID is parsed from the Dryad JSON. Dryad file listings
+are paginated, so the return consists of a list of dicts, one
+per page.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>timeout : int
+  — Request timeout in seconds.</p>
+<hr />
+<p><a name="dryad2dataverse.serializer.Serializer.files"></a></p>
+<h5 id="files">files</h5>
+<pre><code class="language-python"> | @property
+ | files()
+</code></pre>
+<p>Returns a list of tuples with:</p>
+<p>(Download_location, filename, mimetype, size, description,
+digestType, md5sum)</p>
+<p>At this time only md5 is supported.</p>
+<p><a name="dryad2dataverse.serializer.Serializer.oversize"></a></p>
+<h5 id="oversize">oversize</h5>
+<pre><code class="language-python"> | @property
+ | oversize(maxsize=None)
+</code></pre>
+<p>Returns a list of Dryad files whose size value
+exceeds maxsize. Maximum size defaults to
+dryad2dataverse.constants.MAX_UPLOAD</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>maxsize : int
+  — Size in bytes in which to flag as oversize.
+- <code>Default</code> - constants.MAX_UPLOAD.</p>
+<hr />
+<p><a name="dryad2dataverse.transfer"></a></p>
+<h2 id="dryad2dataversetransfer">dryad2dataverse.transfer</h2>
+<p>This module handles data downloads and uploads from a Dryad instance to a Dataverse instance</p>
+<p><a name="dryad2dataverse.transfer.Transfer"></a></p>
+<h3 id="transfer-objects">Transfer Objects</h3>
+<pre><code class="language-python">class Transfer()
+</code></pre>
+<p>Transfers metadata and data files from a
+Drayd installation to Dataverse installation.</p>
+<p><a name="dryad2dataverse.transfer.Transfer.__init__"></a></p>
+<h5 id="__init___1">__init__</h5>
+<pre><code class="language-python"> | __init__(dryad)
+</code></pre>
+<p>Creates a dryad2dataverse.transfer.Transfer instance.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dryad : dryad2dataverse.serializer.Serializer instance</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.dvpid"></a></p>
+<h5 id="dvpid">dvpid</h5>
+<pre><code class="language-python"> | @property
+ | dvpid()
+</code></pre>
+<p>Returns Dataverse study persistent ID as str.</p>
+<p><a name="dryad2dataverse.transfer.Transfer.auth"></a></p>
+<h5 id="auth">auth</h5>
+<pre><code class="language-python"> | @property
+ | auth()
+</code></pre>
+<p>Returns datavese authentication header dict.
+ie: <code>{X-Dataverse-key' : 'APIKEYSTRING'}</code></p>
+<p><a name="dryad2dataverse.transfer.Transfer.fileJson"></a></p>
+<h5 id="filejson_1">fileJson</h5>
+<pre><code class="language-python"> | @property
+ | fileJson()
+</code></pre>
+<p>Returns a list of file JSONs from call to Dryad API /files/{id},
+where the ID is parsed from the Dryad JSON. Dryad file listings
+are paginated.</p>
+<p><a name="dryad2dataverse.transfer.Transfer.files"></a></p>
+<h5 id="files_1">files</h5>
+<pre><code class="language-python"> | @property
+ | files()
+</code></pre>
+<p>Returns a list of lists with:</p>
+<p>[Download_location, filename, mimetype, size, description, md5digest]</p>
+<p>This is mutable; downloading a file will add md5 info if not available.</p>
+<p><a name="dryad2dataverse.transfer.Transfer.oversize"></a></p>
+<h5 id="oversize_1">oversize</h5>
+<pre><code class="language-python"> | @property
+ | oversize()
+</code></pre>
+<p>Returns list of files exceeding Dataverse ingest limit
+dryad2dataverse.constants.MAX_UPLOAD.</p>
+<p><a name="dryad2dataverse.transfer.Transfer.doi"></a></p>
+<h5 id="doi">doi</h5>
+<pre><code class="language-python"> | @property
+ | doi()
+</code></pre>
+<p>Returns Dryad DOI.</p>
+<p><a name="dryad2dataverse.transfer.Transfer.set_correct_date"></a></p>
+<h5 id="set_correct_date">set_correct_date</h5>
+<pre><code class="language-python"> | @staticmethod
+ | set_correct_date(url, hdl, d_type='distributionDate', apikey=None)
+</code></pre>
+<p>Sets "correct" publication date for Dataverse.</p>
+<p>Note: dryad2dataverse.serializer maps Dryad 'publicationDate'
+to Dataverse 'distributionDate' (see serializer.py ~line 675).</p>
+<p>Dataverse citation date default is ":publicationDate". See
+Dataverse API reference:
+https://guides.dataverse.org/en/4.20/api/native-api.html#id54.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>url : str
+  — Base URL to Dataverse installation.</p>
+<p>hdl : str
+  — Persistent indentifier for Dataverse study.</p>
+<p>d_type : str
+  — Date type. One of  'distributionDate', 'productionDate',
+  'dateOfDeposit'. Default 'distributionDate'.</p>
+<p>apikey : str
+  — Default dryad2dataverse.constants.APIKEY.</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.upload_study"></a></p>
+<h5 id="upload_study">upload_study</h5>
+<pre><code class="language-python"> | upload_study(url=None, apikey=None, timeout=45, **kwargs)
+</code></pre>
+<p>Uploads Dryad study metadata to target Dataverse or updates existing.
+Supplying a <code>targetDv</code> kwarg creates a new study and supplying a
+<code>dvpid</code> kwarg updates a currently existing Dataverse study.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>url : str
+  — URL of Dataverse instance. Defaults to constants.DVURL.</p>
+<p>apikey : str
+  — API key of user. Defaults to contants.APIKEY.</p>
+<p>timeout : int
+  — timeout on POST request.</p>
+<p><strong>KEYWORD ARGUMENTS</strong></p>
+<p>One of these is required. Supplying both or neither raises a NoTargetError</p>
+<p>targetDv : str
+  — Short name of target dataverse. Required if new dataset.
+  Specify as targetDV=value.</p>
+<p>dvpid = str
+  — Dataverse persistent ID (for updating metadata).
+  This is not required for new uploads, specify as dvpid=value</p>
+<p><strong>OPTIONAL KEYWORD ARGUMENTS</strong></p>
+<p><a name="dryad2dataverse.transfer.Transfer.download_file"></a></p>
+<h5 id="download_file">download_file</h5>
+<pre><code class="language-python"> | download_file(url, filename, tmp=None, size=None, chk=None, timeout=45)
+</code></pre>
+<p>Downloads a file via requests streaming and saves to constants.TMP.
+returns md5sum on success and an exception on failure.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>url : str
+  — URL of download.</p>
+<p>filename : str
+  — Output file name.</p>
+<ul>
+<li><code>timeout</code> - int
+  — Requests timeout.</li>
+</ul>
+<p>tmp : str
+  — Temporary directory for downloads.
+  Defaults to dryad2dataverse.constants.TMP.</p>
+<p>size : int
+  — Reported file size in bytes.
+  Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
+<p>chk : str
+  — md5 sum of file (if available and known).</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.download_files"></a></p>
+<h5 id="download_files">download_files</h5>
+<pre><code class="language-python"> | download_files(files=None)
+</code></pre>
+<p>Bulk downloader for files.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>files</code> - list
+  — Items in list can be tuples or list with a minimum of:</li>
+</ul>
+<p>(dryaddownloadurl, filenamewithoutpath, [md5sum])</p>
+<p>The md5 sum should be the last member of the tuple.</p>
+<p>Defaults to self.files.</p>
+<p>Normally used without arguments to download all the associated
+  files with a Dryad study.</p>
+<p><a name="dryad2dataverse.transfer.Transfer.force_notab_unlock"></a></p>
+<h5 id="force_notab_unlock">force_notab_unlock</h5>
+<pre><code class="language-python"> | force_notab_unlock(study, dv_url, fid, apikey=None)
+</code></pre>
+<p>Checks for a study lock and forcibly unlocks and uningests
+to prevent tabular file processing. Required if mime and filename
+spoofing is not sufficient.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>study : str
+  — Persistent indentifer of study.</p>
+<p>dv_url : str
+  — URL to base Dataverse installation.</p>
+<p>fid : str
+  — File ID for file object.</p>
+<p>apikey : str
+  — API key for user.
+  If not present authorization defaults to self.auth.</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.upload_file"></a></p>
+<h5 id="upload_file">upload_file</h5>
+<pre><code class="language-python"> | upload_file(dryadUrl=None, filename=None, mimetype=None, size=None, descr=None, md5=None, studyId=None, dest=None, fprefix=None, timeout=300)
+</code></pre>
+<p>Uploads file to Dataverse study. Returns a tuple of the
+dryadFid (or None) and Dataverse JSON from the POST request.
+Failures produce JSON with different status messages
+rather than raising an exception.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>filename : str
+  — Filename (not including path).</p>
+<p>mimetype : str
+  — Mimetype of file.</p>
+<p>size : int
+  — Size in bytes.</p>
+<p>studyId : str
+  — Persistent Dataverse study identifier.
+  Defaults to Transfer.dvpid.</p>
+<p>dest : str
+  — Destination dataverse installation url.
+  Defaults to constants.DVURL.</p>
+<p>md5 : str
+  — md5 checksum for file.</p>
+<p>fprefix : str
+  — Path to file, not including a trailing slash.</p>
+<p>timeout : int
+  - Timeout in seconds for POST request. Default 300.</p>
+<p>dryadUrl : str
+  - Dryad download URL if you want to include a Dryad file id.</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.upload_files"></a></p>
+<h5 id="upload_files">upload_files</h5>
+<pre><code class="language-python"> | upload_files(files=None, pid=None, fprefix=None)
+</code></pre>
+<p>Uploads multiple files to study with persistentId pid.
+Returns a list of the original tuples plus JSON responses.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>files</code> - list
+  — List contains tuples with
+  (dryadDownloadURL, filename, mimetype, size).</li>
+</ul>
+<p>pid : str
+  — Defaults to self.dvpid, which is generated by calling
+  dryad2dataverse.transfer.Transfer.upload_study().</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.upload_json"></a></p>
+<h5 id="upload_json">upload_json</h5>
+<pre><code class="language-python"> | upload_json(studyId=None, dest=None)
+</code></pre>
+<p>Uploads Dryad json as a separate file for archival purposes.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>studyId : str
+  — Dataverse persistent identifier.
+  Default dryad2dataverse.transfer.Transfer.dvpid,
+  which is only generated on
+  dryad2dataverse.transfer.Transfer.upload_study()</p>
+<p>dest : str
+  — Base URL for transfer.
+  Default dryad2datavese.constants.DVURL</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.delete_dv_file"></a></p>
+<h5 id="delete_dv_file">delete_dv_file</h5>
+<pre><code class="language-python"> | delete_dv_file(dvfid, dvurl=None, key=None)
+</code></pre>
+<p>Deletes files from Dataverse target given a dataverse file ID.
+This information is unknowable unless discovered by
+dryad2dataverse.monitor.Monitor or by other methods.</p>
+<p>Returns 1 on success (204 response), or 0 on other response.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dvurl : str
+  — Base URL of dataverse instance.
+  Defaults to dryad2dataverse.constants.DVURL.</p>
+<p>dvfid : str
+  — Dataverse file ID number.</p>
+<hr />
+<p><a name="dryad2dataverse.transfer.Transfer.delete_dv_files"></a></p>
+<h5 id="delete_dv_files">delete_dv_files</h5>
+<pre><code class="language-python"> | delete_dv_files(dvfids=None, dvurl=None, key=None)
+</code></pre>
+<p>Deletes all files in list of Dataverse file ids from
+a Dataverse installation.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dvfids : list
+  — List of Dataverse file ids.
+  Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.</p>
+<p>dvurl : str
+  — Base URL of Dataverse. Defaults to dryad2dataverse.constants.DVURL.</p>
+<p>key : str
+  — API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY.</p>
+<hr />
+<p><a name="dryad2dataverse.monitor"></a></p>
+<h2 id="dryad2dataversemonitor">dryad2dataverse.monitor</h2>
+<p>Dryad/Dataverse status tracker. Monitor creates a singleton object which
+writes to a SQLite database. Methods will (generally) take either a
+dryad2dataverse.serializer.Serializer instance or
+dryad2dataverse.transfer.Transfer instance</p>
+<p>The monitor's primary function is to allow for state checking
+for Dryad studies so that files and studies aren't downloaded
+unneccessarily.</p>
+<p><a name="dryad2dataverse.monitor.Monitor"></a></p>
+<h3 id="monitor-objects">Monitor Objects</h3>
+<pre><code class="language-python">class Monitor()
+</code></pre>
+<p>The Monitor object is a tracker and database updater, so that
+Dryad files can be monitored and updated over time. Monitor is a singleton,
+but is not thread-safe.</p>
+<p><a name="dryad2dataverse.monitor.Monitor.__new__"></a></p>
+<h5 id="__new__">__new__</h5>
+<pre><code class="language-python"> | __new__(cls, dbase=None, *args, **kwargs)
+</code></pre>
+<p>Creates a new singleton instance of Monitor.</p>
+<p>Also creates a database if existing database is not present.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dbase : str
+  — Path to sqlite3 database. That is:
+  /path/to/file.sqlite3</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.__init__"></a></p>
+<h5 id="__init___2">__init__</h5>
+<pre><code class="language-python"> | __init__(dbase=None, *args, **kwargs)
+</code></pre>
+<p>Initialize the Monitor instance if not instantiated already (ie, Monitor
+is a singleton).</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dbase : str
+  — Complete path to desired location of tracking database
+- <code>(eg</code> - /tmp/test.db).</p>
+<p>Defaults to dryad2dataverse.constants.DBASE.</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.__del__"></a></p>
+<h5 id="__del__">__del__</h5>
+<pre><code class="language-python"> | __del__()
+</code></pre>
+<p>Commits all database transactions on object deletion and closes database.</p>
+<p><a name="dryad2dataverse.monitor.Monitor.lastmod"></a></p>
+<h5 id="lastmod">lastmod</h5>
+<pre><code class="language-python"> | @property
+ | lastmod()
+</code></pre>
+<p>Returns last modification date from monitor.dbase.</p>
+<p><a name="dryad2dataverse.monitor.Monitor.status"></a></p>
+<h5 id="status">status</h5>
+<pre><code class="language-python"> | status(serial)
+</code></pre>
+<p>Returns a dictionary with keys 'status' and 'dvpid'.
+<code>{status :'updated', 'dvpid':'doi://some/ident'}</code>.</p>
+<p><code>status</code> is one of 'new', 'unchanged', 'updated' or 'filesonly'.</p>
+<p>'new' is a completely new file.</p>
+<p>'unchanged' is no changes at all.</p>
+<p>'updated' is changes to lastModificationDate AND metadata changes.</p>
+<p>'filesonly' is changes to lastModificationDate only
+(which presumably indicates a file change.</p>
+<p><code>dvpid</code> is a Dataverse persistent identifier.
+<code>None</code> in the case of status='new'</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>serial : dryad2dataverse.serializer instance</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.diff_metadata"></a></p>
+<h5 id="diff_metadata">diff_metadata</h5>
+<pre><code class="language-python"> | diff_metadata(serial)
+</code></pre>
+<p>Analyzes differences in metadata between current serializer
+instance and last updated serializer instance.
+Returns a list of field changes consisting of:</p>
+<p>[{key: (old_value, new_value}] or None if no changes.</p>
+<p>For example:</p>
+<hr />
+<pre><code>[{'title':
+('Cascading effects of algal warming in a freshwater community',
+ 'Cascading effects of algal warming in a freshwater community theatre')}
+]
+</code></pre>
+<p><strong>Arguments</strong>:</p>
+<p>serial : dryad2dataverse.serializer.Serializer instance</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.diff_files"></a></p>
+<h5 id="diff_files">diff_files</h5>
+<pre><code class="language-python"> | diff_files(serial)
+</code></pre>
+<p>Returns a dict with additions and deletions from previous Dryad
+to dataverse upload.</p>
+<p>Because checksums are not necessarily included in Dryad file
+metadata, this method uses dryad file IDs, size, or
+whatever is available.</p>
+<p>If dryad2dataverse.monitor.Monitor.status()
+indicates a change it will produce dictionary output with a list
+of additions or deletions, as below:</p>
+<p><code>{'add':[dyadfiletuples], 'delete:[dryadfiletuples]}</code></p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>serial : dryad2dataverse.serializer.Serializer instance</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.get_dv_fid"></a></p>
+<h5 id="get_dv_fid">get_dv_fid</h5>
+<pre><code class="language-python"> | get_dv_fid(url)
+</code></pre>
+<p>Returns str — the Dataverse file ID from parsing a Dryad
+file download link.  Normally used for determining dataverse
+file ids for <em>deletion</em> in case of dryad file changes.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>url : str
+  — <em>Dryad</em> file URL in form of
+  'https://datadryad.org/api/v2/files/385819/download'.</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.get_dv_fids"></a></p>
+<h5 id="get_dv_fids">get_dv_fids</h5>
+<pre><code class="language-python"> | get_dv_fids(filelist)
+</code></pre>
+<p>Returns Dataverse file IDs from a list of Dryad file tuples.
+Generally, you would use the output from
+dryad2dataverse.monitor.Monitor.diff_files['delete']
+to discover Dataverse file ids for deletion.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>filelist : list
+  — List of Dryad file tuples: eg:</p>
+<p><code>[('https://datadryad.org/api/v2/files/385819/download',
+  'GCB_ACG_Mortality_2020.zip',
+  'application/x-zip-compressed', 23787587),
+  ('https://datadryad.org/api/v2/files/385820/download',
+  'Readme_ACG_Mortality.txt',
+  'text/plain', 1350)]</code></p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.get_json_dvfids"></a></p>
+<h5 id="get_json_dvfids">get_json_dvfids</h5>
+<pre><code class="language-python"> | get_json_dvfids(serial)
+</code></pre>
+<p>Return a list of Dataverse file ids for Dryad JSONs which were
+uploaded to Dataverse.
+Normally used to discover the file IDs to remove Dryad JSONs
+which have changed.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>serial : dryad2dataverse.serializer.Serializer instance</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.update"></a></p>
+<h5 id="update">update</h5>
+<pre><code class="language-python"> | update(transfer)
+</code></pre>
+<p>Updates the Monitor database with information from a
+dryad2dataverse.transfer.Transfer instance.</p>
+<p>If a Dryad primary metadata record has changes, it will be
+deleted from the database.</p>
+<p>This method should be called after all transfers are completed,
+including Dryad JSON updates, as the last action for transfer.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>transfer : dryad2dataverse.transfer.Transfer instance</p>
+<hr />
+<p><a name="dryad2dataverse.monitor.Monitor.set_timestamp"></a></p>
+<h5 id="set_timestamp">set_timestamp</h5>
+<pre><code class="language-python"> | set_timestamp(curdate=None)
+</code></pre>
+<p>Adds current time to the database table. Can be queried and be used
+for subsequent checking for updates. To query last modification time,
+use the dataverse2dryad.monitor.Monitor.lastmod attribute.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>curdate : str
+  — UTC datetime string in the format suitable for the Dryad API.
+  eg. 2021-01-21T21:42:40Z
+  or .strftime('%Y-%m-%dT%H:%M:%SZ').</p>
+<hr />
+<p><a name="dryad2dataverse.exceptions"></a></p>
+<h2 id="dryad2dataverseexceptions">dryad2dataverse.exceptions</h2>
+<p>Custom exceptions for error handling.</p>
+<p><a name="dryad2dataverse.exceptions.Dryad2DataverseError"></a></p>
+<h3 id="dryad2dataverseerror-objects">Dryad2DataverseError Objects</h3>
+<pre><code class="language-python">class Dryad2DataverseError(Exception)
+</code></pre>
+<p>Base exception class for Dryad2Dataverse errors.</p>
+<p><a name="dryad2dataverse.exceptions.NoTargetError"></a></p>
+<h3 id="notargeterror-objects">NoTargetError Objects</h3>
+<pre><code class="language-python">class NoTargetError(Dryad2DataverseError)
+</code></pre>
+<p>No dataverse target supplied error.</p>
+<p><a name="dryad2dataverse.exceptions.DownloadSizeError"></a></p>
+<h3 id="downloadsizeerror-objects">DownloadSizeError Objects</h3>
+<pre><code class="language-python">class DownloadSizeError(Dryad2DataverseError)
+</code></pre>
+<p>Raised when download sizes don't match reported
+Dryad file size.</p>
+<p><a name="dryad2dataverse.exceptions.HashError"></a></p>
+<h3 id="hasherror-objects">HashError Objects</h3>
+<pre><code class="language-python">class HashError(Dryad2DataverseError)
+</code></pre>
+<p>Raised on hex digest mismatch.</p>
+<p><a name="dryad2dataverse.exceptions.DatabaseError"></a></p>
+<h3 id="databaseerror-objects">DatabaseError Objects</h3>
+<pre><code class="language-python">class DatabaseError(Dryad2DataverseError)
+</code></pre>
+<p>Tracking database error.</p>
+<p><a name="dryad2dataverse.exceptions.DataverseUploadError"></a></p>
+<h3 id="dataverseuploaderror-objects">DataverseUploadError Objects</h3>
+<pre><code class="language-python">class DataverseUploadError(Dryad2DataverseError)
+</code></pre>
+<p>Returned on not OK respose (ie, not requests.status_code == 200).</p>
+<p><a name="dryad2dataverse.exceptions.DataverseDownloadError"></a></p>
+<h3 id="dataversedownloaderror-objects">DataverseDownloadError Objects</h3>
+<pre><code class="language-python">class DataverseDownloadError(Dryad2DataverseError)
+</code></pre>
+<p>Returned on not OK respose (ie, not requests.status_code == 200).</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../dbase_structure/" class="btn btn-neutral float-right" title="Tracking Database Structure">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../reference/" class="btn btn-neutral" title="General Reference"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../reference/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../dbase_structure/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

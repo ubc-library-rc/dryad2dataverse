@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>FAQ - Dryad2dataverse</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "FAQ";
+    var mkdocs_page_input_path = "faq.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Dryad2dataverse</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Scripts</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../reference/">General Reference</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API Reference</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../dbase_structure/">Tracking Database Structure</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">FAQ</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#why-is-the-upload-script-dryaddpy-constantly-crashing-with-smtp-errors">Why is the upload script (dryadd.py) constantly crashing with SMTP errors?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-is-my-transfer-to-dataverse-not-showing-up-as-published">Why is my transfer to Dataverse not showing up as published?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#but-i-dont-want-to-manually-curate-my-data">But I don't want to manually curate my data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-does-my-large-file-downloadupload-fail">Why does my large file download/upload fail?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-does-my-upload-of-files-fail-halfway">Why does my upload of files fail halfway?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file">Why is a file which should be a tabular file not a tabular file?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-does-the-code-use-camel-case-instead-of-snake-case-for-variables">Why does the code use camel case instead of snake case for variables?</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Dryad2dataverse</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>FAQ</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="frequently-asked-questions">Frequently asked questions</h1>
+<h4 id="why-is-the-upload-script-dryaddpy-constantly-crashing-with-smtp-errors"><strong>Why is the upload script (dryadd.py) constantly crashing with SMTP errors?</strong></h4>
+<p>If you are using Gmail to send messages about your migration, there are a few potential hurdles.</p>
+<ol>
+<li>
+<p>You <em>must</em> enable <a href="https://support.google.com/accounts/answer/6010255?hl=en"><strong>less secure app access</strong></a>.</p>
+</li>
+<li>
+<p>Even when you do that, it can still crash with no obvious explanation or a mysterious authentication error. In this case, the script may be encountering a Captcha security measure. You can remove this by going to <a href="https://accounts.google.com/DisplayUnlockCaptcha">https://accounts.google.com/DisplayUnlockCaptcha</a> before running your script (when logged into the account which you are using, of course).</p>
+</li>
+<li>
+<p>The settings revert back to normal after some period of time of which I am not aware. Daily or weekly updates <em>should</em> be OK, but monthly ones will probably fail with SMTP errors as the service reverts to defaults.</p>
+</li>
+</ol>
+<p>Your other option is to not use Gmail.</p>
+<p><strong>smtplib</strong> exceptions will cause a script crash, so if you are experiencing persistent mail problems and still wish to use the script, you may wish disable emailing log messages.</p>
+<p>This is easily accomplished by commenting out the section starting with <code>elog = email_log(</code> in <code>scripts/dryadd.py</code>. Obviously you can't do this if you're using a binary dryadd.</p>
+<p>More advanced mail handling may be available in later releases.</p>
+<p><em>All error messages are written to the log anyway,</em> so if you disable emailing of log messages you can still see them in the transfer log.</p>
+<h4 id="why-is-my-transfer-to-dataverse-not-showing-up-as-published"><strong>Why is my transfer to Dataverse not showing up as published?</strong></h4>
+<p><strong>dryad2dataverse</strong> does not <em>publish</em> the dataset. That must still be done via the Dataverse GUI or API. </p>
+<p>Publication functionality has been omitted <em>by design</em>:</p>
+<ul>
+<li>
+<p>File size limits within a default Dataverse installation that do not apply to Dryad, so it's possible that some files need to be moved with the assistance of a Datverse system administrator</p>
+</li>
+<li>
+<p>Although every attempt has been made to map metadata schemas appropriately, it's undoubtedly not perfect. A quick once-over by a human can notice any unusual or unforeseen errors</p>
+</li>
+<li>
+<p>Metadata quality standards can vary between Dryad and a Dataverse installations. A manual curation step is sometimes desirable to ensure that all published records meet the same standards.</p>
+</li>
+</ul>
+<h4 id="but-i-dont-want-to-manually-curate-my-data"><strong>But I don't want to manually curate my data</strong></h4>
+<p>It's possible to publish via the Dataverse API. If you <em>really</em> want to publish automatically, you can obtain a list of unpublished studies from Dataverse and publish them programatically. This is left as an exercise for the reader.</p>
+<h4 id="why-does-my-large-file-downloadupload-fail"><strong>Why does my large file download/upload fail?</strong></h4>
+<p>By default, Dataverse limits file sizes to 3 Gb, but that can vary by installation. <code>dryad2dataverse.constants.MAX_UPLOAD</code> contains the value which should correspond to the maximum upload size in Dataverse. If you don't know <em>what</em> the upload size is, contact the system administrator of your target Dataverse installation to find out.</p>
+<p>To upload files exceeding the API upload limit, you will need to speak to a Dataverse administrator.</p>
+<h4 id="why-does-my-upload-of-files-fail-halfway"><strong>Why does my upload of files fail halfway?</strong></h4>
+<p>Dataverse will automatically cease ingest and lock a study when encountering a file which is suitable for tabular processing. The only way to stop this behaviour is to prohibit ingest in the Dataverse configuration, which is probably not possible for many users of the software.</p>
+<p>To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn't work and tabular processing starts anyway, the study is forcibly unlocked to allow uploads to continue. This process, unfortunately, is [probably] not foolproof.</p>
+<h4 id="why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file"><strong>Why is a file which should be a tabular file not a tabular file?</strong></h4>
+<p>As a direct result of the above, tabular file processing has (hopefully) been eliminated. It's still possible to create a tabular file by <a href="https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file" title="Reingest via API">reingesting it.</a></p>
+<p>Unless you are are the administrator of a Dataverse installation, you likely don't have control over what is or is not considered a tabular file. <strong>dryad2dataverse</strong> attempts to block all tabular file processing, but the process is imperfect. <em>Sic vita.</em></p>
+<h4 id="why-does-the-code-use-camel-case-instead-of-snake-case-for-variables"><strong>Why does the code use camel case instead of snake case for variables?</strong></h4>
+<p>By the time I realized I should be using snake case, it was too late and I was already consistently using camel case. <a href="https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds">https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../credits/" class="btn btn-neutral float-right" title="Credits">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../dbase_structure/" class="btn btn-neutral" title="Tracking Database Structure"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../dbase_structure/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../credits/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
