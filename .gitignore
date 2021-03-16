@@ -23,6 +23,7 @@ minisample.py
 man
 man/**
 daemon*
+daemon.cmd.soroban_test.txt
 daemon*.cmd.txt
 .readthedocs**
 docs/.readthe*
