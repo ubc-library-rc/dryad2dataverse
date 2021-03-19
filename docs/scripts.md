@@ -40,8 +40,18 @@ This product **will not** publish anything in a Dataverse installation (at this 
 * A destination Dataverse must exist, and you should know its short name.
 * The API key must have sufficient privileges to create new studies and upload data.
 * You will need an email address for contact information as this is a required field in Dataverse (but not necessarily in Dryad) and a name to go with it. For example, `i_heart_data@test.invalid` and `Dataverse Support`. Note: Use a valid email address (unlike the example) because uploads will also fail if the address is invalid.
-* An additional email to receive update and error notifications.
+* Information for an email address which *sends* notifications
+	* For this, you need the user name ("user" from "user@test.invalid")
+	* The password for this account
+	* The smtp server address which sends mail. For example, if using gmail, it's `smtp.gmail.com`
+	* The port required to send email via SSL.
+* At least one email address to receive update and error notifications. This can be the same as the sender.
 * A place to store your sqlite3 tracking database.
+
+**A note about GMail**
+
+Although the script is set up to use GMail by default, it likely won't work off the bat. You will need to allow _less secure app access_ and possibly deal with a capture as outlined in the [FAQ](faq.md).
+
 
 **Miscellaneous**
 
@@ -54,32 +64,35 @@ To act as a backup against catastrophic error, the database is automatically cop
 
 ### Usage
 
-The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest.
+The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest. The help menu below is available from the command line by either running the script without inputs or by using the `-h` switch.
+
 
 ```
-usage: dryadd.py [-h] [-u URL] -k KEY -t TARGET [-e USER] [-r RECIPIENTS] [-p PWD] [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP] [--db DBASE]
+usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME -i ROR [--tmpfile TMP] [--db DBASE]
+                 [--log LOG]
 
-Dryad to Dataverse import daemon. Arguments shown in square brackets (ie []) are REQUIRED, despite being shown as optional.
+Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are REQUIRED. Arguments in [square brackets] are not required. The "optional arguments" below refers to
+the use of the option switch, (like -u), meaning "not a positional argument."
 
 optional arguments:
   -h, --help            show this help message and exit
-  -u URL, --dv-url URL  Destination dataverse root url. Eg: https://dataverse.scholarsportal.info
-  -k KEY, --key KEY     API key for dataverse user
+  -u URL, --dv-url URL  REQUIRED: Destination dataverse root url. Default: https://dataverse.scholarsportal.info
+  -k KEY, --key KEY     REQUIRED: API key for dataverse user
   -t TARGET, --target TARGET
-                        Target dataverse short name
+                        REQUIRED: Target dataverse short name
   -e USER, --email USER
-                        Username for email addresswhich sends update notifications.
-  -r RECIPIENTS, --recipient RECIPIENTS
-                        Recipient of email notification
-  -p PWD, --pwd PWD     Password for email account
-  --server MAILSERV     Mail server. Eg. smtp.gmail.com
-  --port PORT           Mail server port
+                        REQUIRED: Username for email address which sends update notifications. ie, the "user" portion of "user@website.invalid".
+  -r RECIPIENTS [RECIPIENTS ...], --recipient RECIPIENTS [RECIPIENTS ...]
+                        REQUIRED: Recipient(s) of email notification. Separate addresses with spaces
+  -p PWD, --pwd PWD     REQUIRED: Password for sending email account. Enclose in single quotes to avoid OS errors with special characters.
+  --server MAILSERV     Mail server for sending account. Default: smtp.gmail.com
+  --port PORT           Mail server port. Default: 465. Mail is sent using SSL.
   -c CONTACT, --contact CONTACT
-                        Contact email for Dataverse records
+                        REQUIRED: Contact email address for Dataverse records. Must pass Dataverse email validation rules (so "test@test.invalid" is not acceptable).
   -n CNAME, --contact-name CNAME
-                        Contact name for Dataverse records
-  -v, --verbosity       Verbose output
-  -i ROR, --ror ROR     Institutional ROR url. Eg: https://ror.org/03rmrcq20
-  --tmpfile TMP         Temporary file location (if not /tmp)
-  --db DBASE            Tracking database location and name if not $HOME/dryad_dataverse_monitor.sqlite3
+                        REQUIRED: Contact name for Dataverse records
+  -i ROR, --ror ROR     REQUIRED: Institutional ROR URL. Eg: "https://ror.org/03rmrcq20". This identifies the institution in Dryad repositories.
+  --tmpfile TMP         Temporary file location. Default: /tmp)
+  --db DBASE            Tracking database location and name. Default: $HOME/dryad_dataverse_monitor.sqlite3
+  --log LOG             Complete path to log. Default: /var/log/dryadd.log
 ```

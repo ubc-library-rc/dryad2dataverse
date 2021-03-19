@@ -21,7 +21,7 @@ Your other option is to not use Gmail.
 
 This is easily accomplished by commenting out the section starting with `elog = email_log(` in `scripts/dryadd.py`. Obviously you can't do this if you're using a binary dryadd.
 
-More advanced mail handling may be available in later releases.
+Currently email notifications are a mandatory part of the `dryadd.py` app, but this may be optional and/or more advanced mail handling may be available in later releases.
 
 _All error messages are written to the log anyway,_ so if you disable emailing of log messages you can still see them in the transfer log.
 

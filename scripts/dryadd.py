@@ -29,8 +29,13 @@ def new_content(serial):
     with Dataverse emailer).
     serial : dryad2dataverse.serializer.Serializer instance
     '''
+    dv_link = (dryad2dataverse.serializer.constants.DVURL +
+               '/dataset.xhtml?persistentId=' +
+               serial.dvpid +
+               '&version=DRAFT')
     subject = f'Dryad new study notification for {serial.doi}'
     content = f'Study {serial.dryadJson["title"]} / {serial.doi} is a new Dryad study.\n\
+            \nDataverse URL: {dv_link}\n\
             \nDetails:\n\
             \nFiles in study:\n\
             \n{serial.files}\n\
@@ -44,8 +49,13 @@ def changed_content(serial, monitor):
     serial : dryad2dataverse.serializer.Serializer instance
     monitor : dryad2dataverse.monitor.Monitor instance
     '''
+    dv_link = (dryad2dataverse.serializer.constants.DVURL +
+               '/dataset.xhtml?persistentId=' +
+               serial.dvpid +
+               '&version=DRAFT')
     subject = f'Dryad study change notification for {serial.doi}'
     content = f'Study {serial.dryadJson["title"]} / {serial.doi} has changed content.\n\
+            \nDataverse URL: {dv_link}\n\
             \nDetails:\n\
             \nMetadata changes:\
             \n{monitor.diff_metadata(serial)}\n\
@@ -87,9 +97,9 @@ def notify(msgtxt,
     mailserv : str
         SMTP server for sending mail
     port : int
-        Mailserver port
-    recipient : str
-        Email address of recipient
+        Mailserver port. Default 465
+    recipient : list
+        List of email addresses of recipients
     '''
 
     if not port:
@@ -98,7 +108,8 @@ def notify(msgtxt,
     msg = Em()
     msg['Subject'] = msgtxt[0]
     msg['From'] = user
-    msg['To'] = [recipient]
+    #msg['To'] = [recipient]
+    msg['To'] = recipient
 
     content = msgtxt[1]
     msg.set_content(content)
@@ -108,7 +119,10 @@ def notify(msgtxt,
     #server.ehlo()
     server = smtplib.SMTP_SSL(mailserv, port)
     server.login(user, pwd)
-    server.sendmail(msg['From'], msg['To'], msg.as_string())
+    #To must be split. See
+    #https://stackoverflow.com/questions/8856117/
+    #how-to-send-email-to-multiple-recipients-using-python-smtplib
+    server.sendmail(msg['From'], msg['To'].split(','), msg.as_string())
     server.close()
 
 def get_records(ror: 'str', mod_date=None):
@@ -158,72 +172,91 @@ def argp():
     Argument parser
     '''
     description = ('Dryad to Dataverse import daemon. '
-                   'Arguments shown in square brackets (ie. []) are '
-                   'REQUIRED, despite being shown as optional.')
+                   'All arguments NOT enclosed by square brackets are REQUIRED. '
+                   'Arguments in [square brackets] are not required. '
+                   'The "optional arguments" below refers to the use of the option switch, '
+                   '(like -u), meaning "not a positional argument."'
+                   )
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-u', '--dv-url',
-                        help='Destination dataverse root url. '
-                        'Eg: https://dataverse.scholarsportal.info',
-                        required=False,
+                        help='REQUIRED: Destination dataverse root url. '
+                        'Default: https://dataverse.scholarsportal.info',
+                        required=True,
                         dest='url')
     parser.add_argument('-k', '--key',
-                        help='API key for dataverse user',
+                        help='REQUIRED: API key for dataverse user',
                         required=True,
                         dest='key')
     parser.add_argument('-t', '--target',
-                        help='Target dataverse short name',
+                        help='REQUIRED: Target dataverse short name',
                         required=True,
                         dest='target')
     parser.add_argument('-e', '--email',
-                        help='Username for email address'
-                        'which sends update notifications.',
-                        required=False,
+                        help='REQUIRED: Username for email address '
+                        'which sends update notifications. ie, the "user" portion '
+                        'of "user@website.invalid".',
+                        required=True,
                         dest='user')
     parser.add_argument('-r', '--recipient',
-                        help='Recipient of email notification',
-                        required=False,
+                        help='REQUIRED: Recipient(s) of email notification. '
+                        'Separate addresses with spaces',
+                        required=True,
+                        nargs='+',
                         dest='recipients')
     parser.add_argument('-p', '--pwd',
-                        help='Password for email account',
-                        required=False,
+                        help='REQUIRED: Password for sending email account. '
+                        'Enclose in single quotes to avoid OS errors with special '
+                        'characters.',
+                        required=True,
                         dest='pwd')
     parser.add_argument('--server',
-                        help='Mail server. Eg. smtp.gmail.com',
+                        help='Mail server for sending account. '
+                        'Default: smtp.gmail.com',
                         required=False,
                         default='smtp.gmail.com',
                         dest='mailserv')
     parser.add_argument('--port',
-                        help='Mail server port',
+                        help='Mail server port. Default: 465. '
+                        'Mail is sent using SSL.',
                         required=False,
                         type=int,
                         default=587,
                         dest='port')
     parser.add_argument('-c', '--contact',
-                        help='Contact email for Dataverse records',
+                        help='REQUIRED: Contact email address for Dataverse records. '
+                        'Must pass Dataverse email validation rules (so "test@test.invalid" '
+                        'is not acceptable).',
                         required=True,
                         dest='contact')
     parser.add_argument('-n', '--contact-name',
-                        help='Contact name for Dataverse records',
+                        help='REQUIRED: Contact name for Dataverse records',
                         required=True,
                         dest='cname')
-    parser.add_argument('-v', '--verbosity',
-                        help='Verbose output',
-                        required=False,
-                        action='store_true')
+    #parser.add_argument('-v', '--verbosity',
+    #                    help='Verbose output',
+    #                    required=False,
+    #                    action='store_true')
     parser.add_argument('-i', '--ror',
-                        help='Institutional ROR url. '
-                        'Eg: https://ror.org/03rmrcq20',
+                        help='REQUIRED: Institutional ROR URL. '
+                        'Eg: "https://ror.org/03rmrcq20". This identifies the '
+                        'institution in Dryad repositories.',
                         required=True,
                         dest='ror')
     parser.add_argument('--tmpfile',
-                        help='Temporary file location (if not /tmp)',
+                        help='Temporary file location. Default: /tmp)',
                         required=False,
                         dest='tmp')
     parser.add_argument('--db',
-                        help='Tracking database location and name if not '
-                        '$HOME/dryad_dataverse_monitor.sqlite3',
+                        help='Tracking database location and name. '
+                        'Default: $HOME/dryad_dataverse_monitor.sqlite3',
                         required=False,
                         dest='dbase')
+    parser.add_argument('--log',
+                        help='Complete path to log. '
+                        'Default: /var/log/dryadd.log',
+                        required=False,
+                        dest='log',
+                        default='/var/log/dryadd.log')
     return parser
 
 def set_constants(args):
@@ -262,7 +295,7 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, secure=(),
     subject = 'Dryad to Dataverse transfer error'
     elog = logging.getLogger('email_log')
     mailer = logging.handlers.SMTPHandler(mailhost=mailhost, fromaddr=fromaddr,
-                                          toaddrs=[toaddrs], subject=subject,
+                                          toaddrs=toaddrs, subject=subject,
                                           credentials=credentials, secure=secure)
     l_format = logging.Formatter('%(name)s - %(asctime)s'
                                  ' - %(levelname)s - %(funcName)s - '
@@ -292,7 +325,6 @@ def rotating_log(path, level):
                'dryad2dataverse.transfer',
                'dryad2dataverse.monitor']:
         logging.getLogger(na).setLevel(level)
-    logger.setLevel(level)
     rotator = logging.handlers.RotatingFileHandler(filename=path,
                                                    maxBytes=10*1024**2,
                                                    backupCount=10)
@@ -305,6 +337,7 @@ def rotating_log(path, level):
     #root_logger = logging.getLogger('')
     #root_logger.setLevel(level)
     #root_logger.addHandler(rotator)
+    logger.setLevel(level)
     return logger
 
 def main(log='/var/log/dryadd.log', level=logging.DEBUG):
@@ -316,10 +349,12 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     level : int
         log level, usually one of logging.LOGLEVEL (ie, logging.warning)
     '''
-    logger = rotating_log(log, level)
-
     parser = argp()
     args = parser.parse_args()
+    if args.log:
+        log = args.log
+    logger = rotating_log(log, level)
+
     set_constants(args)
 
     elog = email_log((args.mailserv, args.port), args.contact, args.recipients,
@@ -416,9 +451,15 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         monitor.set_timestamp()
         logger.info('Completed update process')
         elog.info('Completed update process')
-
+        finished = ('Dryad to Dataverse transfers completed',
+                    ('Dryad to Dataverse transfer daemon has completed.\n'
+                     f'Log available at: {log}'))
+        notify(finished, user=args.user, pwd=args.pwd,
+               recipient=args.recipients)
     except Exception as err:
+        logger.exception(err)
         logger.critical(err)
+        elog.exception(err)
         elog.critical(err)
         raise
 
