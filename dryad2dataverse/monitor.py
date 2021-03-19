@@ -451,7 +451,7 @@ class Monitor():
                         LOGGER.warning('Monitor: max upload size of %s exceeded. '
                                        'Unable to get dataverse file ID',
                                        constants.MAX_UPLOAD)
-                        LOGGER.warning('Error:\n$%s', err)
+                        LOGGER.warning('Error:\n Key "%s" not found', err)
                         continue
                     else:
                         dvfid = 'JSON read error'

@@ -578,8 +578,15 @@ class Transfer():
 
         except Exception as e:
             LOGGER.exception(e)
-            raise
-            #return (fid, {'status' : f'Failure: Reason {upload.reason}'})
+            try:
+                reason = upload.json()['message']
+                LOGGER.warning(upload.json())
+                return (fid, {'status' : f'Failure: {reason}'})
+            except Exception as e:
+                LOGGER.warning('Further exceptions!')
+                LOGGER.exception(e)
+                LOGGER.warning(upload.text)
+                return (fid, {'status' : f'Failure: Reason {upload.reason}'})
 
     def upload_files(self, files=None, pid=None, fprefix=None):
         '''
