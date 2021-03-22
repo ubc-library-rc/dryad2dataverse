@@ -7,6 +7,7 @@ nav_order: 1
 
 # dryad2dataverse -  translate, transfer and track
 
+![dryad2dataverse logo](images/dryad2dataverseLogo.svg)
 ---
 
 ## Introduction

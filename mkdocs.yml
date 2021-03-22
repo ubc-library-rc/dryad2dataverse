@@ -18,4 +18,5 @@ markdown_extensions:
   - codehilite
   - attr_list
 
-theme: readthedocs 
+theme: readthedocs
+  #favicon: images/favicon.png 
