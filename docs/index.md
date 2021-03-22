@@ -38,7 +38,11 @@ The **dryad2dataverse** library is free and open source, released under the MIT 
 
 There are a few reasons why you might find this product useful.
 
-* You are a researcher and you wish to deposit via API into Dataverse repository. You've used Dryad, but the Dataverse JSON and API is unfamiliar and [complex](https://guides.dataverse.org/en/latest/_downloads/dataset-create-new-all-default-fields.json "Complex Dataverse JSON"). You can write your Dryad JSON and convert automatically.
+* You are a researcher and you wish to deposit via API into Dataverse repository. 
+
+* You've used Dryad, but the Dataverse JSON and API is unfamiliar and [complex](https://guides.dataverse.org/en/latest/_downloads/dataset-create-new-all-default-fields.json "Complex Dataverse JSON"). 
+
+* You want to write your Dryad JSON and have it convert automatically.
 
 * Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution's research data (for example, the Dataverse repository at <https://dataverse.scholarsportal.info>).
 
@@ -67,7 +71,7 @@ pip install .
 
 #### Transferring data
 
-Note: a number of variables must be set [correctly] for this to work, such as your target dataverse). This example continues with the Serializer instance above.
+Note: a number of variables must be set [correctly] for this to work, such as your target dataverse. This example continues with the Serializer instance above.
 
 ```
 >>> import dryad2dataverse.transfer

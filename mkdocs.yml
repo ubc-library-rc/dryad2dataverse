@@ -6,7 +6,16 @@ nav:
   - Scripts: scripts.md
   - General Reference: reference.md
   - API Reference: api_reference.md
-  - Tracking Database Structure: dbase_structure/index.html
+    #- Tracking Database Structure: dbase_structure/index.html
+  - Tracking Database Structure: track.md 
   - FAQ: faq.md
   - Credits: credits.md
+
+markdown_extensions:
+  - smarty
+  - toc:
+      permalink: True
+  - codehilite
+  - attr_list
+
 theme: readthedocs 
