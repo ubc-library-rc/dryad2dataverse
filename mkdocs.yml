@@ -19,4 +19,3 @@ markdown_extensions:
   - attr_list
 
 theme: readthedocs
-  #favicon: images/favicon.png 
