@@ -78,7 +78,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../dbase_structure/">Tracking Database Structure</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
                     </li>
                 </ul>
                 <ul>
@@ -121,12 +121,12 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="general-reference">General Reference</h1>
-<p>This page covers material that isn't automatically generated from the source code, that is, the API reference section. Information regarding specific modules is below.</p>
-<h2 id="dryad2dataverseconstants">dryad2dataverse.constants</h2>
+                <h1 id="general-reference">General Reference<a class="headerlink" href="#general-reference" title="Permanent link">&para;</a></h1>
+<p>This page covers material that isn&rsquo;t automatically generated from the source code, that is, the API reference section. Information regarding specific modules is below.</p>
+<h2 id="dryad2dataverseconstants">dryad2dataverse.constants<a class="headerlink" href="#dryad2dataverseconstants" title="Permanent link">&para;</a></h2>
 <p><a name="dryad2dataverse.constants"></a></p>
-<p>And by "constants", you should change these as required. This module contains the information that configures all the parameters required to transfer data from Dryad to Dataverse. As 'constants' don't generally change, there's a non-zero chance that the name of this module will change.</p>
-<h3 id="general-variables">General variables</h3>
+<p>And by &ldquo;constants&rdquo;, you should change these as required. This module contains the information that configures all the parameters required to transfer data from Dryad to Dataverse. As &lsquo;constants&rsquo; don&rsquo;t generally change, there&rsquo;s a non-zero chance that the name of this module will change.</p>
+<h3 id="general-variables">General variables<a class="headerlink" href="#general-variables" title="Permanent link">&para;</a></h3>
 <p><a name="General variables"></a></p>
 <p><strong>RETRY_STRATEGY</strong><br />
     + This is a <code>urllib3.util</code> <code>Retry</code> object which controls the connection attemps of a <code>requests.Session</code> object. Not all connections are guaranteed to be successful the first time round, and the <code>Retry</code> object will allow multiple connection attempts before raising an exception.<br />
@@ -134,17 +134,17 @@
     + For more information/a tutorial on how to use the Retry object, please see <a href="https://findwork.dev/blog/advanced-usage-python-requests-timeouts-retries-hooks/#retry-on-failure">https://findwork.dev/blog/advanced-usage-python-requests-timeouts-retries-hooks/#retry-on-failure</a>  </p>
 <p><strong>DRYURL</strong><br />
     + Base URL for the Dryad data repository.<br />
-    + Default = 'https://datadryad.org'  </p>
-<p>It's unlikely you will ever change this, but Dryad is an open source project, so it's not out of the realm of possibility that there will be another Dryad-style repository.</p>
+    + Default = &lsquo;https://datadryad.org&rsquo;  </p>
+<p>It&rsquo;s unlikely you will ever change this, but Dryad is an open source project, so it&rsquo;s not out of the realm of possibility that there will be another Dryad-style repository.</p>
 <p><strong>TMP</strong><br />
     + Temporary file download location. Note that downloaded files have the potential of being very large, so select a directory which has sufficient space.    <br />
-    + Default ='/tmp'  </p>
+    + Default =&rsquo;/tmp&rsquo;  </p>
 <p>This is configured for *nix style environments. Windows does not, by default, have <code>/tmp</code> directory, for instance.</p>
-<h3 id="data-transfer-variables">Data transfer variables</h3>
+<h3 id="data-transfer-variables">Data transfer variables<a class="headerlink" href="#data-transfer-variables" title="Permanent link">&para;</a></h3>
 <p><a name="Data transfer variables"></a>
 <strong>DVURL</strong><br />
     + Base URL for dataverse installation<br />
-    + Default = 'https://dataverse.scholarsportal.info'  </p>
+    + Default = &lsquo;https://dataverse.scholarsportal.info&rsquo;  </p>
 <p>Obviously, if you are not transferring your data to the <a href="https://dataverse.scholarsportal.info">Scholars Portal</a>, you will need to change this.</p>
 <p><strong>APIKEY</strong> <br />
     + Dataverse API key for user performing transfer. Sufficient privileges for upload and metadata manipulation must be attached to the user. See <a href="https://guides.dataverse.org/en/latest/api/index.html">Dataverse API documentation</a> for an explanation of the privilege level required. <br />
@@ -155,29 +155,29 @@
     + Default = 3221225472   </p>
 <p>Files will not be downloaded or uploaded if their (reported) size exceeds this limit.</p>
 <p><strong>DV_CONTACT_EMAIL</strong> <br />
-    + Dataverse "Contact" email address. Required as part of Dataverse metadata. This would generally be the email address of the data set curator<br />
+    + Dataverse &ldquo;Contact&rdquo; email address. Required as part of Dataverse metadata. This would generally be the email address of the data set curator<br />
     + Default= None  </p>
 <p>API uploads to Dataverse fail without a contact email. While dryad2dataverse attempts to read email addresses from Dryad records, they are not required in Dryad.</p>
 <p><strong>DV_CONTACT_NAME</strong> <br />
-    + Dataverse "Contact" name. Required as part of Dataverse metadata. Generally the name of the data set curator, whether individual or an organization<br />
+    + Dataverse &ldquo;Contact&rdquo; name. Required as part of Dataverse metadata. Generally the name of the data set curator, whether individual or an organization<br />
     + Default = None  </p>
 <p>As with contact email addresses, contact names are required in Dataverse, but not in Dryad.</p>
 <p><strong>NOTAB</strong><br />
     + File extensions which should have tabular processing disabled. Lower case only.<br />
     + Dataverse will immediately cease ingest and lock a dataset when encountering a file which can be processed to .tab format. This causes upload crashes unless disabled.<br />
-    + Files may be converted to .tab format after upload using Dataverse's <code>reingest</code> endpoint: <a href="https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file">https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file</a><br />
-    + Default = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta', '.rdata', '.xslx']  </p>
-<p>If one of the files in the upload triggers tabular processing the upload will suddenly cease and fail. This behaviour is built into Dataverse (unfortunately), and can be only overcome through workarounds such as double-zipping files, or, in this case, spoofing MIME types and extensions. Because Dataverse's tabular file processing capabilities are subject to change, this is not an exhaustive list and some files may be processed regardless. See also dryad2dataverse.transfer.Transfer.force_notab_unlock().</p>
-<h1 id="monitoring-database-variables">Monitoring database variables</h1>
+    + Files may be converted to .tab format after upload using Dataverse&rsquo;s <code>reingest</code> endpoint: <a href="https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file">https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file</a><br />
+    + Default = [&lsquo;.sav&rsquo;, &lsquo;.por&rsquo;, &lsquo;.zip&rsquo;, &lsquo;.csv&rsquo;, &lsquo;.tsv&rsquo;, &lsquo;.dta&rsquo;, &lsquo;.rdata&rsquo;, &lsquo;.xslx&rsquo;]  </p>
+<p>If one of the files in the upload triggers tabular processing the upload will suddenly cease and fail. This behaviour is built into Dataverse (unfortunately), and can be only overcome through workarounds such as double-zipping files, or, in this case, spoofing MIME types and extensions. Because Dataverse&rsquo;s tabular file processing capabilities are subject to change, this is not an exhaustive list and some files may be processed regardless. See also dryad2dataverse.transfer.Transfer.force_notab_unlock().</p>
+<h1 id="monitoring-database-variables">Monitoring database variables<a class="headerlink" href="#monitoring-database-variables" title="Permanent link">&para;</a></h1>
 <p><a name="Monitoring database variables"></a></p>
 <p><strong>HOME</strong><br />
     + Home directory path for user  <br />
-    + Default = os.path.expanduser('~')  </p>
+    + Default = os.path.expanduser(&lsquo;~&rsquo;)  </p>
 <p>Home directory for the user. There is probably no reason to change this.</p>
 <p><strong>DBASE</strong><br />
     + Full path for transfer monitoring sqlite3 database<br />
-    + Default = HOME + os.sep + 'dryad_dataverse_monitor.sqlite3'  </p>
-<p>By default, the monitoring/tracking database will be created in the user's home directory, which is convenient but not necessarily not ideal. The location can also be set on instantiation of <code>dryad2dataverse.monitor.Monitor</code>: eg <code>monitor = dryad2dataverse.monitor.Monitor('/path/to/tracking/directory/databasename.sqlite3')</code></p>
+    + Default = HOME + os.sep + &lsquo;dryad_dataverse_monitor.sqlite3&rsquo;  </p>
+<p>By default, the monitoring/tracking database will be created in the user&rsquo;s home directory, which is convenient but not necessarily not ideal. The location can also be set on instantiation of <code>dryad2dataverse.monitor.Monitor</code>: eg <code>monitor = dryad2dataverse.monitor.Monitor('/path/to/tracking/directory/databasename.sqlite3')</code></p>
               
             </div>
           </div>

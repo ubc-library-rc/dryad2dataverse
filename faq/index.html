@@ -68,7 +68,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../dbase_structure/">Tracking Database Structure</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
                     </li>
                 </ul>
                 <ul class="current">
@@ -127,8 +127,8 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="frequently-asked-questions">Frequently asked questions</h1>
-<h4 id="why-is-the-upload-script-dryaddpy-constantly-crashing-with-smtp-errors"><strong>Why is the upload script (dryadd.py) constantly crashing with SMTP errors?</strong></h4>
+                <h1 id="frequently-asked-questions">Frequently asked questions<a class="headerlink" href="#frequently-asked-questions" title="Permanent link">&para;</a></h1>
+<h4 id="why-is-the-upload-script-dryaddpy-constantly-crashing-with-smtp-errors"><strong>Why is the upload script (dryadd.py) constantly crashing with SMTP errors?</strong><a class="headerlink" href="#why-is-the-upload-script-dryaddpy-constantly-crashing-with-smtp-errors" title="Permanent link">&para;</a></h4>
 <p>If you are using Gmail to send messages about your migration, there are a few potential hurdles.</p>
 <ol>
 <li>
@@ -143,35 +143,35 @@
 </ol>
 <p>Your other option is to not use Gmail.</p>
 <p><strong>smtplib</strong> exceptions will cause a script crash, so if you are experiencing persistent mail problems and still wish to use the script, you may wish disable emailing log messages.</p>
-<p>This is easily accomplished by commenting out the section starting with <code>elog = email_log(</code> in <code>scripts/dryadd.py</code>. Obviously you can't do this if you're using a binary dryadd.</p>
-<p>More advanced mail handling may be available in later releases.</p>
+<p>This is easily accomplished by commenting out the section starting with <code>elog = email_log(</code> in <code>scripts/dryadd.py</code>. Obviously you can&rsquo;t do this if you&rsquo;re using a binary dryadd.</p>
+<p>Currently email notifications are a mandatory part of the <code>dryadd.py</code> app, but this may be optional and/or more advanced mail handling may be available in later releases.</p>
 <p><em>All error messages are written to the log anyway,</em> so if you disable emailing of log messages you can still see them in the transfer log.</p>
-<h4 id="why-is-my-transfer-to-dataverse-not-showing-up-as-published"><strong>Why is my transfer to Dataverse not showing up as published?</strong></h4>
+<h4 id="why-is-my-transfer-to-dataverse-not-showing-up-as-published"><strong>Why is my transfer to Dataverse not showing up as published?</strong><a class="headerlink" href="#why-is-my-transfer-to-dataverse-not-showing-up-as-published" title="Permanent link">&para;</a></h4>
 <p><strong>dryad2dataverse</strong> does not <em>publish</em> the dataset. That must still be done via the Dataverse GUI or API. </p>
 <p>Publication functionality has been omitted <em>by design</em>:</p>
 <ul>
 <li>
-<p>File size limits within a default Dataverse installation that do not apply to Dryad, so it's possible that some files need to be moved with the assistance of a Datverse system administrator</p>
+<p>File size limits within a default Dataverse installation that do not apply to Dryad, so it&rsquo;s possible that some files need to be moved with the assistance of a Datverse system administrator</p>
 </li>
 <li>
-<p>Although every attempt has been made to map metadata schemas appropriately, it's undoubtedly not perfect. A quick once-over by a human can notice any unusual or unforeseen errors</p>
+<p>Although every attempt has been made to map metadata schemas appropriately, it&rsquo;s undoubtedly not perfect. A quick once-over by a human can notice any unusual or unforeseen errors</p>
 </li>
 <li>
 <p>Metadata quality standards can vary between Dryad and a Dataverse installations. A manual curation step is sometimes desirable to ensure that all published records meet the same standards.</p>
 </li>
 </ul>
-<h4 id="but-i-dont-want-to-manually-curate-my-data"><strong>But I don't want to manually curate my data</strong></h4>
-<p>It's possible to publish via the Dataverse API. If you <em>really</em> want to publish automatically, you can obtain a list of unpublished studies from Dataverse and publish them programatically. This is left as an exercise for the reader.</p>
-<h4 id="why-does-my-large-file-downloadupload-fail"><strong>Why does my large file download/upload fail?</strong></h4>
-<p>By default, Dataverse limits file sizes to 3 Gb, but that can vary by installation. <code>dryad2dataverse.constants.MAX_UPLOAD</code> contains the value which should correspond to the maximum upload size in Dataverse. If you don't know <em>what</em> the upload size is, contact the system administrator of your target Dataverse installation to find out.</p>
+<h4 id="but-i-dont-want-to-manually-curate-my-data"><strong>But I don&rsquo;t want to manually curate my data</strong><a class="headerlink" href="#but-i-dont-want-to-manually-curate-my-data" title="Permanent link">&para;</a></h4>
+<p>It&rsquo;s possible to publish via the Dataverse API. If you <em>really</em> want to publish automatically, you can obtain a list of unpublished studies from Dataverse and publish them programatically. This is left as an exercise for the reader.</p>
+<h4 id="why-does-my-large-file-downloadupload-fail"><strong>Why does my large file download/upload fail?</strong><a class="headerlink" href="#why-does-my-large-file-downloadupload-fail" title="Permanent link">&para;</a></h4>
+<p>By default, Dataverse limits file sizes to 3 Gb, but that can vary by installation. <code>dryad2dataverse.constants.MAX_UPLOAD</code> contains the value which should correspond to the maximum upload size in Dataverse. If you don&rsquo;t know <em>what</em> the upload size is, contact the system administrator of your target Dataverse installation to find out.</p>
 <p>To upload files exceeding the API upload limit, you will need to speak to a Dataverse administrator.</p>
-<h4 id="why-does-my-upload-of-files-fail-halfway"><strong>Why does my upload of files fail halfway?</strong></h4>
+<h4 id="why-does-my-upload-of-files-fail-halfway"><strong>Why does my upload of files fail halfway?</strong><a class="headerlink" href="#why-does-my-upload-of-files-fail-halfway" title="Permanent link">&para;</a></h4>
 <p>Dataverse will automatically cease ingest and lock a study when encountering a file which is suitable for tabular processing. The only way to stop this behaviour is to prohibit ingest in the Dataverse configuration, which is probably not possible for many users of the software.</p>
-<p>To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn't work and tabular processing starts anyway, the study is forcibly unlocked to allow uploads to continue. This process, unfortunately, is [probably] not foolproof.</p>
-<h4 id="why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file"><strong>Why is a file which should be a tabular file not a tabular file?</strong></h4>
-<p>As a direct result of the above, tabular file processing has (hopefully) been eliminated. It's still possible to create a tabular file by <a href="https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file" title="Reingest via API">reingesting it.</a></p>
-<p>Unless you are are the administrator of a Dataverse installation, you likely don't have control over what is or is not considered a tabular file. <strong>dryad2dataverse</strong> attempts to block all tabular file processing, but the process is imperfect. <em>Sic vita.</em></p>
-<h4 id="why-does-the-code-use-camel-case-instead-of-snake-case-for-variables"><strong>Why does the code use camel case instead of snake case for variables?</strong></h4>
+<p>To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn&rsquo;t work and tabular processing starts anyway, the study is forcibly unlocked to allow uploads to continue. This process, unfortunately, is [probably] not foolproof.</p>
+<h4 id="why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file"><strong>Why is a file which should be a tabular file not a tabular file?</strong><a class="headerlink" href="#why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file" title="Permanent link">&para;</a></h4>
+<p>As a direct result of the above, tabular file processing has (hopefully) been eliminated. It&rsquo;s still possible to create a tabular file by <a href="https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file" title="Reingest via API">reingesting it.</a></p>
+<p>Unless you are are the administrator of a Dataverse installation, you likely don&rsquo;t have control over what is or is not considered a tabular file. <strong>dryad2dataverse</strong> attempts to block all tabular file processing, but the process is imperfect. <em>Sic vita.</em></p>
+<h4 id="why-does-the-code-use-camel-case-instead-of-snake-case-for-variables"><strong>Why does the code use camel case instead of snake case for variables?</strong><a class="headerlink" href="#why-does-the-code-use-camel-case-instead-of-snake-case-for-variables" title="Permanent link">&para;</a></h4>
 <p>By the time I realized I should be using snake case, it was too late and I was already consistently using camel case. <a href="https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds">https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds</a></p>
               
             </div>
@@ -183,7 +183,7 @@
         <a href="../credits/" class="btn btn-neutral float-right" title="Credits">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../dbase_structure/" class="btn btn-neutral" title="Tracking Database Structure"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../track/" class="btn btn-neutral" title="Tracking Database Structure"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -209,7 +209,7 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../dbase_structure/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../track/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../credits/" style="color: #fcfcfc">Next &raquo;</a></span>
