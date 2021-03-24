@@ -66,7 +66,11 @@ class Monitor():
                       drymd5 TEXT, dvfid TEXT, dvmd5 TEXT, \
                       dvfilejson TEXT);',
                       'CREATE TABLE IF NOT EXISTS lastcheck \
-                      (checkdate TEXT);']
+                      (checkdate TEXT);',
+                      'CREATE TABLE IF NOT EXISTS failed_uploads \
+                      (dryaduid INT, dryfid INT, status TEXT);'
+                      ]
+
             for line in create:
                 cls.cursor.execute(line)
             cls.conn.commit()
@@ -445,18 +449,22 @@ class Monitor():
                 try:
                     dvfid = rec[1]['data']['files'][0]['dataFile']['id']
                     # Screw you for burying the file ID this deep
-                except (KeyError, IndexError) as err:
-                    dvfid = rec[1].get('status')
-                    if dvfid == 'Failure: MAX_UPLOAD size exceeded':
-                        LOGGER.warning('Monitor: max upload size of %s exceeded. '
-                                       'Unable to get dataverse file ID',
-                                       constants.MAX_UPLOAD)
-                        LOGGER.warning('Error:\n Key "%s" not found', err)
+                    recMd5 = rec[1]['data']['files'][0]['dataFile']['checksum']['value']
+                except (KeyError, IndexError):
+                    #write to failed uploads table instead
+                    status = rec[1].get('status')
+                    if not status:
+                        LOGGER.error('JSON read error for Dryad file ID %s', rec[0])
+                        LOGGER.error('File %s for DOI %s may not be uploaded', rec[0], transfer.doi)
                         continue
-                    else:
-                        dvfid = 'JSON read error'
-                        LOGGER.warning('JSON read error')
-                recMd5 = rec[1]['data']['files'][0]['dataFile']['checksum']['value']
+                    self.cursor.execute('INSERT INTO failed_uploads VALUES \
+                                        (?, ?, ?);', (dryaduid, rec[0], json.dumps(rec[1])))
+                    if status == 'Failure: MAX_UPLOAD size exceeded':
+                        LOGGER.warning('Monitor: max upload size of %s exceeded. '
+                                       'Unable to get dataverse file ID for Dryad '
+                                       'DOI %s, File ID %s',
+                                       constants.MAX_UPLOAD, transfer.doi, rec[0])
+                        continue
                 # md5s verified during upload step, so they should
                 # match already
                 self.cursor.execute('INSERT INTO dvFiles VALUES \
