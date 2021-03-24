@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>dryadStudy - ./dryad_dataverse_monitor.sqlite3 Database</title>
+        <title>dryadStudy - /Users/paul/tmp/dryad_dataverse_monitor.sqlite3 Database</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png">
@@ -46,7 +46,7 @@
                 <nav class="navbar navbar-static-top">
                     <div class="container">
                         <div class="navbar-header">
-                            <a href="../index.html" class="navbar-brand"><b>./dryad_dataverse_monitor.sqlite3</b> Database</a>
+                            <a href="../index.html" class="navbar-brand"><b>/Users/paul/tmp/dryad_dataverse_monitor.sqlite3</b> Database</a>
                             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
                         </div>
 
@@ -121,6 +121,10 @@
                                             </tr>
                                             <tr>
                                                 <td title="dvStudy.dryaduid references dryadStudy.uid via "><a href='dvStudy.html'>dvStudy</a><span class='relatedKey'>.dryaduid</span></td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="failed_uploads.dryaduid references dryadStudy.uid via "><a href='failed_uploads.html'>failed_uploads</a><span class='relatedKey'>.dryaduid</span></td>
                                                 <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
                                             </tr>
                                         </table>
@@ -251,10 +255,11 @@
                                 <div class="tab-content no-padding">
                                     <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
-<area shape="rect" id="node1" href="dryadFiles.html" target="_top" title="dryadFiles" alt="" coords="359,5,512,123">
-<area shape="rect" id="node2" href="dryadStudy.html" target="_top" title="dryadStudy" alt="" coords="5,137,315,353">
-<area shape="rect" id="node3" href="dvFiles.html" target="_top" title="dvFiles" alt="" coords="370,140,501,257">
-<area shape="rect" id="node4" href="dvStudy.html" target="_top" title="dvStudy" alt="" coords="366,275,505,392">
+<area shape="rect" id="node1" href="dryadFiles.html" target="_top" title="dryadFiles" alt="" coords="373,5,527,123">
+<area shape="rect" id="node2" href="dryadStudy.html" target="_top" title="dryadStudy" alt="" coords="5,205,315,421">
+<area shape="rect" id="node3" href="dvFiles.html" target="_top" title="dvFiles" alt="" coords="385,140,515,257">
+<area shape="rect" id="node4" href="dvStudy.html" target="_top" title="dvStudy" alt="" coords="381,275,519,392">
+<area shape="rect" id="node5" href="failed_uploads.html" target="_top" title="failed_uploads" alt="" coords="359,409,541,527">
 </map>
                                         <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/dryadStudy.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
                                     </div>

@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>dvStudy - /Users/paul/tmp/dryad_dataverse_monitor.sqlite3 Database</title>
+        <title>failed_uploads - /Users/paul/tmp/dryad_dataverse_monitor.sqlite3 Database</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png">
@@ -73,7 +73,7 @@
             <div class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
-                    <h1>dvStudy</h1><p><span id="recordNumber">0</span> rows</p><br />
+                    <h1>failed_uploads</h1><p><span id="recordNumber">0</span> rows</p><br />
                 </section>
                 <!-- Main content -->
                 <section class="content">
@@ -116,7 +116,7 @@
                                     <td>
                                         <table border='0' cellspacing='0' cellpadding='0'>
                                             <tr>
-                                                <td title="dvStudy.dryaduid references dryadStudy.uid via "><a href='dryadStudy.html'>dryadStudy</a><span class='relatedKey'>.uid</span></td>
+                                                <td title="failed_uploads.dryaduid references dryadStudy.uid via "><a href='dryadStudy.html'>dryadStudy</a><span class='relatedKey'>.uid</span></td>
                                                 <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
                                             </tr>
                                         </table>
@@ -124,7 +124,24 @@
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td><span id="dvpid">dvpid</span></td>
+                                    <td><span id="dryfid">dryfid</span></td>
+                                    <td>INT</td>
+                                    <td>2000000000,10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="status">status</span></td>
                                     <td>TEXT</td>
                                     <td>2000000000,10</td>
                                     <td title='nullable'>√</td>
@@ -163,20 +180,20 @@
                                 <div class="tab-content no-padding">
                                     <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
-<area shape="rect" id="node1" href="dvStudy.html" target="_top" title="dvStudy" alt="" coords="211,5,493,133">
+<area shape="rect" id="node1" href="failed_uploads.html" target="_top" title="failed_uploads" alt="" coords="211,5,539,163">
 <area shape="rect" id="node2" href="dryadStudy.html" target="_top" title="dryadStudy" alt="" coords="5,8,167,125">
 </map>
-                                        <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/dvStudy.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                        <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/failed_uploads.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
                                     </div>
                                     <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
-<area shape="rect" id="node1" href="dryadFiles.html" target="_top" title="dryadFiles" alt="" coords="275,5,429,93">
-<area shape="rect" id="node2" href="dryadStudy.html" target="_top" title="dryadStudy" alt="" coords="5,164,167,281">
-<area shape="rect" id="node3" href="dvFiles.html" target="_top" title="dvFiles" alt="" coords="287,111,417,199">
-<area shape="rect" id="node4" href="dvStudy.html" target="_top" title="dvStudy" alt="" coords="211,216,493,344">
-<area shape="rect" id="node5" href="failed_uploads.html" target="_top" title="failed_uploads" alt="" coords="261,361,443,449">
+<area shape="rect" id="node1" href="dryadFiles.html" target="_top" title="dryadFiles" alt="" coords="298,5,451,93">
+<area shape="rect" id="node2" href="dryadStudy.html" target="_top" title="dryadStudy" alt="" coords="5,161,167,279">
+<area shape="rect" id="node3" href="dvFiles.html" target="_top" title="dvFiles" alt="" coords="309,111,440,199">
+<area shape="rect" id="node4" href="dvStudy.html" target="_top" title="dvStudy" alt="" coords="305,216,444,304">
+<area shape="rect" id="node5" href="failed_uploads.html" target="_top" title="failed_uploads" alt="" coords="211,321,539,479">
 </map>
-                                        <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/dvStudy.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                        <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/failed_uploads.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
                                     </div>
                                 </div>
                             </div>
