@@ -384,7 +384,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
             #Create study object
             study = dryad2dataverse.serializer.Serializer(doi[0])
             if study.embargo:
-                logger.warning('Study %s embargoed. Skipping', study.doi)
+                logger.warning('Study %s is embargoed. Skipping', study.doi)
                 elog.warning('Study %s is embargoed. Skipping', study.doi)
                 continue
 
@@ -431,7 +431,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 continue
 
             diff = monitor.diff_files(study)
-            print(diff)
+            #print(diff)
             if diff.get('delete'):
                 del_these = monitor.get_dv_fids(diff['delete'])
                 transfer.delete_dv_files(dvfids=del_these)
@@ -447,6 +447,10 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
 
             #Update the tracking database for that record
             monitor.update(transfer)
+
+            #Delete the transfer object to ensure that
+            #the temporary directory doesn't get filled
+            del transfer 
         #and finally, update the time for the next run
         monitor.set_timestamp()
         logger.info('Completed update process')
