@@ -779,8 +779,8 @@ class Serializer():
 
                 #Dryad doesn't validate URL fields to start with http or https. Assume https
                 if not pubUrl['publicationURL']['value'].lower().startswith('htt'):
-                    pubUrl['publicationURL']['value'] = ('https://' + 
-                                                          pubUrl['publicationURL']['value'])
+                    pubUrl['publicationURL']['value'] = ('https://' +
+                                                         pubUrl['publicationURL']['value'])
                 pubcite.update(pubIdType)
                 pubcite.update(pubUrl)
                 out.append(pubcite)

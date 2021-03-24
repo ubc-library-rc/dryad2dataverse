@@ -44,7 +44,7 @@ class Transfer():
         self.session = requests.Session()
         self.session.mount('https://', HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
 
-    def _del(self): #Change name to __del__ to make a destructor
+    def _del__(self): #TODONE: Change name to __del__ to make a destructor
         '''Expunges files from constants.TMP on deletion'''
         for f in self.files:
             if os.path.exists(f'{constants.TMP}{os.sep}{f[1]}'):
@@ -381,7 +381,7 @@ class Transfer():
                 requests.exceptions.ConnectionError) as err:
             LOGGER.critical('Unable to download %s', url)
             LOGGER.exception(err)
-            raise
+            raise exceptions.DataverseDownloadError
 
     def download_files(self, files=None):
         '''
@@ -656,10 +656,21 @@ class Transfer():
                 meta.raise_for_status()
                 self.fileUpRecord.append((0, meta.json()))
                 self.jsonFlag = (0, meta.json())
+                LOGGER.debug('Successfully uploaded Dryad JSON to %s', studyId)
 
-            except Exception as e:
-                LOGGER.exception(e)
-                raise
+            #JSON uploads randomly fail with a Dataverse server.log error of
+            #"A system exception occurred during an invocation on EJB . . ."
+            #Not reproducible, so errors will only be written to the log.
+            #Jesus.
+            except (requests.exceptions.HTTPError,
+                    requests.exceptions.ConnectionError) as err:
+                LOGGER.warning('Unable to upload Dryad JSON to %s', studyId)
+                LOGGER.warning('ERROR message: %s', meta.text)
+                LOGGER.exception(err)
+                #And further checking as to what is happening
+                if not isinstance(self.dryad.dryadJson, dict):
+                    LOGGER.warning('Dryad JSON is not a dictionary')
+
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):
         #WTAF curl -u $API_TOKEN: -X DELETE
