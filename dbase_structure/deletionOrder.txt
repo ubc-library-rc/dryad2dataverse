@@ -1,4 +1,5 @@
 lastcheck
+failed_uploads
 dvStudy
 dvFiles
 dryadFiles

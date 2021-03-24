@@ -104,6 +104,8 @@
         <ul>
     <li class="toctree-l4"><a class="reference internal" href="#__init___1">__init__</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_del__">_del__</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dvpid">dvpid</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#auth">auth</a>
@@ -326,7 +328,7 @@ trailing portion of:</p>
  | dryadJson()
 </code></pre>
 
-<p>Returns Dryad study JSON. Will call Serializer.fetch_record() if 
+<p>Returns Dryad study JSON. Will call Serializer.fetch_record() if
 no JSON is present.</p>
 <p><a name="dryad2dataverse.serializer.Serializer.dryadJson"></a></p>
 <h5 id="dryadjson_1">dryadJson<a class="headerlink" href="#dryadjson_1" title="Permanent link">&para;</a></h5>
@@ -393,7 +395,7 @@ dryad2dataverse.constants.MAX_UPLOAD</p>
 <p><strong>Arguments</strong>:</p>
 <p>maxsize : int
   — Size in bytes in which to flag as oversize.
-- <code>Default</code> - constants.MAX_UPLOAD.</p>
+  Defaults to constants.MAX_UPLOAD.</p>
 <hr />
 <p><a name="dryad2dataverse.transfer"></a></p>
 <h2 id="dryad2dataversetransfer">dryad2dataverse.transfer<a class="headerlink" href="#dryad2dataversetransfer" title="Permanent link">&para;</a></h2>
@@ -404,7 +406,7 @@ dryad2dataverse.constants.MAX_UPLOAD</p>
 </code></pre>
 
 <p>Transfers metadata and data files from a
-Drayd installation to Dataverse installation.</p>
+Dryad installation to Dataverse installation.</p>
 <p><a name="dryad2dataverse.transfer.Transfer.__init__"></a></p>
 <h5 id="__init___1">__init__<a class="headerlink" href="#__init___1" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | __init__(dryad)
@@ -415,6 +417,12 @@ Drayd installation to Dataverse installation.</p>
 <p><strong>Arguments</strong>:</p>
 <p>dryad : dryad2dataverse.serializer.Serializer instance</p>
 <hr />
+<p><a name="dryad2dataverse.transfer.Transfer._del__"></a></p>
+<h5 id="_del__">_del__<a class="headerlink" href="#_del__" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | _del__()
+</code></pre>
+
+<p>Expunges files from constants.TMP on deletion</p>
 <p><a name="dryad2dataverse.transfer.Transfer.dvpid"></a></p>
 <h5 id="dvpid">dvpid<a class="headerlink" href="#dvpid" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | @property
@@ -465,8 +473,7 @@ dryad2dataverse.constants.MAX_UPLOAD.</p>
 <p>Returns Dryad DOI.</p>
 <p><a name="dryad2dataverse.transfer.Transfer.set_correct_date"></a></p>
 <h5 id="set_correct_date">set_correct_date<a class="headerlink" href="#set_correct_date" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python"> | @staticmethod
- | set_correct_date(url, hdl, d_type='distributionDate', apikey=None)
+<pre class="codehilite"><code class="language-python"> | set_correct_date(url, hdl, d_type='distributionDate', apikey=None)
 </code></pre>
 
 <p>Sets &ldquo;correct&rdquo; publication date for Dataverse.</p>
@@ -511,7 +518,7 @@ Supplying a <code>targetDv</code> kwarg creates a new study and supplying a
 <p>dvpid = str
   — Dataverse persistent ID (for updating metadata).
   This is not required for new uploads, specify as dvpid=value</p>
-<p><strong>OPTIONAL KEYWORD ARGUMENTS</strong></p>
+<hr />
 <p><a name="dryad2dataverse.transfer.Transfer.download_file"></a></p>
 <h5 id="download_file">download_file<a class="headerlink" href="#download_file" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | download_file(url, filename, tmp=None, size=None, chk=None, timeout=45)
@@ -525,10 +532,8 @@ returns md5sum on success and an exception on failure.</p>
   — URL of download.</p>
 <p>filename : str
   — Output file name.</p>
-<ul>
-<li><code>timeout</code> - int
-  — Requests timeout.</li>
-</ul>
+<p>timeout : int
+  — Requests timeout.</p>
 <p>tmp : str
   — Temporary directory for downloads.
   Defaults to dryad2dataverse.constants.TMP.</p>
@@ -536,7 +541,7 @@ returns md5sum on success and an exception on failure.</p>
   — Reported file size in bytes.
   Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
 <p>chk : str
-  — md5 sum of file (if available and known).</p>
+  - md5 sum of file (if available and known).</p>
 <hr />
 <p><a name="dryad2dataverse.transfer.Transfer.download_files"></a></p>
 <h5 id="download_files">download_files<a class="headerlink" href="#download_files" title="Permanent link">&para;</a></h5>
@@ -546,10 +551,8 @@ returns md5sum on success and an exception on failure.</p>
 <p>Bulk downloader for files.</p>
 <hr />
 <p><strong>Arguments</strong>:</p>
-<ul>
-<li><code>files</code> - list
-  — Items in list can be tuples or list with a minimum of:</li>
-</ul>
+<p>files : list
+  — Items in list can be tuples or list with a minimum of:</p>
 <p>(dryaddownloadurl, filenamewithoutpath, [md5sum])</p>
 <p>The md5 sum should be the last member of the tuple.</p>
 <p>Defaults to self.files.</p>
@@ -557,7 +560,7 @@ returns md5sum on success and an exception on failure.</p>
   files with a Dryad study.</p>
 <p><a name="dryad2dataverse.transfer.Transfer.force_notab_unlock"></a></p>
 <h5 id="force_notab_unlock">force_notab_unlock<a class="headerlink" href="#force_notab_unlock" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python"> | force_notab_unlock(study, dv_url, fid, apikey=None)
+<pre class="codehilite"><code class="language-python"> | force_notab_unlock(study, dv_url, apikey=None)
 </code></pre>
 
 <p>Checks for a study lock and forcibly unlocks and uningests
@@ -569,8 +572,6 @@ spoofing is not sufficient.</p>
   — Persistent indentifer of study.</p>
 <p>dv_url : str
   — URL to base Dataverse installation.</p>
-<p>fid : str
-  — File ID for file object.</p>
 <p>apikey : str
   — API key for user.
   If not present authorization defaults to self.auth.</p>
@@ -616,11 +617,9 @@ rather than raising an exception.</p>
 Returns a list of the original tuples plus JSON responses.</p>
 <hr />
 <p><strong>Arguments</strong>:</p>
-<ul>
-<li><code>files</code> - list
+<p>files : list
   — List contains tuples with
-  (dryadDownloadURL, filename, mimetype, size).</li>
-</ul>
+  (dryadDownloadURL, filename, mimetype, size).</p>
 <p>pid : str
   — Defaults to self.dvpid, which is generated by calling
   dryad2dataverse.transfer.Transfer.upload_study().</p>
