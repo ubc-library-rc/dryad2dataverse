@@ -115,7 +115,7 @@ trailing portion of:
  | dryadJson()
 ```
 
-Returns Dryad study JSON. Will call Serializer.fetch_record() if 
+Returns Dryad study JSON. Will call Serializer.fetch_record() if
 no JSON is present.
 
 <a name="dryad2dataverse.serializer.Serializer.dryadJson"></a>
@@ -215,7 +215,7 @@ dryad2dataverse.constants.MAX_UPLOAD
   
   maxsize : int
   — Size in bytes in which to flag as oversize.
-- `Default` - constants.MAX_UPLOAD.
+  Defaults to constants.MAX_UPLOAD.
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer"></a>
@@ -231,7 +231,7 @@ class Transfer()
 ```
 
 Transfers metadata and data files from a
-Drayd installation to Dataverse installation.
+Dryad installation to Dataverse installation.
 
 <a name="dryad2dataverse.transfer.Transfer.__init__"></a>
 ##### \_\_init\_\_
@@ -248,6 +248,15 @@ Creates a dryad2dataverse.transfer.Transfer instance.
 
   dryad : dryad2dataverse.serializer.Serializer instance
   ----------------------------------------
+
+<a name="dryad2dataverse.transfer.Transfer._del__"></a>
+##### \_del\_\_
+
+```python
+ | _del__()
+```
+
+Expunges files from constants.TMP on deletion
 
 <a name="dryad2dataverse.transfer.Transfer.dvpid"></a>
 ##### dvpid
@@ -321,7 +330,6 @@ Returns Dryad DOI.
 ##### set\_correct\_date
 
 ```python
- | @staticmethod
  | set_correct_date(url, hdl, d_type='distributionDate', apikey=None)
 ```
 
@@ -390,7 +398,7 @@ Supplying a `targetDv` kwarg creates a new study and supplying a
   — Dataverse persistent ID (for updating metadata).
   This is not required for new uploads, specify as dvpid=value
   
-  **OPTIONAL KEYWORD ARGUMENTS**
+  ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.download_file"></a>
 ##### download\_file
@@ -413,7 +421,7 @@ returns md5sum on success and an exception on failure.
   filename : str
   — Output file name.
   
-- `timeout` - int
+  timeout : int
   — Requests timeout.
   
   tmp : str
@@ -425,7 +433,7 @@ returns md5sum on success and an exception on failure.
   Defaults to dryad2dataverse.constants.MAX_UPLOAD.
   
   chk : str
-  — md5 sum of file (if available and known).
+  - md5 sum of file (if available and known).
   ----------------------------------------
 
 <a name="dryad2dataverse.transfer.Transfer.download_files"></a>
@@ -442,7 +450,7 @@ Bulk downloader for files.
 **Arguments**:
 
   
-- `files` - list
+  files : list
   — Items in list can be tuples or list with a minimum of:
   
   (dryaddownloadurl, filenamewithoutpath, [md5sum])
@@ -458,7 +466,7 @@ Bulk downloader for files.
 ##### force\_notab\_unlock
 
 ```python
- | force_notab_unlock(study, dv_url, fid, apikey=None)
+ | force_notab_unlock(study, dv_url, apikey=None)
 ```
 
 Checks for a study lock and forcibly unlocks and uningests
@@ -475,9 +483,6 @@ spoofing is not sufficient.
   
   dv_url : str
   — URL to base Dataverse installation.
-  
-  fid : str
-  — File ID for file object.
   
   apikey : str
   — API key for user.
@@ -546,7 +551,7 @@ Returns a list of the original tuples plus JSON responses.
 **Arguments**:
 
   
-- `files` - list
+  files : list
   — List contains tuples with
   (dryadDownloadURL, filename, mimetype, size).
   

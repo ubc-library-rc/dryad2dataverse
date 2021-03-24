@@ -68,7 +68,8 @@ class Monitor():
                       'CREATE TABLE IF NOT EXISTS lastcheck \
                       (checkdate TEXT);',
                       'CREATE TABLE IF NOT EXISTS failed_uploads \
-                      (dryaduid INT, dryfid INT, status TEXT);'
+                      (dryaduid INTEGER references dryadstudy (uid), \
+                      dryfid INT, status TEXT);'
                       ]
 
             for line in create:
