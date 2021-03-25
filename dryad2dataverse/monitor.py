@@ -451,21 +451,26 @@ class Monitor():
                     dvfid = rec[1]['data']['files'][0]['dataFile']['id']
                     # Screw you for burying the file ID this deep
                     recMd5 = rec[1]['data']['files'][0]['dataFile']['checksum']['value']
-                except (KeyError, IndexError):
+                except (KeyError, IndexError) as err:
                     #write to failed uploads table instead
                     status = rec[1].get('status')
                     if not status:
                         LOGGER.error('JSON read error for Dryad file ID %s', rec[0])
                         LOGGER.error('File %s for DOI %s may not be uploaded', rec[0], transfer.doi)
+                        LOGGER.exception(err)
+                        msg = {'status': 'Failure: Other non-specific '
+                                         'failure. Check logs'}
+
+                        self.cursor.execute('INSERT INTO failed_uploads VALUES \
+                                        (?, ?, ?);', (dryaduid, rec[0], json.dumps(msg)))
                         continue
                     self.cursor.execute('INSERT INTO failed_uploads VALUES \
                                         (?, ?, ?);', (dryaduid, rec[0], json.dumps(rec[1])))
-                    if status == 'Failure: MAX_UPLOAD size exceeded':
-                        LOGGER.warning('Monitor: max upload size of %s exceeded. '
-                                       'Unable to get dataverse file ID for Dryad '
-                                       'DOI %s, File ID %s',
-                                       constants.MAX_UPLOAD, transfer.doi, rec[0])
-                        continue
+                    LOGGER.warning(type(err))
+                    LOGGER.warning('%s. DOI %s, File ID %s',
+                                   rec[1].get('status'),
+                                   transfer.doi, rec[0])
+                    continue
                 # md5s verified during upload step, so they should
                 # match already
                 self.cursor.execute('INSERT INTO dvFiles VALUES \

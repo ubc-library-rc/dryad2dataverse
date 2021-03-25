@@ -664,12 +664,16 @@ class Transfer():
             #Jesus.
             except (requests.exceptions.HTTPError,
                     requests.exceptions.ConnectionError) as err:
-                LOGGER.warning('Unable to upload Dryad JSON to %s', studyId)
-                LOGGER.warning('ERROR message: %s', meta.text)
+                LOGGER.error('Unable to upload Dryad JSON to %s', studyId)
+                LOGGER.error('ERROR message: %s', meta.text)
                 LOGGER.exception(err)
                 #And further checking as to what is happening
+                self.fileUpRecord.append((0, {'status':'Failure: Unable to upload Dryad JSON'}))
                 if not isinstance(self.dryad.dryadJson, dict):
-                    LOGGER.warning('Dryad JSON is not a dictionary')
+                    LOGGER.error('Dryad JSON is not a dictionary')
+            except Exception as err:
+                LOGGER.error('Unable to upload Dryad JSON')
+                LOGGER.exception(err)
 
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):
