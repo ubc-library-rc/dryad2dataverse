@@ -125,7 +125,7 @@ def notify(msgtxt,
     server.sendmail(msg['From'], msg['To'].split(','), msg.as_string())
     server.close()
 
-def get_records(ror: 'str', mod_date=None):
+def get_records(ror: 'str', mod_date=None, verbosity=True):
     '''
     returns a tuple of ((doi, metadata), ...). Dryad searches return complete
     study metadata from the search, surprisingly.
@@ -135,10 +135,13 @@ def get_records(ror: 'str', mod_date=None):
         https://ror.org/
 
     mod_date : str
-            UTC datetime string in the format suitable for the Dryad API.
-            eg. 2021-01-21T21:42:40Z
-            or .strftime('%Y-%m-%dT%H:%M:%SZ')
-            if no mod_date is passed, all studies will be retrieved
+        UTC datetime string in the format suitable for the Dryad API.
+        eg. 2021-01-21T21:42:40Z
+        or .strftime('%Y-%m-%dT%H:%M:%SZ')
+        if no mod_date is passed, all studies will be retrieved
+
+    verbosity : bool
+       Output some data to stdout
     '''
     headers = {'accept':'application/json',
                'Content-Type':'application/json'}
@@ -147,17 +150,17 @@ def get_records(ror: 'str', mod_date=None):
               'per_page' : per_page}
     if mod_date:
         params['modifiedSince'] = mod_date
-    #print(params)
     stud = requests.get(f'{DRY}/search', headers=headers,
                         params=params)
     records = []
     total = stud.json()['total']
-    print(f'Total Records: {total}')
+    if verbosity:
+        print(f'Total Records: {total}')
     params['per_page'] = 100
     for data in range(total//100+1):
-        print(f'Records page: {data+1}')
+        if verbosity:
+            print(f'Records page: {data+1}')
         params['page'] = data+1
-        print(params)
         stud = requests.get(f'{DRY}/search',
                             headers=headers,
                             params=params)
@@ -232,10 +235,10 @@ def argp():
                         help='REQUIRED: Contact name for Dataverse records',
                         required=True,
                         dest='cname')
-    #parser.add_argument('-v', '--verbosity',
-    #                    help='Verbose output',
-    #                    required=False,
-    #                    action='store_true')
+    parser.add_argument('-v', '--verbosity',
+                        help='Verbose output',
+                        required=False,
+                        action='store_true')
     parser.add_argument('-i', '--ror',
                         help='REQUIRED: Institutional ROR URL. '
                         'Eg: "https://ror.org/03rmrcq20". This identifies the '
@@ -371,7 +374,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     logger.info('Last update time: %s', monitor.lastmod)
 
     #get all updates since the last update check
-    updates = get_records(args.ror, monitor.lastmod)
+    updates = get_records(args.ror, monitor.lastmod,
+                          verbosity=args.verbosity)
 
     #update all the new files
     try:
@@ -431,7 +435,6 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 continue
 
             diff = monitor.diff_files(study)
-            #print(diff)
             if diff.get('delete'):
                 del_these = monitor.get_dv_fids(diff['delete'])
                 transfer.delete_dv_files(dvfids=del_these)
@@ -450,7 +453,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
 
             #Delete the transfer object to ensure that
             #the temporary directory doesn't get filled
-            del transfer 
+            del transfer
         #and finally, update the time for the next run
         monitor.set_timestamp()
         logger.info('Completed update process')
@@ -468,6 +471,4 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         raise
 
 if __name__ == '__main__':
-    #print(get_records('https://ror.org/03rmrcq20', '2021-01-01'))
-    #main(log='/Users/paul/tmp/dry.log')
-    main(log='/Users/paul/tmp/dry_ignore.log')
+    main()
