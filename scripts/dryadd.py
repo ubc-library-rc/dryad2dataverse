@@ -20,7 +20,6 @@ import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
-
 DRY = 'https://datadryad.org/api/v2'
 
 def new_content(serial):
@@ -260,6 +259,20 @@ def argp():
                         required=False,
                         dest='log',
                         default='/var/log/dryadd.log')
+    parser.add_argument('-l', '--no_force_unlock',
+                        help='No forcible file unlock. Required'
+                        'if /lock endpint is restricted',
+                        required=False,
+                        action='store_false',
+                        dest='force_unlock')
+
+    parser.add_argument('-x', '--exclude',
+                        help='Exclude these DOIs. Separate by spaces',
+                        required=False,
+                        default=[],
+                        nargs='+',
+                        dest='exclude')
+
     return parser
 
 def set_constants(args):
@@ -382,9 +395,14 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         count = 0
         for doi in updates:
             count += 1
-            logger.info('Processing %s of %s', count, len(updates))
+            logger.info('Start processing %s of %s', count, len(updates))
+            logger.info('DOI: %s, Dryad URL: https://datadryad.org/stash/dataset/%s',
+                        doi[0], doi[0])
             if not updates:
                 break #no new files in this case
+            if doi[0] in args.exclude:
+                logger.warning('Skipping excluded doi: %s', doi[0])
+                continue
             #Create study object
             study = dryad2dataverse.serializer.Serializer(doi[0])
             if study.embargo:
@@ -411,7 +429,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 logger.info('Downloading study files')
                 transfer.download_files()
                 logger.info('Uploading files to Dataverse')
-                transfer.upload_files()
+                transfer.upload_files(force_unlock=args.force_unlock)
                 logger.info('Uploading Dryad JSON metadata')
                 transfer.upload_json()
                 notify(new_content(study),
@@ -446,7 +464,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 #you need to download them first if they're new
                 transfer.download_files(diff['add'])
                 #now send them to Dataverse
-                transfer.upload_files(diff['add'], pid=study.dvpid)
+                transfer.upload_files(diff['add'], pid=study.dvpid,
+                                      force_unlock=args.force_unlock)
 
             #Update the tracking database for that record
             monitor.update(transfer)
@@ -464,10 +483,20 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         notify(finished, user=args.user, pwd=args.pwd,
                recipient=args.recipients)
     except Exception as err:
+        logger.critical('Critical failure with DOI: %s, '
+                        'Dryad URL: https://datadryad.org/stash/dataset/%s,'
+                        'Dataverse URL: %s', transfer.doi, transfer.doi,
+                        dryad2dataverse.constants.DVURL+
+                        'dataset.xhtml?persistentId='+transfer.dvpid)
         logger.exception(err)
         logger.critical(err)
+        elog.critical('Critical failure with DOI: %s, '
+                      'Dryad URL: https://datadryad.org/stash/dataset/%s,'
+                      'Dataverse URL: %s', transfer.doi, transfer.doi,
+                      dryad2dataverse.constants.DVURL+
+                      'dataset.xhtml?persistentId='+transfer.dvpid)
         elog.exception(err)
-        elog.critical(err)
+        #elog.critical(err)
         raise
 
 if __name__ == '__main__':

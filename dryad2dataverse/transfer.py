@@ -7,6 +7,7 @@ import io
 import json
 import logging
 import os
+import time
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -401,6 +402,7 @@ class Transfer():
 
               Normally used without arguments to download all the associated
               files with a Dryad study.
+        ----------------------------------------
         '''
         if not files:
             files = self.files
@@ -411,11 +413,66 @@ class Transfer():
             LOGGER.exception('Unable to download file with info %s\n%s', f, e)
             raise
 
+    def file_lock_check(self, study, dv_url, apikey=None, count=0):
+        '''
+        Checks for a study lock
+
+        Returns True if locked. Normally used to check
+        if processing is completed. As tabular processing
+        halts file ingest, there should be no locks on a
+        Dataverse study before performing a data file upload.
+
+        ----------------------------------------
+        Parameters:
+
+        study : str
+            — Persistent indentifer of study.
+
+        dv_url : str
+            — URL to base Dataverse installation.
+
+        apikey : str
+            — API key for user.
+              If not present authorization defaults to self.auth.
+
+        count : int
+            — Number of times the function has been called. Logs
+              lock messages only on 0.
+        ----------------------------------------
+        '''
+        if dv_url.endswith('/'):
+            dv_url = dv_url[:-1]
+        if apikey:
+            headers = {'X-Dataverse-key': apikey}
+        else:
+            headers = self.auth
+        params = {'persistentId': study}
+        try:
+            lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+                                           headers=headers,
+                                           params=params, timeout=300)
+            lock_status.raise_for_status()
+            if lock_status.json().get('data'):
+                if count == 0:
+                    LOGGER.warning('Study %s has been locked', study)
+                    LOGGER.warning('Lock info:\n%s', lock_status.json())
+                return True
+            return False
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as err:
+            LOGGER.error('Unable to detect lock status for %s', study)
+            LOGGER.error('ERROR message: %s', lock_status.text)
+            LOGGER.exception(err)
+            #return True #Should I raise here?
+            raise
+
     def force_notab_unlock(self, study, dv_url, apikey=None):
         '''
         Checks for a study lock and forcibly unlocks and uningests
         to prevent tabular file processing. Required if mime and filename
         spoofing is not sufficient.
+
+        **Forcible unlocks require a superuser API key.**
 
         ----------------------------------------
         Parameters:
@@ -448,6 +505,7 @@ class Transfer():
             force_unlock = self.session.delete(f'{dv_url}/api/datasets/:persistentId/locks',
                                                params=params, headers=headers,
                                                timeout=300)
+            force_unlock.raise_for_status()
             LOGGER.warning('Lock removed for %s', study)
             LOGGER.warning('Lock status:\n %s', force_unlock.json())
             #This is what the file ID was for, in case it can
@@ -470,7 +528,7 @@ class Transfer():
     def upload_file(self, dryadUrl=None, filename=None,
                     mimetype=None, size=None, descr=None,
                     md5=None, studyId=None, dest=None,
-                    fprefix=None, timeout=300):
+                    fprefix=None, force_unlock=False, timeout=300):
         '''
         Uploads file to Dataverse study. Returns a tuple of the
         dryadFid (or None) and Dataverse JSON from the POST request.
@@ -508,6 +566,16 @@ class Transfer():
 
         dryadUrl : str
             - Dryad download URL if you want to include a Dryad file id.
+
+
+        force_unlock : bool
+            — Attempt forcible unlock instead of waiting for tabular
+              file processing.
+              Defaults to False.
+              The Dataverse `/locks` endpoint blocks POST and DELETE requests
+              from non-superusers (undocumented as of 31 March 2021).
+              **Forcible unlock requires a superuser API key.**
+
         ----------------------------------------
         '''
         if not studyId:
@@ -572,7 +640,17 @@ class Transfer():
             #fid = upload.json()['data']['files'][0]['dataFile']['id']
             #fid not required for unlock
             #self.force_notab_unlock(studyId, dest, fid)
-            self.force_notab_unlock(studyId, dest)
+            if force_unlock:
+                self.force_notab_unlock(studyId, dest)
+            else:
+                count = 0
+                wait = True
+                while wait:
+                    wait = self.file_lock_check(studyId, dest, count=count)
+                    if wait:
+                        time.sleep(15) # Don't hit it too often
+                    count += 1
+
 
             return (fid, upload.json())
 
@@ -588,7 +666,7 @@ class Transfer():
                 LOGGER.warning(upload.text)
                 return (fid, {'status' : f'Failure: Reason {upload.reason}'})
 
-    def upload_files(self, files=None, pid=None, fprefix=None):
+    def upload_files(self, files=None, pid=None, fprefix=None, force_unlock=False):
         '''
         Uploads multiple files to study with persistentId pid.
         Returns a list of the original tuples plus JSON responses.
@@ -603,6 +681,18 @@ class Transfer():
         pid : str
             — Defaults to self.dvpid, which is generated by calling
               dryad2dataverse.transfer.Transfer.upload_study().
+
+        fprefix : str
+            — File location prefix.
+              Defaults to dryad2dataverse.constants.TMP
+
+        force_unlock : bool
+            — Attempt forcible unlock instead of waiting for tabular
+              file processing.
+              Defaults to False.
+              The Dataverse `/locks` endpoint blocks POST and DELETE requests
+              from non-superusers (undocumented as of 31 March 2021).
+              **Forcible unlock requires a superuser API key.**
         ----------------------------------------
         '''
         if not files:
@@ -613,7 +703,8 @@ class Transfer():
         for f in files:
             #out.append(self.upload_file(f[0], f[1], f[2], f[3],
             #                             f[4], f[5], pid, fprefix=fprefix))
-            out.append(self.upload_file(*[x for x in f], pid, fprefix=fprefix))
+            out.append(self.upload_file(*[x for x in f], pid, fprefix=fprefix,
+                                        force_unlock=force_unlock))
         return out
 
     def upload_json(self, studyId=None, dest=None):
@@ -674,7 +765,6 @@ class Transfer():
             except Exception as err:
                 LOGGER.error('Unable to upload Dryad JSON')
                 LOGGER.exception(err)
-
 
     def delete_dv_file(self, dvfid, dvurl=None, key=None):
         #WTAF curl -u $API_TOKEN: -X DELETE
