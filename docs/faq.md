@@ -25,6 +25,31 @@ Currently email notifications are a mandatory part of the `dryadd.py` app, but t
 
 _All error messages are written to the log anyway,_ so if you disable emailing of log messages you can still see them in the transfer log.
 
+#### **Why is the upload script (dryadd.py) is crashing with dryad2dataverse.exceptions.DownloadSizeError size errors?**
+
+There are a few instances when the script will crash on an exception and this is one of them. This occurs when the download size does not match reported size of the file in Dryad.
+
+There are two obvious alternatives here. The first is that the download was corrupted in some way. In this case, you should go to your temporary file location and delete the offending file(s). Run the script again and it should continue as normal.
+
+The other, much more insidious error comes from Dryad. A very few Dryad studies have files with duplicate names. These are not visible on the web page for the study, but are visible via the file API. As the files are named on download with the names given to them by Dryad, this is a problem because two files cannot have the same name. Additionally, because only *one* of the files appears on the Dryad page *without* any associated metadata, it's not possible to tell which one is which without a manual inspection.
+
+Presumably this should not be happening, as the number of files on the Dryad web page and the number of files available via API should match. There is no way to resolve this error without consulting the people at Dryad.
+
+In this case, the only workable solution is to exclude the problematic Dryad study from the upload. Do this by noting the Dryad DOI and then using the `-x, --exclude` switch.
+
+`python3 dryadd.py [bunch of stuff] -x doi:10.5061/dryad.7pd82 &`
+
+
+#### **Why is the upload script (dryadd.py) is crashing with 404 errors for data files?**
+
+Related to the error above, in a very few instances the Dryad web page is displaying an embargo on the page, but the Dryad JSON *does not* have `{curationStatus: Embargoed}`, which means that `dryad2dataverse.serializer.Serializer.embargo == False`.
+
+This means that instead of skipping the download, it is attempted. But the embargo flag is incorrect and the files are unavailable, generating a 404 error. 
+
+As there is no other way to determine embargo status other than by inspecting the Dryad study web page (and even then perhaps not), the solution is to exclude the DOI using the `-x` switch.
+
+`python3 dryadd.py [bunch of stuff] -x doi:10.5061/dryad.b74d971 &`
+
 #### **Why is my transfer to Dataverse not showing up as published?**
 
 **dryad2dataverse** does not _publish_ the dataset. That must still be done via the Dataverse GUI or API. 
@@ -57,7 +82,7 @@ To circumvent this, dryad2dataverse attempts to fool Dataverse into not processi
 
 As a direct result of the above, tabular file processing has (hopefully) been eliminated. It's still possible to create a tabular file by [reingesting it.](https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file "Reingest via API")
 
-Unless you are are the administrator of a Dataverse installation, you likely don't have control over what is or is not considered a tabular file. **dryad2dataverse** attempts to block all tabular file processing, but the process is imperfect. _Sic vita._
+Unless you are are the administrator of a Dataverse installation, you likely don't have control over what is or is not considered a tabular file. **dryad2dataverse** attempts to block all tabular file processing, but the process is imperfect, notably with Excel files. _Sic vita._
 
 #### **Why does the code use camel case instead of snake case for variables?**
 

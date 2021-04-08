@@ -68,8 +68,9 @@ The implementation is relatively straightforward. Simply supply the required par
 
 
 ```
-usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME -i ROR [--tmpfile TMP] [--db DBASE]
-                 [--log LOG]
+
+usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP] [--db DBASE]
+                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]]
 
 Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are REQUIRED. Arguments in [square brackets] are not required. The "optional arguments" below refers to
 the use of the option switch, (like -u), meaning "not a positional argument."
@@ -91,8 +92,13 @@ optional arguments:
                         REQUIRED: Contact email address for Dataverse records. Must pass Dataverse email validation rules (so "test@test.invalid" is not acceptable).
   -n CNAME, --contact-name CNAME
                         REQUIRED: Contact name for Dataverse records
+  -v, --verbosity       Verbose output
   -i ROR, --ror ROR     REQUIRED: Institutional ROR URL. Eg: "https://ror.org/03rmrcq20". This identifies the institution in Dryad repositories.
   --tmpfile TMP         Temporary file location. Default: /tmp)
   --db DBASE            Tracking database location and name. Default: $HOME/dryad_dataverse_monitor.sqlite3
   --log LOG             Complete path to log. Default: /var/log/dryadd.log
+  -l, --no_force_unlock
+                        No forcible file unlock. Requiredif /lock endpint is restricted
+  -x EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
+                        Exclude these DOIs. Separate by spaces
 ```
