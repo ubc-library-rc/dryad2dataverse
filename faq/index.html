@@ -76,6 +76,10 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#why-is-the-upload-script-dryaddpy-constantly-crashing-with-smtp-errors">Why is the upload script (dryadd.py) constantly crashing with SMTP errors?</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-is-the-upload-script-dryaddpy-is-crashing-with-dryad2dataverseexceptionsdownloadsizeerror-size-errors">Why is the upload script (dryadd.py) is crashing with dryad2dataverse.exceptions.DownloadSizeError size errors?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-is-the-upload-script-dryaddpy-is-crashing-with-404-errors-for-data-files">Why is the upload script (dryadd.py) is crashing with 404 errors for data files?</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#why-is-my-transfer-to-dataverse-not-showing-up-as-published">Why is my transfer to Dataverse not showing up as published?</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#but-i-dont-want-to-manually-curate-my-data">But I don't want to manually curate my data</a>
@@ -146,6 +150,18 @@
 <p>This is easily accomplished by commenting out the section starting with <code>elog = email_log(</code> in <code>scripts/dryadd.py</code>. Obviously you can&rsquo;t do this if you&rsquo;re using a binary dryadd.</p>
 <p>Currently email notifications are a mandatory part of the <code>dryadd.py</code> app, but this may be optional and/or more advanced mail handling may be available in later releases.</p>
 <p><em>All error messages are written to the log anyway,</em> so if you disable emailing of log messages you can still see them in the transfer log.</p>
+<h4 id="why-is-the-upload-script-dryaddpy-is-crashing-with-dryad2dataverseexceptionsdownloadsizeerror-size-errors"><strong>Why is the upload script (dryadd.py) is crashing with dryad2dataverse.exceptions.DownloadSizeError size errors?</strong><a class="headerlink" href="#why-is-the-upload-script-dryaddpy-is-crashing-with-dryad2dataverseexceptionsdownloadsizeerror-size-errors" title="Permanent link">&para;</a></h4>
+<p>There are a few instances when the script will crash on an exception and this is one of them. This occurs when the download size does not match reported size of the file in Dryad.</p>
+<p>There are two obvious alternatives here. The first is that the download was corrupted in some way. In this case, you should go to your temporary file location and delete the offending file(s). Run the script again and it should continue as normal.</p>
+<p>The other, much more insidious error comes from Dryad. A very few Dryad studies have files with duplicate names. These are not visible on the web page for the study, but are visible via the file API. As the files are named on download with the names given to them by Dryad, this is a problem because two files cannot have the same name. Additionally, because only <em>one</em> of the files appears on the Dryad page <em>without</em> any associated metadata, it&rsquo;s not possible to tell which one is which without a manual inspection.</p>
+<p>Presumably this should not be happening, as the number of files on the Dryad web page and the number of files available via API should match. There is no way to resolve this error without consulting the people at Dryad.</p>
+<p>In this case, the only workable solution is to exclude the problematic Dryad study from the upload. Do this by noting the Dryad DOI and then using the <code>-x, --exclude</code> switch.</p>
+<p><code>python3 dryadd.py [bunch of stuff] -x doi:10.5061/dryad.7pd82 &amp;</code></p>
+<h4 id="why-is-the-upload-script-dryaddpy-is-crashing-with-404-errors-for-data-files"><strong>Why is the upload script (dryadd.py) is crashing with 404 errors for data files?</strong><a class="headerlink" href="#why-is-the-upload-script-dryaddpy-is-crashing-with-404-errors-for-data-files" title="Permanent link">&para;</a></h4>
+<p>Related to the error above, in a very few instances the Dryad web page is displaying an embargo on the page, but the Dryad JSON <em>does not</em> have <code>{curationStatus: Embargoed}</code>, which means that <code>dryad2dataverse.serializer.Serializer.embargo == False</code>.</p>
+<p>This means that instead of skipping the download, it is attempted. But the embargo flag is incorrect and the files are unavailable, generating a 404 error. </p>
+<p>As there is no other way to determine embargo status other than by inspecting the Dryad study web page (and even then perhaps not), the solution is to exclude the DOI using the <code>-x</code> switch.</p>
+<p><code>python3 dryadd.py [bunch of stuff] -x doi:10.5061/dryad.b74d971 &amp;</code></p>
 <h4 id="why-is-my-transfer-to-dataverse-not-showing-up-as-published"><strong>Why is my transfer to Dataverse not showing up as published?</strong><a class="headerlink" href="#why-is-my-transfer-to-dataverse-not-showing-up-as-published" title="Permanent link">&para;</a></h4>
 <p><strong>dryad2dataverse</strong> does not <em>publish</em> the dataset. That must still be done via the Dataverse GUI or API. </p>
 <p>Publication functionality has been omitted <em>by design</em>:</p>
@@ -170,7 +186,7 @@
 <p>To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn&rsquo;t work and tabular processing starts anyway, the study is forcibly unlocked to allow uploads to continue. This process, unfortunately, is [probably] not foolproof.</p>
 <h4 id="why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file"><strong>Why is a file which should be a tabular file not a tabular file?</strong><a class="headerlink" href="#why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file" title="Permanent link">&para;</a></h4>
 <p>As a direct result of the above, tabular file processing has (hopefully) been eliminated. It&rsquo;s still possible to create a tabular file by <a href="https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file" title="Reingest via API">reingesting it.</a></p>
-<p>Unless you are are the administrator of a Dataverse installation, you likely don&rsquo;t have control over what is or is not considered a tabular file. <strong>dryad2dataverse</strong> attempts to block all tabular file processing, but the process is imperfect. <em>Sic vita.</em></p>
+<p>Unless you are are the administrator of a Dataverse installation, you likely don&rsquo;t have control over what is or is not considered a tabular file. <strong>dryad2dataverse</strong> attempts to block all tabular file processing, but the process is imperfect, notably with Excel files. <em>Sic vita.</em></p>
 <h4 id="why-does-the-code-use-camel-case-instead-of-snake-case-for-variables"><strong>Why does the code use camel case instead of snake case for variables?</strong><a class="headerlink" href="#why-does-the-code-use-camel-case-instead-of-snake-case-for-variables" title="Permanent link">&para;</a></h4>
 <p>By the time I realized I should be using snake case, it was too late and I was already consistently using camel case. <a href="https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds">https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds</a></p>
               
