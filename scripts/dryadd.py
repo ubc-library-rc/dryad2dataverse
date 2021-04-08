@@ -484,17 +484,17 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                recipient=args.recipients)
     except Exception as err:
         logger.critical('Critical failure with DOI: %s, '
-                        'Dryad URL: https://datadryad.org/stash/dataset/%s,'
+                        'Dryad URL: https://datadryad.org/stash/dataset/%s, '
                         'Dataverse URL: %s', transfer.doi, transfer.doi,
                         dryad2dataverse.constants.DVURL+
-                        'dataset.xhtml?persistentId='+transfer.dvpid)
+                        '/dataset.xhtml?persistentId='+transfer.dvpid)
         logger.exception(err)
         logger.critical(err)
         elog.critical('Critical failure with DOI: %s, '
-                      'Dryad URL: https://datadryad.org/stash/dataset/%s,'
+                      'Dryad URL: https://datadryad.org/stash/dataset/%s, '
                       'Dataverse URL: %s', transfer.doi, transfer.doi,
                       dryad2dataverse.constants.DVURL+
-                      'dataset.xhtml?persistentId='+transfer.dvpid)
+                      '/dataset.xhtml?persistentId='+transfer.dvpid)
         elog.exception(err)
         #elog.critical(err)
         raise

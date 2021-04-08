@@ -20,13 +20,13 @@ CONFIG = {
     'description': 'Dryad to Dataverse Migrator',
     'author': 'Paul Lesack',
     'license': 'MIT',
-    'url': 'https://researchcommons.library.ubc.ca',
-    'download_url': 'http://actual.download.example.com',
+    'url': 'https://ubc-library-rc.github.io/dryad2dataverse/',
+    'download_url': 'https://github.com/ubc-library-rc/dryad2dataverse',
     'author_email': 'paul.lesack@ubc.ca',
     'version' : '0.1',
     'install_requires': ['nose', 'requests_toolbelt'],
     'packages': ['dryad2dataverse'],
-    'scripts':['scripts/sample_loop.py'],
+    'scripts':['scripts/dryadd.py'],
     'name': 'dryad2dataverse'
 }
 
