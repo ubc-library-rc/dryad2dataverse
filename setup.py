@@ -24,7 +24,7 @@ CONFIG = {
     'download_url': 'https://github.com/ubc-library-rc/dryad2dataverse',
     'author_email': 'paul.lesack@ubc.ca',
     'version' : '0.1',
-    'install_requires': ['nose', 'requests_toolbelt'],
+    'install_requires': ['requests_toolbelt'],
     'packages': ['dryad2dataverse'],
     'scripts':['scripts/dryadd.py'],
     'name': 'dryad2dataverse'
