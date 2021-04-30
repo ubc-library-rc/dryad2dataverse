@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Credits - Dryad2dataverse</title>
+  <title>Changelog - Dryad2dataverse</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Credits";
-    var mkdocs_page_input_path = "credits.md";
+    var mkdocs_page_name = "Changelog";
+    var mkdocs_page_input_path = "changelog.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -71,22 +71,22 @@
                     <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
                     </li>
                 </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Changelog</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#v010-30-april-2021">v0.1.0 - 30 April 2021</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#v010-08-april-2021">v0.1.0 - 08 April 2021</a>
+    </li>
+    </ul>
                     </li>
                 </ul>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
                     </li>
                 </ul>
-                <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Credits</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#contact">Contact</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#acknowledgements">Acknowledgements</a>
-    </li>
-    </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
                     </li>
                 </ul>
       </div>
@@ -110,7 +110,7 @@
     
       
     
-    <li>Credits</li>
+    <li>Changelog</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -121,14 +121,35 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="credits">Credits<a class="headerlink" href="#credits" title="Permanent link">&para;</a></h1>
-<h2 id="contact">Contact<a class="headerlink" href="#contact" title="Permanent link">&para;</a></h2>
-<p><strong>dryad2dataverse</strong> was written by <a href="https://directory.library.ubc.ca/people/email/182">Paul Lesack</a> of the <a href="https://researchcommons.library.ubc.ca/">University of British Columbia Library Research Commons</a>.</p>
-<h2 id="acknowledgements">Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permanent link">&para;</a></h2>
-<p>No software development is done in a vacuum, and this project is no exception.</p>
-<p>Thanks to Eugene Barsky and Doug Brigham of the University of British Columbia library <a href="https://researchcommons.library.ubc.ca">Research Commons</a> for their assistance and support, to Ryan Scherle of <a href="https://datadryad.org">Dryad</a> for his help with the Dryad API, and the helpful people at <a href="https://dataverse.org">Dataverse</a>.</p>
-<p>Without the fabulous <a href="https://requests.readthedocs.io/en/master/">requests</a> library and <a href="https://toolbelt.readthedocs.io/en/latest/user.html">the requests toolbelt</a> everything would have taken a great deal longer.</p>
-<p>Without <a href="https://pydoc-markdown.readthedocs.io/en/latest/">pydoc-markdown</a>, <a href="https://www.mkdocs.org">mkdocs</a> and <a href="http://schemaspy.org/">schemaspy</a> the documentation would have taken much, much longer to write.</p>
+                <h1 id="dryad2dataverse-changelog">Dryad2dataverse changelog<a class="headerlink" href="#dryad2dataverse-changelog" title="Permanent link">&para;</a></h1>
+<p>Perfection on the first attempt is rare.</p>
+<h2 id="v010-30-april-2021">v0.1.0 - 30 April 2021<a class="headerlink" href="#v010-30-april-2021" title="Permanent link">&para;</a></h2>
+<p><strong>dryad2dataverse</strong></p>
+<ul>
+<li>improved versioning system</li>
+</ul>
+<p><strong>dryad2dataverse.serializer</strong></p>
+<ul>
+<li>Fixed bug where keywords were only serialized when grants were present</li>
+</ul>
+<p><strong>dryad2dataverse.transfer</strong></p>
+<ul>
+<li>Added better defaults for <code>transfer.set_correct_date</code></li>
+</ul>
+<p><strong>dryad2dataverse.monitor</strong></p>
+<ul>
+<li>Added meaningless change to <code>monitor.update</code> for internal consistency</li>
+</ul>
+<p><strong>scripts/dryadd.py</strong></p>
+<ul>
+<li>Show version option added</li>
+<li><code>transfer.set_correct_date()</code> added to set citation to match Dryad citation.</li>
+</ul>
+<hr />
+<h2 id="v010-08-april-2021">v0.1.0 - 08 April 2021<a class="headerlink" href="#v010-08-april-2021" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Initial release</li>
+</ul>
               
             </div>
           </div>
@@ -136,8 +157,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="../faq/" class="btn btn-neutral float-right" title="FAQ">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-        <a href="../faq/" class="btn btn-neutral" title="FAQ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+        <a href="../track/" class="btn btn-neutral" title="Tracking Database Structure"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -163,8 +186,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../faq/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../track/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
+      
+        <span style="margin-left: 15px"><a href="../faq/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

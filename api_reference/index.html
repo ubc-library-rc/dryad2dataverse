@@ -56,7 +56,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Scripts</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Command line script</a>
                     </li>
                 </ul>
                 <ul>
@@ -199,6 +199,10 @@
                 </ul>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
                     </li>
                 </ul>
                 <ul>
@@ -475,7 +479,7 @@ dryad2dataverse.constants.MAX_UPLOAD.</p>
 <p>Returns Dryad DOI.</p>
 <p><a name="dryad2dataverse.transfer.Transfer.set_correct_date"></a></p>
 <h5 id="set_correct_date">set_correct_date<a class="headerlink" href="#set_correct_date" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python"> | set_correct_date(url, hdl, d_type='distributionDate', apikey=None)
+<pre class="codehilite"><code class="language-python"> | set_correct_date(url=None, hdl=None, d_type='distributionDate', apikey=None)
 </code></pre>
 
 <p>Sets &ldquo;correct&rdquo; publication date for Dataverse.</p>
@@ -487,9 +491,12 @@ https://guides.dataverse.org/en/4.20/api/native-api.html#id54.</p>
 <hr />
 <p><strong>Arguments</strong>:</p>
 <p>url : str
-  — Base URL to Dataverse installation.</p>
+  — Base URL to Dataverse installation.
+  Defaults to dryad2dataverse.constants.DVURL</p>
 <p>hdl : str
-  — Persistent indentifier for Dataverse study.</p>
+  — Persistent indentifier for Dataverse study.
+  Defaults to Transfer.dvpid (which can be None if the
+  study has not yet been uploaded).</p>
 <p>d_type : str
   — Date type. One of  &lsquo;distributionDate&rsquo;, &lsquo;productionDate&rsquo;,
   &lsquo;dateOfDeposit&rsquo;. Default &lsquo;distributionDate&rsquo;.</p>

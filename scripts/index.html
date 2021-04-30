@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Scripts - Dryad2dataverse</title>
+  <title>Command line script - Dryad2dataverse</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -18,7 +18,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Scripts";
+    var mkdocs_page_name = "Command line script";
     var mkdocs_page_input_path = "scripts.md";
     var mkdocs_page_url = null;
   </script>
@@ -56,7 +56,7 @@
                     </li>
                 </ul>
                 <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Scripts</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Command line script</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#an-important-caveat">An important caveat</a>
     </li>
@@ -77,6 +77,10 @@
                 </ul>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
                     </li>
                 </ul>
                 <ul>
@@ -108,7 +112,7 @@
     
       
     
-    <li>Scripts</li>
+    <li>Command line script</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -130,7 +134,7 @@
 <ul>
 <li>Checking for updates and handling <strong>those</strong> automatically</li>
 </ul>
-<p>Included with <strong>dryad2dataverse</strong> is a script and possibly binary files which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process.</p>
+<p>Included with <strong>dryad2dataverse</strong> is a script and possibly binary files (should they ever be compiled) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process.</p>
 <h3 id="an-important-caveat">An important caveat<a class="headerlink" href="#an-important-caveat" title="Permanent link">&para;</a></h3>
 <p>This product <strong>will not</strong> publish anything in a Dataverse installation (at this time, at least). This is intentional to allow a human-based curatorial step before releasing any data onto an unsuspecting audience. There&rsquo;s no error like systemic error, so not automatically releasing material should help alleviate this.</p>
 <h3 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h3>
@@ -171,7 +175,7 @@
 <h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
 <p>The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest. The help menu below is available from the command line by either running the script without inputs or by using the <code>-h</code> switch.</p>
 <pre class="codehilite"><code>usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP] [--db DBASE]
-                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]]
+                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [--version]
 
 Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are REQUIRED. Arguments in [square brackets] are not required. The &quot;optional arguments&quot; below refers to
 the use of the option switch, (like -u), meaning &quot;not a positional argument.&quot;
@@ -202,6 +206,7 @@ optional arguments:
                         No forcible file unlock. Requiredif /lock endpint is restricted
   -x EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
                         Exclude these DOIs. Separate by spaces
+  --version             Show version number and exit
 </code></pre>
               
             </div>

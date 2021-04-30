@@ -56,7 +56,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Scripts</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Command line script</a>
                     </li>
                 </ul>
                 <ul>
@@ -69,6 +69,10 @@
                 </ul>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
                     </li>
                 </ul>
                 <ul class="current">
@@ -88,7 +92,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#why-does-my-upload-of-files-fail-halfway">Why does my upload of files fail halfway?</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file">Why is a file which should be a tabular file not a tabular file?</a>
+    <li class="toctree-l2"><a class="reference internal" href="#why-is-a-file-which-should-not-be-a-tabular-file-a-tabular-file">Why is a file which should not be a tabular file a tabular file?</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#why-does-the-code-use-camel-case-instead-of-snake-case-for-variables">Why does the code use camel case instead of snake case for variables?</a>
     </li>
@@ -183,10 +187,13 @@
 <p>To upload files exceeding the API upload limit, you will need to speak to a Dataverse administrator.</p>
 <h4 id="why-does-my-upload-of-files-fail-halfway"><strong>Why does my upload of files fail halfway?</strong><a class="headerlink" href="#why-does-my-upload-of-files-fail-halfway" title="Permanent link">&para;</a></h4>
 <p>Dataverse will automatically cease ingest and lock a study when encountering a file which is suitable for tabular processing. The only way to stop this behaviour is to prohibit ingest in the Dataverse configuration, which is probably not possible for many users of the software.</p>
-<p>To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn&rsquo;t work and tabular processing starts anyway, the study is forcibly unlocked to allow uploads to continue. This process, unfortunately, is [probably] not foolproof.</p>
-<h4 id="why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file"><strong>Why is a file which should be a tabular file not a tabular file?</strong><a class="headerlink" href="#why-is-a-file-which-should-be-a-tabular-file-not-a-tabular-file" title="Permanent link">&para;</a></h4>
+<p>To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn&rsquo;t work and tabular processing starts anyway, by default the <code>dryadd.py</code> script will wait for tabular processing to finish before continuing with the next file. As you may imagine, that can add some time to the process.</p>
+<p><em>If you are a super-user</em>, you can attempt a forcible unlock allow uploads to continue. This process, unfortunately, is not perfect as for some reason Dataverse returns 403 errors instead of unlocking, albeit infrequently.</p>
+<h4 id="why-is-a-file-which-should-not-be-a-tabular-file-a-tabular-file"><strong>Why is a file which should not be a tabular file a tabular file?</strong><a class="headerlink" href="#why-is-a-file-which-should-not-be-a-tabular-file-a-tabular-file" title="Permanent link">&para;</a></h4>
 <p>As a direct result of the above, tabular file processing has (hopefully) been eliminated. It&rsquo;s still possible to create a tabular file by <a href="https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file" title="Reingest via API">reingesting it.</a></p>
-<p>Unless you are are the administrator of a Dataverse installation, you likely don&rsquo;t have control over what is or is not considered a tabular file. <strong>dryad2dataverse</strong> attempts to block all tabular file processing, but the process is imperfect, notably with Excel files. <em>Sic vita.</em></p>
+<p>Unless you are are the administrator of a Dataverse installation, you likely don&rsquo;t have control over what is or is not considered a tabular file. <strong>dryad2dataverse</strong> attempts to block all tabular file processing, but the process is imperfect. The only way to guarantee that tabular processing won&rsquo;t occur is to stop it on the Dataverse server.</p>
+<p>If you are not a Dataverse super-user, then you are out of luck and my poor spoofing attempts are what you get.</p>
+<p><em>Sic vita.</em></p>
 <h4 id="why-does-the-code-use-camel-case-instead-of-snake-case-for-variables"><strong>Why does the code use camel case instead of snake case for variables?</strong><a class="headerlink" href="#why-does-the-code-use-camel-case-instead-of-snake-case-for-variables" title="Permanent link">&para;</a></h4>
 <p>By the time I realized I should be using snake case, it was too late and I was already consistently using camel case. <a href="https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds">https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds</a></p>
               
@@ -199,7 +206,7 @@
         <a href="../credits/" class="btn btn-neutral float-right" title="Credits">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../track/" class="btn btn-neutral" title="Tracking Database Structure"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../changelog/" class="btn btn-neutral" title="Changelog"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -225,7 +232,7 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../track/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../changelog/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../credits/" style="color: #fcfcfc">Next &raquo;</a></span>
