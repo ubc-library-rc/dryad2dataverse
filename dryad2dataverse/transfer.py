@@ -132,7 +132,7 @@ class Transfer():
         return {'X-Dataverse-key' : apikey}
 
     #@staticmethod
-    def set_correct_date(self, url, hdl,
+    def set_correct_date(self, url=None, hdl=None,
                          d_type='distributionDate',
                          apikey=None):
         '''
@@ -150,9 +150,12 @@ class Transfer():
 
         url : str
             — Base URL to Dataverse installation.
+              Defaults to dryad2dataverse.constants.DVURL
 
         hdl : str
             — Persistent indentifier for Dataverse study.
+              Defaults to Transfer.dvpid (which can be None if the
+              study has not yet been uploaded).
 
         d_type : str
             — Date type. One of  'distributionDate', 'productionDate',
@@ -163,6 +166,10 @@ class Transfer():
         ----------------------------------------
         '''
         try:
+            if not url:
+                url = constants.DVURL
+            if not hdl:
+                hdl = self.dvpid
             headers = {'X-Dataverse-key' : apikey}
             if apikey:
                 headers = {'X-Dataverse-key' : apikey}

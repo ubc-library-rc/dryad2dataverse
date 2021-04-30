@@ -20,6 +20,9 @@ import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
+VERSION = (0, 1, 1)
+__version__ = '.'.join([str(x) for x in VERSION])
+
 DRY = 'https://datadryad.org/api/v2'
 
 def new_content(serial):
@@ -273,6 +276,10 @@ def argp():
                         nargs='+',
                         dest='exclude')
 
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+__version__,
+                        help='Show version number and exit')
+
     return parser
 
 def set_constants(args):
@@ -432,6 +439,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 transfer.upload_files(force_unlock=args.force_unlock)
                 logger.info('Uploading Dryad JSON metadata')
                 transfer.upload_json()
+                transfer.set_correct_date()
                 notify(new_content(study),
                        user=args.user, pwd=args.pwd,
                        recipient=args.recipients)
@@ -444,6 +452,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 rem = monitor.get_json_dvfids(study)
                 transfer.delete_dv_files(rem)
                 transfer.upload_json()
+                transfer.set_correct_date()
                 notify(changed_content(study, monitor),
                        user=args.user, pwd=args.pwd,
                        recipient=args.recipients)

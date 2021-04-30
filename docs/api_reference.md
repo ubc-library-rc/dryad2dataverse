@@ -337,7 +337,7 @@ Returns Dryad DOI.
 ##### set\_correct\_date
 
 ```python
- | set_correct_date(url, hdl, d_type='distributionDate', apikey=None)
+ | set_correct_date(url=None, hdl=None, d_type='distributionDate', apikey=None)
 ```
 
 Sets "correct" publication date for Dataverse.
@@ -356,9 +356,12 @@ https://guides.dataverse.org/en/4.20/api/native-api.html#id54.
   
   url : str
   — Base URL to Dataverse installation.
+  Defaults to dryad2dataverse.constants.DVURL
   
   hdl : str
   — Persistent indentifier for Dataverse study.
+  Defaults to Transfer.dvpid (which can be None if the
+  study has not yet been uploaded).
   
   d_type : str
   — Date type. One of  'distributionDate', 'productionDate',
@@ -1062,5 +1065,4 @@ class DataverseDownloadError(Dryad2DataverseError)
 ```
 
 Returned on not OK respose (ie, not requests.status_code == 200).
-
 

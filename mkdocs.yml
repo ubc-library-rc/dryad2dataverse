@@ -3,11 +3,12 @@ docs_dir: 'docs'
 nav:
   - Overview: index.md
   - Installation: installation.md
-  - Scripts: scripts.md
+  - Command line script: scripts.md
   - General Reference: reference.md
   - API Reference: api_reference.md
     #- Tracking Database Structure: dbase_structure/index.html
   - Tracking Database Structure: track.md 
+  - Changelog: changelog.md
   - FAQ: faq.md
   - Credits: credits.md
 

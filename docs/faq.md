@@ -76,13 +76,19 @@ To upload files exceeding the API upload limit, you will need to speak to a Data
 
 Dataverse will automatically cease ingest and lock a study when encountering a file which is suitable for tabular processing. The only way to stop this behaviour is to prohibit ingest in the Dataverse configuration, which is probably not possible for many users of the software.
 
-To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn't work and tabular processing starts anyway, the study is forcibly unlocked to allow uploads to continue. This process, unfortunately, is [probably] not foolproof.
+To circumvent this, dryad2dataverse attempts to fool Dataverse into not processing the tabular file, by changing the extension or MIME type at upload time. If this doesn't work and tabular processing starts anyway, by default the `dryadd.py` script will wait for tabular processing to finish before continuing with the next file. As you may imagine, that can add some time to the process.
 
-#### **Why is a file which should be a tabular file not a tabular file?**
+*If you are a super-user*, you can attempt a forcible unlock allow uploads to continue. This process, unfortunately, is not perfect as for some reason Dataverse returns 403 errors instead of unlocking, albeit infrequently.
+
+#### **Why is a file which should not be a tabular file a tabular file?**
 
 As a direct result of the above, tabular file processing has (hopefully) been eliminated. It's still possible to create a tabular file by [reingesting it.](https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file "Reingest via API")
 
-Unless you are are the administrator of a Dataverse installation, you likely don't have control over what is or is not considered a tabular file. **dryad2dataverse** attempts to block all tabular file processing, but the process is imperfect, notably with Excel files. _Sic vita._
+Unless you are are the administrator of a Dataverse installation, you likely don't have control over what is or is not considered a tabular file. **dryad2dataverse** attempts to block all tabular file processing, but the process is imperfect. The only way to guarantee that tabular processing won't occur is to stop it on the Dataverse server.
+
+If you are not a Dataverse super-user, then you are out of luck and my poor spoofing attempts are what you get.
+
+ _Sic vita._
 
 #### **Why does the code use camel case instead of snake case for variables?**
 

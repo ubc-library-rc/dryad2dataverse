@@ -17,7 +17,7 @@ and possibly:
 
 * Checking for updates and handling **those** automatically
 
-Included with **dryad2dataverse** is a script and possibly binary files which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process.
+Included with **dryad2dataverse** is a script and possibly binary files (should they ever be compiled) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process.
 
 ### An important caveat
 
@@ -68,9 +68,8 @@ The implementation is relatively straightforward. Simply supply the required par
 
 
 ```
-
 usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP] [--db DBASE]
-                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]]
+                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [--version]
 
 Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are REQUIRED. Arguments in [square brackets] are not required. The "optional arguments" below refers to
 the use of the option switch, (like -u), meaning "not a positional argument."
@@ -101,4 +100,5 @@ optional arguments:
                         No forcible file unlock. Requiredif /lock endpint is restricted
   -x EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
                         Exclude these DOIs. Separate by spaces
+  --version             Show version number and exit
 ```

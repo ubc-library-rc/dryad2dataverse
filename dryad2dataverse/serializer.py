@@ -698,24 +698,24 @@ class Serializer():
             self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(grants)
 
         #Keywords
-            keywords = Serializer._typeclass(typeName='keyword',
-                                             multiple=True, typeClass='compound')
-            out = []
-            for key in dryJson.get('keywords', []):
-                #Apparently keywords are not required
-                keydict = {'keyword':key}
-                #because takes a dict
-                kv = Serializer._convert_generic(inJson=keydict,
-                                                 dvField='keywordValue',
-                                                 dryField='keyword')
-                vocab = {'dryad':'Dryad'}
-                voc = Serializer._convert_generic(inJson=vocab,
-                                                  dvField='keywordVocabulary',
-                                                  dryField='dryad')
-                kv.update(voc)
-                out.append(kv)
-            keywords['value'] = out
-            self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(keywords)
+        keywords = Serializer._typeclass(typeName='keyword',
+                                         multiple=True, typeClass='compound')
+        out = []
+        for key in dryJson.get('keywords', []):
+            #Apparently keywords are not required
+            keydict = {'keyword':key}
+            #because takes a dict
+            kv = Serializer._convert_generic(inJson=keydict,
+                                             dvField='keywordValue',
+                                             dryField='keyword')
+            vocab = {'dryad':'Dryad'}
+            voc = Serializer._convert_generic(inJson=vocab,
+                                              dvField='keywordVocabulary',
+                                              dryField='dryad')
+            kv.update(voc)
+            out.append(kv)
+        keywords['value'] = out
+        self._dvJson['datasetVersion']['metadataBlocks']['citation']['fields'].append(keywords)
 
         #modification date
         moddate = Serializer._convert_generic(inJson=dryJson,

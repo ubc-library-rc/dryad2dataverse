@@ -424,7 +424,7 @@ class Monitor():
                                  dvpid = ?', (transfer.dryad.dvpid,))
             if not self.cursor.fetchone():
                 self.cursor.execute('INSERT INTO dvStudy VALUES (?, ?)',
-                                    (dryaduid, transfer.dvpid))
+                                    (dryaduid, transfer.dryad.dvpid))
             else:
                 self.cursor.execute('UPDATE dvStudy SET dryaduid=?, \
                                      dvpid=? WHERE dvpid =?',

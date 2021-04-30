@@ -1,0 +1,34 @@
+# Dryad2dataverse changelog
+
+Perfection on the first attempt is rare.
+
+
+## v0.1.0 - 30 April 2021
+
+**dryad2dataverse**
+
+* improved versioning system
+
+**dryad2dataverse.serializer**
+
+* Fixed bug where keywords were only serialized when grants were present
+
+**dryad2dataverse.transfer**
+
+* Added better defaults for `transfer.set_correct_date`
+
+**dryad2dataverse.monitor**
+
+* Added meaningless change to `monitor.update` for internal consistency
+
+**scripts/dryadd.py**
+
+* Show version option added
+* `transfer.set_correct_date()` added to set citation to match Dryad citation.
+
+---
+
+## v0.1.0 - 08 April 2021
+
+* Initial release
+

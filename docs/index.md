@@ -12,7 +12,7 @@ nav_order: 1
 
 ## Introduction
 
-**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library and an associated application which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
+**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library and an associated [application](scripts.md) which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
 
 With these tools it's possible to: 
 

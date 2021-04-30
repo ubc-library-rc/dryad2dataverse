@@ -25,6 +25,9 @@ renderer:
     - title: Tracking Database Structure
       name: dbase_structure
       source: dbase_structure/index.html 
+    - title: Changelog 
+      name: changelog 
+      source: changelog.md 
     - title: FAQ   
       name: faq.md 
       source: faq.md 
