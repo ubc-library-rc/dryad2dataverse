@@ -2,8 +2,12 @@
 
 Perfection on the first attempt is rare.
 
+### v.0.1.2 - 4 May 2021
 
-## v0.1.0 - 30 April 2021
+* fixed error in setup.py
+* added binaries of `dryadd` for Windows and Mac
+
+## v0.1.1 - 30 April 2021
 
 **dryad2dataverse**
 

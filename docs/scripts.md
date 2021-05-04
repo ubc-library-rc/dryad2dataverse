@@ -4,7 +4,7 @@ title:
 nav_order: 4
 ---
 
-# Automated migrator and tracker - **dryadd.py**
+# Automated migrator and tracker - dryadd
 
 ---
 
@@ -17,7 +17,7 @@ and possibly:
 
 * Checking for updates and handling **those** automatically
 
-Included with **dryad2dataverse** is a script and possibly binary files (should they ever be compiled) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process.
+Included with **dryad2dataverse** is a [script](https://github.com/ubc-library-rc/dryad2dataverse/blob/master/scripts/dryadd.py) and [binary files for Windows and Mac](https://github.com/ubc-library-rc/dryad2dataverse/tree/master/binaries) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process. Depending on what you use and the plaform, the application will be called `dryadd.py, dryadd` or `dryadd.exe`
 
 ### An important caveat
 

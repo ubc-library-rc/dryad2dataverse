@@ -19,7 +19,7 @@ except ImportError:
     from distutils.core import setup
 
 init = os.path.join(
-    os.path.dirname(__file__), '__init__.py')
+    os.path.dirname(__file__), 'dryad2dataverse', '__init__.py')
 
 version_line = list(
     filter(lambda l: l.startswith('VERSION'), open(init)))[0].strip()
