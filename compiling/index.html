@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Credits - Dryad2dataverse</title>
+  <title>Compiling or packaging the application - Dryad2dataverse</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Credits";
-    var mkdocs_page_input_path = "credits.md";
+    var mkdocs_page_name = "Compiling or packaging the application";
+    var mkdocs_page_input_path = "compiling.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -59,8 +59,14 @@
                     <li class="toctree-l1"><a class="reference internal" href="../scripts/">Command line application</a>
                     </li>
                 </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../compiling/">Compiling or packaging the application</a>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Compiling or packaging the application</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#windows">Windows</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mac">Mac</a>
+    </li>
+    </ul>
                     </li>
                 </ul>
                 <ul>
@@ -83,14 +89,8 @@
                     <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
                     </li>
                 </ul>
-                <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Credits</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#contact">Contact</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#acknowledgements">Acknowledgements</a>
-    </li>
-    </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
                     </li>
                 </ul>
       </div>
@@ -114,7 +114,7 @@
     
       
     
-    <li>Credits</li>
+    <li>Compiling or packaging the application</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -125,14 +125,28 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="credits">Credits<a class="headerlink" href="#credits" title="Permanent link">&para;</a></h1>
-<h2 id="contact">Contact<a class="headerlink" href="#contact" title="Permanent link">&para;</a></h2>
-<p><strong>dryad2dataverse</strong> was written by <a href="https://directory.library.ubc.ca/people/email/182">Paul Lesack</a> of the <a href="https://researchcommons.library.ubc.ca/">University of British Columbia Library Research Commons</a>.</p>
-<h2 id="acknowledgements">Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permanent link">&para;</a></h2>
-<p>No software development is done in a vacuum, and this project is no exception.</p>
-<p>Thanks to Eugene Barsky and Doug Brigham of the University of British Columbia library <a href="https://researchcommons.library.ubc.ca">Research Commons</a> for their assistance and support, to Ryan Scherle of <a href="https://datadryad.org">Dryad</a> for his help with the Dryad API, and the helpful people at <a href="https://dataverse.org">Dataverse</a>.</p>
-<p>Without the fabulous <a href="https://requests.readthedocs.io/en/master/">requests</a> library and <a href="https://toolbelt.readthedocs.io/en/latest/user.html">the requests toolbelt</a> everything would have taken a great deal longer.</p>
-<p>Without <a href="https://pydoc-markdown.readthedocs.io/en/latest/">pydoc-markdown</a>, <a href="https://www.mkdocs.org">mkdocs</a> and <a href="http://schemaspy.org/">schemaspy</a> the documentation would have taken much, much longer to write.</p>
+                <h1 id="compiling-andor-packaging-the-dryadd-script">Compiling and/or packaging the dryadd script<a class="headerlink" href="#compiling-andor-packaging-the-dryadd-script" title="Permanent link">&para;</a></h1>
+<p>While binaries for Windows and Mac are <a href="https://github.com/ubc-library-rc/dryad2dataverse/tree/master/binaries">supplied</a>, should you wish to create them yourself from the dryadd.py script, you can so so following the procedure below. This can be done with either <a href="https://nuitka.net/">nuitka</a> or <a href="https://pyinstaller.readthedocs.io/en/stable/">PyInstaller</a>.</p>
+<p>Note that <em>nuitka</em> will compile to a C application, but PyInstaller packages everything to create a standalone application that is not a pure C application. Whether this matters is open for debate. </p>
+<h3 id="windows">Windows<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h3>
+<p>With <em>nuitka</em>:</p>
+<pre class="codehilite"><code>nuitka --follow-imports --onefile --windows-product-name=dryadd --windows-product-version=0.1.1 --windows-company-name=&quot;University of British Columbia Library&quot;  \path\to\dryad2dataverse\scripts\dryadd.py
+</code></pre>
+
+<p>Note that the &ndash;windows-product-[x] options are required, but there&rsquo;s nothing preventing you from using whatever information you prefer. Also, the version string listed on this page is only an example; use the current version.</p>
+<p>with <em>PyInstaller</em>:</p>
+<pre class="codehilite"><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py
+</code></pre>
+
+<h3 id="mac">Mac<a class="headerlink" href="#mac" title="Permanent link">&para;</a></h3>
+<p>with <em>nuitka</em>:</p>
+<p>The <em>nuitka</em> <code>--onefile</code> option is currently not available for MacOS. It&rsquo;s possible to compile using the <code>--standalone</code> flag, but the utility of this is debatable.</p>
+<pre class="codehilite"><code>nuitka  --follow-imports --standalone /path/to/dryad2dataverse/scripts/dryadd.py
+</code></pre>
+
+<p>with <em>PyInstaller</em>:</p>
+<pre class="codehilite"><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py
+</code></pre>
               
             </div>
           </div>
@@ -140,8 +154,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="../reference/" class="btn btn-neutral float-right" title="General Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-        <a href="../faq/" class="btn btn-neutral" title="FAQ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+        <a href="../scripts/" class="btn btn-neutral" title="Command line application"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -167,8 +183,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../faq/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../scripts/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
+      
+        <span style="margin-left: 15px"><a href="../reference/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

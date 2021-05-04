@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Command line script - Dryad2dataverse</title>
+  <title>Command line application - Dryad2dataverse</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -18,7 +18,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Command line script";
+    var mkdocs_page_name = "Command line application";
     var mkdocs_page_input_path = "scripts.md";
     var mkdocs_page_url = null;
   </script>
@@ -56,7 +56,7 @@
                     </li>
                 </ul>
                 <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Command line script</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Command line application</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#an-important-caveat">An important caveat</a>
     </li>
@@ -65,6 +65,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
     </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../compiling/">Compiling or packaging the application</a>
                     </li>
                 </ul>
                 <ul>
@@ -112,7 +116,7 @@
     
       
     
-    <li>Command line script</li>
+    <li>Command line application</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -123,7 +127,7 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="automated-migrator-and-tracker-dryaddpy">Automated migrator and tracker - <strong>dryadd.py</strong><a class="headerlink" href="#automated-migrator-and-tracker-dryaddpy" title="Permanent link">&para;</a></h1>
+                <h1 id="automated-migrator-and-tracker-dryadd">Automated migrator and tracker - dryadd<a class="headerlink" href="#automated-migrator-and-tracker-dryadd" title="Permanent link">&para;</a></h1>
 <hr />
 <p>While it&rsquo;s all very nice that there&rsquo;s code that can migrate Dryad material to Dataverse, many users are not familiar enough with Python/programming or, just as likely, don&rsquo;t want to have to program things themselves. Anyone transferring from Dryad to Dataverse is likely doing a variant of the same thing, which consists of:</p>
 <ul>
@@ -134,7 +138,7 @@
 <ul>
 <li>Checking for updates and handling <strong>those</strong> automatically</li>
 </ul>
-<p>Included with <strong>dryad2dataverse</strong> is a script and possibly binary files (should they ever be compiled) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process.</p>
+<p>Included with <strong>dryad2dataverse</strong> is a <a href="https://github.com/ubc-library-rc/dryad2dataverse/blob/master/scripts/dryadd.py">script</a> and <a href="https://github.com/ubc-library-rc/dryad2dataverse/tree/master/binaries">binary files for Windows and Mac</a> which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process. Depending on what you use and the plaform, the application will be called <code>dryadd.py, dryadd</code> or <code>dryadd.exe</code></p>
 <h3 id="an-important-caveat">An important caveat<a class="headerlink" href="#an-important-caveat" title="Permanent link">&para;</a></h3>
 <p>This product <strong>will not</strong> publish anything in a Dataverse installation (at this time, at least). This is intentional to allow a human-based curatorial step before releasing any data onto an unsuspecting audience. There&rsquo;s no error like systemic error, so not automatically releasing material should help alleviate this.</p>
 <h3 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h3>
@@ -215,7 +219,7 @@ optional arguments:
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../reference/" class="btn btn-neutral float-right" title="General Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../compiling/" class="btn btn-neutral float-right" title="Compiling or packaging the application">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../installation/" class="btn btn-neutral" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -247,7 +251,7 @@ optional arguments:
         <span><a href="../installation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../reference/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../compiling/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
