@@ -23,5 +23,15 @@ Windows x64 binary
 dryadd.exe.sha256
 sha256 checksum for dryadd.exe
 
+dv_bulk_releaser
+Bulk release utility for Mac OS with Intel x86 processors
 
+dv_bulk_releaser.sha256
+sha 256 checksum for dv_bulk_releaser
+
+dv_bulk_releaser.exe
+Bulk release utility Windows x64 binary 
+
+dv_bulk_releaser.exe.sha256
+sha 256 checksum for dv_bulk_releaser.exe
 

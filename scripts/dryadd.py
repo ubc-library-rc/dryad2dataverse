@@ -7,7 +7,6 @@ Requires Python 3.6+ and requests library
 
 from  email.message import EmailMessage as Em
 import argparse
-#import datetime
 import logging
 import logging.handlers
 import os
@@ -110,15 +109,10 @@ def notify(msgtxt,
     msg = Em()
     msg['Subject'] = msgtxt[0]
     msg['From'] = user
-    #msg['To'] = [recipient]
     msg['To'] = recipient
 
     content = msgtxt[1]
     msg.set_content(content)
-    #server = smtplib.SMTP(mailserv, port)
-    #server.ehlo()
-    #server.starttls()
-    #server.ehlo()
     server = smtplib.SMTP_SSL(mailserv, port)
     server.login(user, pwd)
     #To must be split. See
@@ -338,8 +332,6 @@ def rotating_log(path, level):
         logging level (eg, logging.DEBUG)
 
     '''
-    #global logger
-    #logger = logging.getLogger(__name__)
     logger = logging.getLogger()#root logger
     #Set all the logs to the same level:
     #https://stackoverflow.com/questions/35325042/
@@ -356,10 +348,6 @@ def rotating_log(path, level):
                                  ' - %(levelname)s - %(funcName)s - '
                                  '%(message)s')
     rotator.setFormatter(l_format)
-    #This is required to see the error messages from the other modules. WTF.
-    #root_logger = logging.getLogger('')
-    #root_logger.setLevel(level)
-    #root_logger.addHandler(rotator)
     logger.setLevel(level)
     return logger
 

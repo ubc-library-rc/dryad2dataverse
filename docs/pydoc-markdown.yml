@@ -13,9 +13,12 @@ renderer:
     - title: Installation 
       name: installation
       source: installation.md 
-    - title: Scripts
+    - title: Command Line Application 
       name: scripts 
-      source: scripts.md 
+      source: script.md 
+    - title: Other Utilities
+      name: other_utils
+      source: other_utils.md
     - title: General Reference
       name: reference
       source: reference.md 
@@ -24,7 +27,7 @@ renderer:
       source: api_reference.md
     - title: Tracking Database Structure
       name: dbase_structure
-      source: dbase_structure/index.html 
+      source: track.md 
     - title: Changelog 
       name: changelog 
       source: changelog.md 

@@ -12,7 +12,7 @@ nav_order: 1
 
 ## Introduction
 
-**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library and an associated [application](scripts.md) which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
+**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library and an associated [application](script.md) which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
 
 With these tools it's possible to: 
 
@@ -27,7 +27,7 @@ The minimum required Python version for **dryad2dataverse** is Python **3.6**, a
 ### Not just a library - no programming required
 ----
 
-If you hate programming, are pressed for time and/or don't want to read any documentation, **dryad2dataverse** also comes with a [command line tool](scripts.md) to do all of these things without requiring any knowledge of Python or programming.
+If you hate programming, are pressed for time and/or don't want to read any documentation, **dryad2dataverse** also comes with a [command line tool](script.md) to do all of these things without requiring any knowledge of Python or programming.
 
 ----
 
