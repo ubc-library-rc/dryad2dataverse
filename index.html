@@ -80,7 +80,11 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="scripts/">Command line application</a>
+                    <li class="toctree-l1"><a class="reference internal" href="script/">Command line application</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="other_utils/">Other utilities</a>
                     </li>
                 </ul>
                 <ul>
@@ -146,7 +150,7 @@
                 <h1 id="dryad2dataverse-translate-transfer-and-track">dryad2dataverse -  translate, transfer and track<a class="headerlink" href="#dryad2dataverse-translate-transfer-and-track" title="Permanent link">&para;</a></h1>
 <h2 id="_1"><img alt="dryad2dataverse logo" src="images/dryad2dataverseLogo.svg" /><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p><strong>dryad2dataverse</strong> is an oddly specific <a href="https://python.org">Python</a> programming language library and an associated <a href="scripts/">application</a> which allows easier transfer of metadata and data from a Dryad data repository (ie, <a href="https://datadryad.org">https://datadryad.org</a>) to a <a href="https://dataverse.org/" title="Dataverse software main site">Dataverse</a> repository.</p>
+<p><strong>dryad2dataverse</strong> is an oddly specific <a href="https://python.org">Python</a> programming language library and an associated <a href="script/">application</a> which allows easier transfer of metadata and data from a Dryad data repository (ie, <a href="https://datadryad.org">https://datadryad.org</a>) to a <a href="https://dataverse.org/" title="Dataverse software main site">Dataverse</a> repository.</p>
 <p>With these tools it&rsquo;s possible to: </p>
 <p>a) Serialize Dryad metadata to Dataverse JSON</p>
 <p>b) Transfer Dryad studies to Dataverse without any knowledge of the somewhat complex Dataverse API</p>
@@ -154,7 +158,7 @@
 <p>The minimum required Python version for <strong>dryad2dataverse</strong> is Python <strong>3.6</strong>, as it is the earliest version which supports <a href="https://www.python.org/dev/peps/pep-0498/">f-strings</a>. It was developed using version 3.7.2, and it runs just fine under the [now current] 3.9.2. You can find Python at <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a>. <em>No testing was done with Anaconda, only stock Python</em>. That said, it probably works fine with Anaconda.</p>
 <h3 id="not-just-a-library-no-programming-required">Not just a library - no programming required<a class="headerlink" href="#not-just-a-library-no-programming-required" title="Permanent link">&para;</a></h3>
 <hr />
-<p>If you hate programming, are pressed for time and/or don&rsquo;t want to read any documentation, <strong>dryad2dataverse</strong> also comes with a <a href="scripts/">command line tool</a> to do all of these things without requiring any knowledge of Python or programming.</p>
+<p>If you hate programming, are pressed for time and/or don&rsquo;t want to read any documentation, <strong>dryad2dataverse</strong> also comes with a <a href="script/">command line tool</a> to do all of these things without requiring any knowledge of Python or programming.</p>
 <hr />
 <p>The <strong>dryad2dataverse</strong> library is free and open source, released under the MIT license. It&rsquo;s also not written by anyone with a degree in computer science, so as the MIT license says: </p>
 <pre class="codehilite"><code>Software is provided &quot;as is&quot;, without warranty of any kind
@@ -285,5 +289,5 @@ pip install .
 
 <!--
 MkDocs version : 1.1.2
-Build Date UTC : 2021-05-04 21:53:24.341142+00:00
+Build Date UTC : 2021-05-14 20:20:08.559980+00:00
 -->
