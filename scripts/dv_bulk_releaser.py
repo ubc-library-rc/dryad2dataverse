@@ -36,7 +36,7 @@ def argp():
     parser.add_argument('-i', '--interactive', action='store_true',
                         help='Manually confirm each release')
     parser.add_argument('--time', '-t', help='Time between release attempts in seconds. Default 10',
-                        default=10, dest='stime')
+                        default=10, type=int, dest='stime')
     parser.add_argument('-v', help='Verbose mode', action='store_true', dest='verbose')
     parser.add_argument('-r', '--dry-run',
                         help='Only output a list of studies to be released',
