@@ -52,9 +52,7 @@ There are a few reasons why you might find this product useful.
 ## Quick install
 
 ```
-git clone https://github.com/ubc-library-rc/dryad2dataverse.git
-cd dryad2dataverse
-pip install .
+pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git
 ```
 
 ## Basic usage

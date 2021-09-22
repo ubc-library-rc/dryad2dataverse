@@ -7,47 +7,40 @@ nav_order: 5
 
 # Installation
 
-This is not a complete list of installation methods. For a complete guide to Python package installation, please see <https://packaging.python.org/tutorials/installing-packages/>.
+This is not a complete list of installation methods. For a complete guide to Python package installation, please see <https://packaging.python.org/tutorials/installing-packages/>. As a baseline, you will need to install a version of [Python](https;//python.org) >= 3.6.
 
-## Requirements
+## Simple installation using Pip
 
-* requests >= 2.21.0  
-* requests-toolbelt >= 0.9.1
-* nose >= 1.3.7 
+Once you've installed Python, installation via `pip` is very simple. Dryad2dataverse isn't on [PyPi](https://pypi.org/) yet, but you can still use Python's package manager, `pip`:
 
-Actually, it will probably work just fine with earlier versions, but that's what development started with.
+`pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git`
 
-## Pip from source
 
-### Download
+## Manual Download
 The source code for this project is available at <https://github.com/ubc-library-rc/dryad2dataverse>
 
 To install, first clone the repository:
 
 `git clone https://github.com/ubc-library-rc/dryad2dataverse.git`
 
-### Intermediate (optional) step: using a virtual environment
-Depending on your needs, you may wish to keep dryad2dataverse in a virtual environment. This step is completely optional.
+If you wish to install with `pip`, you can use:
 
-In this case, you will need to perform the following steps to create your virtual environment. First, create a directory to hold your virtual environment:
+`pip install .'
 
-`mkdir -p \path\to\sample_venv`
+or, if you are planning to tinker with the source code:
 
-Create the virtual environment:
+`pip install -e .`
 
-`python3 -m venv \path\to\sample_venv`
+### Using dryad2dataverse with a virtual environment
 
-Finally, enable the virtual environment:
+1. First create a directory that will hold your virtual environment
 
-`source \path\to\sample_venv\bin activate`
+2. In a terminal, change to that directory
 
-Creating the virtual environment is not required if you don't mind having the prerequisites installed. More information on virtual environments can be found on the Python website: <https://docs.python.org/3.6/tutorial/venv.html>
+3. install the virtual environment using: `python3 -m venv .`
 
-### Installation
+4. Activate the virtual environment: `source bin/activate` (Linux and Mac) or `.\Scripts\activate` on Windows.
 
-Once you've cloned the files and optionally used `venv`:
+5. Install as per one of the methods above.
 
-```
-cd dryad2dataverse
-pip install .
-```
+More information on virtual environments can be found on the Python website: <https://docs.python.org/3.6/tutorial/venv.html>

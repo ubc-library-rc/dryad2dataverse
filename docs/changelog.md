@@ -2,7 +2,17 @@
 
 Perfection on the first attempt is rare.
 
-### v.0.1.2 - 4 May 2021
+### v.0.1.3 - 22 Sept 2021
+
+**requirements.txt**
+
+* Updated version requirements for urllib3 and requests to plug dependabot alert hole.
+
+**dryadd.py**
+
+* Updated associated dryadd.py binaries
+
+## v.0.1.2 - 4 May 2021
 
 * fixed error in setup.py
 * added binaries of `dryadd` for Windows and Mac
