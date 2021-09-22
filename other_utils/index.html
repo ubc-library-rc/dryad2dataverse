@@ -136,24 +136,24 @@
 <p>Of course, depending on what you&rsquo;re using it could be invoked with <code>dv_bulk_releaser.exe</code> or <code>python dv_bulk_release.py</code>, etc.</p>
 <p>The utility will wait for all locks to be removed from a study before continuing to the next, and pauses between lock checks and uploads to reduce server burden.</p>
 <p>There are more options available:</p>
-<pre class="codehilite"><code>usage: dv_bulk_releaser [-h] [-u URL] -k KEY [-i] [--time STIME] [-v] [-r] [-d DV | -p PID [PID ...]] [--version]
+<div class="codehilite"><pre><span></span><code><span class="n">usage</span><span class="o">:</span> <span class="n">dv_bulk_releaser</span> <span class="o">[-</span><span class="n">h</span><span class="o">]</span> <span class="o">[-</span><span class="n">u</span> <span class="n">URL</span><span class="o">]</span> <span class="o">-</span><span class="n">k</span> <span class="n">KEY</span> <span class="o">[-</span><span class="n">i</span><span class="o">]</span> <span class="o">[--</span><span class="n">time</span> <span class="n">STIME</span><span class="o">]</span> <span class="o">[-</span><span class="n">v</span><span class="o">]</span> <span class="o">[-</span><span class="n">r</span><span class="o">]</span> <span class="o">[-</span><span class="n">d</span> <span class="n">DV</span> <span class="o">|</span> <span class="o">-</span><span class="n">p</span> <span class="n">PID</span> <span class="o">[</span><span class="n">PID</span> <span class="o">...]]</span> <span class="o">[--</span><span class="n">version</span><span class="o">]</span>
 
-Bulk file releaser for unpublished Dataverse files. Either releases individual studies or all unreleased files in a single dataverse.
+<span class="n">Bulk</span> <span class="n">file</span> <span class="n">releaser</span> <span class="k">for</span> <span class="n">unpublished</span> <span class="n">Dataverse</span> <span class="n">files</span><span class="o">.</span> <span class="n">Either</span> <span class="n">releases</span> <span class="n">individual</span> <span class="n">studies</span> <span class="n">or</span> <span class="n">all</span> <span class="n">unreleased</span> <span class="n">files</span> <span class="k">in</span> <span class="n">a</span> <span class="n">single</span> <span class="n">dataverse</span><span class="o">.</span>
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -u URL, --url URL     Dataverse base URL
-  -k KEY, --key KEY     API key
-  -i, --interactive     Manually confirm each release
-  --time STIME, -t STIME
-                        Time between release attempts in seconds. Default 10
-  -v                    Verbose mode
-  -r, --dry-run         Only output a list of studies to be released
-  -d DV, --dv DV        Short name of Dataverse to process (eg: UBC_DRYAD)
-  -p PID [PID ...], --pid PID [PID ...]
-                        Handles or DOIs to delete in format hdl:11272.1/FK2/12345 or doi:10.80240/FK2/NWRABI. Multiple values OK
-  --version             Show version number and exit
-</code></pre>
+<span class="n">optional</span> <span class="k">arguments</span><span class="o">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="o">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="k">this</span> <span class="n">help</span> <span class="n">message</span> <span class="n">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">u</span> <span class="n">URL</span><span class="o">,</span> <span class="o">--</span><span class="n">url</span> <span class="n">URL</span>     <span class="n">Dataverse</span> <span class="n">base</span> <span class="n">URL</span>
+  <span class="o">-</span><span class="n">k</span> <span class="n">KEY</span><span class="o">,</span> <span class="o">--</span><span class="n">key</span> <span class="n">KEY</span>     <span class="n">API</span> <span class="n">key</span>
+  <span class="o">-</span><span class="n">i</span><span class="o">,</span> <span class="o">--</span><span class="n">interactive</span>     <span class="n">Manually</span> <span class="n">confirm</span> <span class="k">each</span> <span class="n">release</span>
+  <span class="o">--</span><span class="n">time</span> <span class="n">STIME</span><span class="o">,</span> <span class="o">-</span><span class="n">t</span> <span class="n">STIME</span>
+                        <span class="n">Time</span> <span class="n">between</span> <span class="n">release</span> <span class="n">attempts</span> <span class="k">in</span> <span class="n">seconds</span><span class="o">.</span> <span class="n">Default</span> <span class="mi">10</span>
+  <span class="o">-</span><span class="n">v</span>                    <span class="n">Verbose</span> <span class="n">mode</span>
+  <span class="o">-</span><span class="n">r</span><span class="o">,</span> <span class="o">--</span><span class="n">dry</span><span class="o">-</span><span class="n">run</span>         <span class="n">Only</span> <span class="n">output</span> <span class="n">a</span> <span class="n">list</span> <span class="n">of</span> <span class="n">studies</span> <span class="n">to</span> <span class="n">be</span> <span class="n">released</span>
+  <span class="o">-</span><span class="n">d</span> <span class="n">DV</span><span class="o">,</span> <span class="o">--</span><span class="n">dv</span> <span class="n">DV</span>        <span class="n">Short</span> <span class="n">name</span> <span class="n">of</span> <span class="n">Dataverse</span> <span class="n">to</span> <span class="n">process</span> <span class="o">(</span><span class="n">eg</span><span class="o">:</span> <span class="n">UBC_DRYAD</span><span class="o">)</span>
+  <span class="o">-</span><span class="n">p</span> <span class="n">PID</span> <span class="o">[</span><span class="n">PID</span> <span class="o">...],</span> <span class="o">--</span><span class="n">pid</span> <span class="n">PID</span> <span class="o">[</span><span class="n">PID</span> <span class="o">...]</span>
+                        <span class="n">Handles</span> <span class="n">or</span> <span class="n">DOIs</span> <span class="n">to</span> <span class="n">delete</span> <span class="k">in</span> <span class="n">format</span> <span class="n">hdl</span><span class="o">:</span><span class="mf">11272.1</span><span class="sr">/FK2/12345 or doi:10.80240/FK2/</span><span class="n">NWRABI</span><span class="o">.</span> <span class="n">Multiple</span> <span class="n">values</span> <span class="n">OK</span>
+  <span class="o">--</span><span class="n">version</span>             <span class="n">Show</span> <span class="n">version</span> <span class="n">number</span> <span class="n">and</span> <span class="n">exit</span>
+</code></pre></div>
               
             </div>
           </div>

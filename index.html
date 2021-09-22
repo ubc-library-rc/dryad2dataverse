@@ -161,8 +161,9 @@
 <p>If you hate programming, are pressed for time and/or don&rsquo;t want to read any documentation, <strong>dryad2dataverse</strong> also comes with a <a href="script/">command line tool</a> to do all of these things without requiring any knowledge of Python or programming.</p>
 <hr />
 <p>The <strong>dryad2dataverse</strong> library is free and open source, released under the MIT license. It&rsquo;s also not written by anyone with a degree in computer science, so as the MIT license says: </p>
-<pre class="codehilite"><code>Software is provided &quot;as is&quot;, without warranty of any kind
-</code></pre>
+<div class="codehilite"><pre><span></span><code>Software is provided &quot;as is&quot;, without warranty of any kind
+</code></pre></div>
+
 
 <h3 id="why-would-i-need-this">Why would I need this?<a class="headerlink" href="#why-would-i-need-this" title="Permanent link">&para;</a></h3>
 <p>There are a few reasons why you might find this product useful.</p>
@@ -184,58 +185,59 @@
 </li>
 </ul>
 <h2 id="quick-install">Quick install<a class="headerlink" href="#quick-install" title="Permanent link">&para;</a></h2>
-<pre class="codehilite"><code>git clone https://github.com/ubc-library-rc/dryad2dataverse.git
-cd dryad2dataverse
-pip install .
-</code></pre>
+<div class="codehilite"><pre><span></span><code>pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git
+</code></pre></div>
+
 
 <h2 id="basic-usage">Basic usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
 <h4 id="converting-json">Converting JSON<a class="headerlink" href="#converting-json" title="Permanent link">&para;</a></h4>
-<pre class="codehilite"><code>&gt;&gt;&gt; #Convert Dryad JSON to Dataverse JSON and save to a file
-&gt;&gt;&gt; import dryad2dataverse.serializer
-&gt;&gt;&gt; i_heart_dryad = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
-&gt;&gt;&gt; with open('dataverse_json.json', 'w') as f:
-    f.write(f'{i_heart_dryad.dvJson}')
-&gt;&gt;&gt; #Or just view it this way in a Python session
-&gt;&gt;&gt; i_heard_dryad.dvJson
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1">#Convert Dryad JSON to Dataverse JSON and save to a file</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">dryad2dataverse.serializer</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">i_heart_dryad</span> <span class="o">=</span> <span class="n">dryad2dataverse</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">Serializer</span><span class="p">(</span><span class="s1">&#39;doi:10.5061/dryad.2rbnzs7jp&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;dataverse_json.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i_heart_dryad</span><span class="o">.</span><span class="n">dvJson</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1">#Or just view it this way in a Python session</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">i_heard_dryad</span><span class="o">.</span><span class="n">dvJson</span>
+</code></pre></div>
+
 
 <h4 id="transferring-data">Transferring data<a class="headerlink" href="#transferring-data" title="Permanent link">&para;</a></h4>
 <p>Note: a number of variables must be set [correctly] for this to work, such as your target dataverse. This example continues with the Serializer instance above.</p>
-<pre class="codehilite"><code>&gt;&gt;&gt; import dryad2dataverse.transfer
-&gt;&gt;&gt; dv = dryad2dataverse.transfer.Transfer(i_heart_dryad)
-&gt;&gt;&gt; # Files must first be downloaded; there is no direct transfer
-&gt;&gt;&gt; dv.download_files()
-&gt;&gt;&gt; # 'dryad' is the short name of the target dataverse
-&gt;&gt;&gt; # Yours may be different
-&gt;&gt;&gt; # First, create the study metadata
-&gt;&gt;&gt; dv.upload_study(targetDv='dryad')
-&gt;&gt;&gt; # Then upload the files
-&gt;&gt;&gt; dv.upload_files()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">dryad2dataverse.transfer</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dv</span> <span class="o">=</span> <span class="n">dryad2dataverse</span><span class="o">.</span><span class="n">transfer</span><span class="o">.</span><span class="n">Transfer</span><span class="p">(</span><span class="n">i_heart_dryad</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># Files must first be downloaded; there is no direct transfer</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dv</span><span class="o">.</span><span class="n">download_files</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># &#39;dryad&#39; is the short name of the target dataverse</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># Yours may be different</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># First, create the study metadata</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dv</span><span class="o">.</span><span class="n">upload_study</span><span class="p">(</span><span class="n">targetDv</span><span class="o">=</span><span class="s1">&#39;dryad&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># Then upload the files</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dv</span><span class="o">.</span><span class="n">upload_files</span><span class="p">()</span>
+</code></pre></div>
+
 
 <h4 id="change-monitoring">Change monitoring<a class="headerlink" href="#change-monitoring" title="Permanent link">&para;</a></h4>
 <p>Because monitoring the status of something over time requires persistence, the dryad2dataverse.monitor.Monitor object uses an <a href="https://sqlite.org">SQLite3</a> database, which has the enormous advantage of being a single file that is portable between systems. This allows monitoring without laborious database configuration on a host system, and updates can be run on any system that has sufficient storage space to act as an intermediary between Dryad and Dataverse. This is quite a simple database, as the <a href="dbase_structure/">documentation on its structure</a> shows.</p>
 <p>If you need to change systems just swap the database to the new system.</p>
 <p>In theory you could run it from a Raspberry Pi Zero that you have in a desk drawer, although that may not be the wisest idea. Maybe use your cell phone.</p>
 <p>Monitoring changes requires both the <code>Serializer</code> and <code>Transfer</code> objects from above.</p>
-<pre class="codehilite"><code>&gt;&gt;&gt; # Create the Monitor instance
-&gt;&gt;&gt; monitor = dryad2dataverse.monitor.Monitor()
-&gt;&gt;&gt; # Check status of your serializer object
-&gt;&gt;&gt; monitor.status(i_heart_dryad)
-{'status': 'new', 'dvpid': None}
-&gt;&gt;&gt; # imagine, now that i_still_heart_dryad is a study
-&gt;&gt;&gt; # that was uploaded previously
-&gt;&gt;&gt; monitor.status(i_still_heart_dryad)
-{'status': 'unchanged', 'dvpid': 'doi:99.99999/FK2/FAKER'}
-&gt;&gt;&gt; #Check the difference in files
-&gt;&gt;&gt; monitor.diff_files(i_still_heart_dryad)
-{}
-&gt;&gt;&gt; # After the transfer dv above:
-&gt;&gt;&gt; monitor.update(transfer)
-&gt;&gt;&gt; # And then, to make your life easier, update the last time you checked Dryad
-&gt;&gt;&gt; monitor.set_timestamp()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># Create the Monitor instance</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">monitor</span> <span class="o">=</span> <span class="n">dryad2dataverse</span><span class="o">.</span><span class="n">monitor</span><span class="o">.</span><span class="n">Monitor</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># Check status of your serializer object</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">monitor</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="n">i_heart_dryad</span><span class="p">)</span>
+<span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;new&#39;</span><span class="p">,</span> <span class="s1">&#39;dvpid&#39;</span><span class="p">:</span> <span class="n">None</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># imagine, now that i_still_heart_dryad is a study</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># that was uploaded previously</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">monitor</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="n">i_still_heart_dryad</span><span class="p">)</span>
+<span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;unchanged&#39;</span><span class="p">,</span> <span class="s1">&#39;dvpid&#39;</span><span class="p">:</span> <span class="s1">&#39;doi:99.99999/FK2/FAKER&#39;</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1">#Check the difference in files</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">monitor</span><span class="o">.</span><span class="n">diff_files</span><span class="p">(</span><span class="n">i_still_heart_dryad</span><span class="p">)</span>
+<span class="p">{}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># After the transfer dv above:</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">monitor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">transfer</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># And then, to make your life easier, update the last time you checked Dryad</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">monitor</span><span class="o">.</span><span class="n">set_timestamp</span><span class="p">()</span>
+</code></pre></div>
               
             </div>
           </div>
@@ -289,5 +291,5 @@ pip install .
 
 <!--
 MkDocs version : 1.1.2
-Build Date UTC : 2021-05-14 20:20:08.559980+00:00
+Build Date UTC : 2021-09-22 21:41:21.770282+00:00
 -->

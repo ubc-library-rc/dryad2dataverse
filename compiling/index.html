@@ -134,23 +134,26 @@
 <p>Note that <em>nuitka</em> will compile to a C application, but PyInstaller packages everything to create a standalone application that is not a pure C application. Whether this matters is open for debate. </p>
 <h3 id="windows">Windows<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h3>
 <p>With <em>nuitka</em>:</p>
-<pre class="codehilite"><code>nuitka --follow-imports --onefile --windows-product-name=dryadd --windows-product-version=0.1.1 --windows-company-name=&quot;University of British Columbia Library&quot;  \path\to\dryad2dataverse\scripts\dryadd.py
-</code></pre>
+<div class="codehilite"><pre><span></span><code>nuitka --follow-imports --onefile --windows-product-name=dryadd --windows-product-version=0.1.1 --windows-company-name=&quot;University of British Columbia Library&quot;  \path\to\dryad2dataverse\scripts\dryadd.py
+</code></pre></div>
+
 
 <p>Note that the &ndash;windows-product-[x] options are required, but there&rsquo;s nothing preventing you from using whatever information you prefer. Also, the version string listed on this page is only an example; use the current version.</p>
 <p>with <em>PyInstaller</em>:</p>
-<pre class="codehilite"><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py
-</code></pre>
+<div class="codehilite"><pre><span></span><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py
+</code></pre></div>
+
 
 <h3 id="mac">Mac<a class="headerlink" href="#mac" title="Permanent link">&para;</a></h3>
 <p>with <em>nuitka</em>:</p>
 <p>The <em>nuitka</em> <code>--onefile</code> option is currently not available for MacOS. It&rsquo;s possible to compile using the <code>--standalone</code> flag, but the utility of this is debatable.</p>
-<pre class="codehilite"><code>nuitka  --follow-imports --standalone /path/to/dryad2dataverse/scripts/dryadd.py
-</code></pre>
+<div class="codehilite"><pre><span></span><code>nuitka  --follow-imports --standalone /path/to/dryad2dataverse/scripts/dryadd.py
+</code></pre></div>
+
 
 <p>with <em>PyInstaller</em>:</p>
-<pre class="codehilite"><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py
-</code></pre>
+<div class="codehilite"><pre><span></span><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py
+</code></pre></div>
               
             </div>
           </div>
