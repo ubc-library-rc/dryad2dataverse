@@ -52,7 +52,7 @@ There are a few reasons why you might find this product useful.
 ## Quick install
 
 ```
-pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git
+pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master
 ```
 
 ## Basic usage

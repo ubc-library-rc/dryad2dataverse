@@ -13,7 +13,7 @@ This is not a complete list of installation methods. For a complete guide to Pyt
 
 Once you've installed Python, installation via `pip` is very simple. Dryad2dataverse isn't on [PyPi](https://pypi.org/) yet, but you can still use Python's package manager, `pip`:
 
-`pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git`
+`pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master`
 
 
 ## Manual Download
@@ -44,3 +44,11 @@ or, if you are planning to tinker with the source code:
 5. Install as per one of the methods above.
 
 More information on virtual environments can be found on the Python website: <https://docs.python.org/3.6/tutorial/venv.html>
+
+## Keeping up to date
+
+If you have installed with pip, upgrading is easy:
+
+`pip install --upgrade git+https://github.com/ubc-library-rc/dryad2dataverse.git@master`
+
+If you used one of the other methods, you should upgrade manually.
