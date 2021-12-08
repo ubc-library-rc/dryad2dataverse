@@ -8,6 +8,8 @@ Requires Python 3.6+ and requests library
 
 from  email.message import EmailMessage as Em
 import argparse
+import datetime
+import glob
 import logging
 import logging.handlers
 import os
@@ -20,7 +22,7 @@ import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
-VERSION = (0, 1, 2)
+VERSION = (0, 2, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -270,7 +272,12 @@ def argp():
                         default=[],
                         nargs='+',
                         dest='exclude')
-
+    parser.add_argument('-b', '--num-backups',
+                        help=('Number of database backups to keep. '
+                              'Default 3'),
+                        required=False,
+                        type=int,
+                        default=3)
     parser.add_argument('--version', action='version',
                         version='%(prog)s '+__version__,
                         help='Show version number and exit')
@@ -377,8 +384,16 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     #copy the database to make a backup, because paranoia is your friend
     if os.path.exists(dryad2dataverse.constants.DBASE):
         shutil.copyfile(dryad2dataverse.constants.DBASE,
-                        dryad2dataverse.constants.DBASE+'.bak')
-
+                        dryad2dataverse.constants.DBASE+'.'+
+                        datetime.datetime.now().strftime('%Y-%m-%d'))
+    #list comprehension includes untimestamped dbase name, hence 2+
+    fnames = glob.glob(os.path.abspath(dryad2dataverse.constants.DBASE)
+                       +'*')
+    fnames.remove(os.path.abspath(dryad2dataverse.constants.DBASE))
+    fnames.sort(reverse=True)
+    fnames = fnames[args.num_backups:]
+    for fil in fnames:
+        os.remove(fil)
     monitor = dryad2dataverse.monitor.Monitor(args.dbase)
     logger.info('Last update time: %s', monitor.lastmod)
 
