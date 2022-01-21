@@ -251,6 +251,32 @@ class Monitor():
 
         return None
 
+    @staticmethod
+    def __added_hashes(oldFiles, newFiles):
+        '''
+        Checks that two objects in dryad2dataverse.serializer.files format
+        stripped of digestType and digest values are identical. Returns array
+        of files with changed hash.
+
+        Assumes name, mimeType, size, descr all unchanged, which is not
+        necessarily a valid assumption
+
+        oldFiles: list or tuple:
+            (name, mimeType, size, descr, digestType, digest)
+
+        newFiles: list or tuple:
+            (name, mimeType, size, descr, digestType, digest)
+        '''
+        hash_change = []
+        old = [x[1:-2] for x in oldFiles]
+        #URLs are not permanent
+        old_no_url = [x[1:] for x in oldFiles]
+        for fi in newFiles:
+            if fi[1:-2] in old and fi[1:] not in old_no_url:
+                hash_change.append(fi)
+        return hash_change
+
+
     def diff_files(self, serial):
         '''
         Returns a dict with additions and deletions from previous Dryad
@@ -325,7 +351,7 @@ class Monitor():
         new_no_hash = [new_map[x]['no_hash'] for x in new_map]
 
         #check for added hash only
-        hash_change = self.__added_hashes(oldFiles, newFiles)
+        hash_change = Monitor.__added_hashes(oldFiles, newFiles)
 
         must = set(old_no_hash).issuperset(set(new_no_hash))
         if not must:
@@ -341,30 +367,6 @@ class Monitor():
         if hash_change:
             diffReport.update({'hash_change': hash_change})
         return diffReport
-
-    def __added_hashes(self, oldFiles, newFiles):
-        '''
-        Checks that two objects in dryad2dataverse.serializer.files format
-        stripped of digestType and digest values are identical. Returns array
-        of files with changed hash.
-
-        Assumes name, mimeType, size, descr all unchanged, which is not
-        necessarily a valid assumption
-
-        oldFiles: list or tuple:
-            (name, mimeType, size, descr, digestType, digest)
-
-        newFiles: list or tuple:
-            (name, mimeType, size, descr, digestType, digest)
-        '''
-        hash_change = []
-        old = [x[1:-2] for x in oldFiles]
-        #URLs are not permanent
-        old_no_url = [x[1:] for x in oldFiles]
-        for fi in newFiles:
-            if fi[1:-2] in old and fi[1:] not in old_no_url:
-                hash_change.append(fi)
-        return hash_change
 
     def get_dv_fid(self, url):
         '''

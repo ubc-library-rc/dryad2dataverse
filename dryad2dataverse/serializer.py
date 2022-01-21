@@ -207,7 +207,7 @@ class Serializer():
                     digestType = f.get('digestType', '')
                     #not all files have a digest
                     digest = f.get('digest', '')
-                    #Does it matter? If the primary use case is to 
+                    #Does it matter? If the primary use case is to
                     #compare why not take all the digest types.
                     #md5 = ''
                     #if digestType == 'md5' and digest:

@@ -739,7 +739,7 @@ class Transfer():
         if not self.jsonFlag:
             url = dest + '/api/datasets/:persistentId/add'
             pack = io.StringIO(json.dumps(self.dryad.dryadJson))
-            desc = {'description':f'Original JSON from Dryad',
+            desc = {'description':'Original JSON from Dryad',
                     'categories':['Documentation', 'Code']}
             fname = self.doi[self.doi.rfind('/')+1:].replace('.', '_')
             payload = {'file': (f'{fname}.json', pack, 'text/plain;charset=UTF-8'),
