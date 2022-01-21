@@ -137,6 +137,17 @@ def test_no_transfer():
     assert_equal(ftest.fileUpRecord,  [])
     assert_equal(ftest.fileDelRecord, [])
 
+def test_find_dvfid():
+    #admittedly, this is kind of a garbage test
+    ins = 'INSERT INTO dvfiles VALUES (?, ?, ?, ?, ?, ?);'
+    data_a = (203, 16247, "02d78d74c2b7307c5821cf5e92a3478c",152242,"02d78d74c2b7307c5821cf5e92a3478c", '{}')
+    data_b = (947,16247,'9f498c8e9f0875f7b132b9aadae8f8bb',258214,'9f498c8e9f0875f7b132b9aadae8f8bb', '{}') 
+    montest.cursor.execute(ins, data_a)
+    montest.cursor.execute(ins, data_b)
+    montest.conn.commit()
+    assert_equal(montest.get_dv_fid('https://datadryad.org/api/v2/files/16247/download'), '258214')
+
+
 #def test_uploaded_transfer():
 #    ftest = dryad2dataverse.transfer.Transfer(testCase)
 #    ftest.fileUpRecord.append((385819, json.dumps({'dvn':'simulatedJson'})))

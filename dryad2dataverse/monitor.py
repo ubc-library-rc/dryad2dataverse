@@ -316,14 +316,14 @@ class Monitor():
             return diffReport
         #filenames for checking hash changes.
         #Can't use URL or hashes for comparisons because they can change
-        #without warning, despite the fact that the API says that 
-        #file IDs are unique. They aren't. Verified by Ryan Scherle at 
+        #without warning, despite the fact that the API says that
+        #file IDs are unique. They aren't. Verified by Ryan Scherle at
         #Dryad December 2021
         old_map = {x:{'orig':y, 'no_hash':y[1:4]} for x,y in enumerate(oldFiles)}
         new_map = {x:{'orig':y, 'no_hash':y[1:4]} for x,y in enumerate(newFiles)}
         old_no_hash = [old_map[x]['no_hash'] for x in old_map]
         new_no_hash = [new_map[x]['no_hash'] for x in new_map]
-        
+
         #check for added hash only
         hash_change = self.__added_hashes(oldFiles, newFiles)
 
@@ -388,8 +388,12 @@ class Monitor():
             LOGGER.exception(e)
             raise
 
-        self.cursor.execute('SELECT dvfid FROM dvFiles WHERE \
-                             dryfid = ?', (fid,))
+        #File IDs are *CHANGEABLE* according to Dryad, Dec 2021
+        #SQLite default returns are by ROWID ASC, so the last record
+        #returned should still be the correct, ie. most recent, one.
+        #However, just in case, this is now done explicitly.
+        self.cursor.execute('SELECT dvfid, ROWID FROM dvFiles WHERE \
+                             dryfid = ? ORDER BY ROWID ASC;', (fid,))
         dvfid = self.cursor.fetchall()
         if dvfid:
             return dvfid[-1][0]
