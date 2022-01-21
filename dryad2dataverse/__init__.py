@@ -23,5 +23,5 @@ Modules included:
     dryad2dataverse.exceptions : Custom exceptions.
 '''
 
-VERSION = (0, 1, 4)
+VERSION = (0, 2, 0)
 __version__ = '.'.join([str(x) for x in VERSION])

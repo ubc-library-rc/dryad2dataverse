@@ -185,9 +185,12 @@ class Serializer():
         Returns a list of tuples with:
 
         (Download_location, filename, mimetype, size, description,
-        digestType, md5sum)
+         digest, digestType )
 
-        At this time only md5 is supported.
+        Digest types include, but are not necessarily limited to:
+
+        'adler-32','crc-32','md2','md5','sha-1','sha-256',
+        'sha-384','sha-512'
         '''
         out = []
         for page in self.fileJson:
@@ -201,17 +204,20 @@ class Serializer():
                     size = f['size']
                     #HOW ABOUT PUTTING THIS IN THE DRYAD API PAGE?
                     descr = f.get('description', '')
-                    digestType = f.get('digestType')
+                    digestType = f.get('digestType', '')
                     #not all files have a digest
-                    digest = f.get('digest')
-                    md5 = ''
-                    if digestType == 'md5' and digest:
-                        md5 = digest
-                        #nothing in the docs as to algorithms so just picking md5
-                        #Email from Ryan Scherle 30 Nov 20: supported digest type
-                        #('adler-32','crc-32','md2','md5','sha-1','sha-256',
-                        #'sha-384','sha-512')
-                    out.append((downLink, name, mimeType, size, descr, md5))
+                    digest = f.get('digest', '')
+                    #Does it matter? If the primary use case is to 
+                    #compare why not take all the digest types.
+                    #md5 = ''
+                    #if digestType == 'md5' and digest:
+                    #    md5 = digest
+                    #    #nothing in the docs as to algorithms so just picking md5
+                    #    #Email from Ryan Scherle 30 Nov 20: supported digest type
+                    #    #('adler-32','crc-32','md2','md5','sha-1','sha-256',
+                    #    #'sha-384','sha-512')
+                    out.append((downLink, name, mimeType, size, descr, digestType,
+                                digest))
 
         return out
 

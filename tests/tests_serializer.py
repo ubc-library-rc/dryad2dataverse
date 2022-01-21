@@ -5,9 +5,11 @@ import json
 import pickle
 import  dryad2dataverse.serializer as dryad
 
+#testing Dryad json 14 January 2022
+#This JSON is found at ./2rbnzs7jp_14Jan22.json
 testCase = dryad.Serializer('doi:10.5061/dryad.2rbnzs7jp')
-with open('tests/dryadStudy.json') as f:
-    testCase._dryadJson = json.load(f)
+#with open('tests/dryadStudy.json') as f:
+#    testCase._dryadJson = json.load(f)
 
 
 NULLVALUES= {x[0]: None for x in testCase.dryadJson['authors'][0].items()}
@@ -46,6 +48,11 @@ def test_abstract():
     assert_equal(isinstance(testCase.dryadJson['abstract'], str), True)
     #assert_equal(testCase._convert_abstract(testCase.dryadJson['abstract']), abs)
     assert_equal(testCase._convert_generic(inJson=testCase.dryadJson, dvField='dsDescriptionValue', dryField='abstract'), abs)
+
+def test_version():
+    assert_equal(True, isinstance(testCase.dryadJson['versionNumber'], int))
+    #removed 
+    #assert_equal(True, isinstance(testCase.version, int))
 
 def test_author():
     #dvAuthor = json.loads("{'authorName':{'typeName':'authorName', 'value': 'Powers, Jennifer'}}")
@@ -125,8 +132,8 @@ def test_doi():
 
 def test_keyword():
     keywords=[
-            {'keywordValue':{'typeName':'keywordValue','value':'drought'}},
-            {'keywordValue':{'typeName':'keywordValue','value':'Tree mortality'}},
+            #{'keywordValue':{'typeName':'keywordValue','value':'drought'}},
+            #{'keywordValue':{'typeName':'keywordValue','value':'Tree mortality'}},
             {'keywordValue':{'typeName':'keywordValue','value':'Costa Rica'}}
             ]
 
