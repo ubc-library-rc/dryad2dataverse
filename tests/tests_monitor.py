@@ -83,6 +83,7 @@ def test_unchanged_files():
 def test_added_files():
     assert_equal.__self__.maxDiff = None
     newdata=copy.copy(testCase.fileJson[0]['_embedded']['stash:files'][-1])
+    newdata['_links']['stash:file-download']['href'] = '/api/v2/files/999999/download' 
     newdata['path'] = 'ubc_rand1.csv'
     newdata['description'] = 'UBC random data 1'
     newdata['digestType'] = 'md5'
@@ -91,7 +92,9 @@ def test_added_files():
     #print(testCase.files)
     diff = montest.diff_files(testCase)
     assert_not_equal({}, diff)
-    expect = {'add': [( 'ubc_rand1.csv',
+    expect = {'add': [( 
+       'https://datadryad.org/api/v2/files/999999/download', 
+        'ubc_rand1.csv',
            'text/plain',
            1350,
            'UBC random data 1', 
@@ -100,14 +103,14 @@ def test_added_files():
     assert_equal(expect, diff)
     #restore state
     del testCase.fileJson[0]['_embedded']['stash:files'][-1]
-     
 
 def test_deleted_files():
     newdata=copy.copy(testCase.fileJson[0]['_embedded']['stash:files'][0])
     del testCase.fileJson[0]['_embedded']['stash:files'][0]
     diff = montest.diff_files(testCase)
     assert_not_equal({}, diff)
-    expect = {'delete': [('GCB_ACG_Mortality_2020.zip',
+    expect = {'delete': [('https://datadryad.org/api/v2/files/267417/download',
+                          'GCB_ACG_Mortality_2020.zip',
            'application/x-zip-compressed',
            23787587,
            '',
@@ -125,7 +128,7 @@ def test_added_hash():
     assert_not_equal({}, diff)
     print(diff)
     assert_equal(diff, {'hash_change' : 
-        [x[1:] for x in testCase.files if x[-1].endswith('test')]})
+        [x for x in testCase.files if x[-1].endswith('test')]})
     #restore state
     testCase._fileJson = None
 

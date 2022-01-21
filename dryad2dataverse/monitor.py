@@ -216,67 +216,6 @@ class Monitor():
         return {'status': 'lastmodsame', 'dvpid': dvpid,
                      'notes': newfile.get('versionChanges')}
 
-    def status_old(self, serial):
-        '''
-        Returns a dictionary with keys 'status' and 'dvpid'.
-        `{status :'updated', 'dvpid':'doi://some/ident'}`.
-
-        `status` is one of 'new', 'unchanged', 'updated' or 'filesonly'.
-
-                'new' is a completely new file.
-
-                'unchanged' is no changes at all.
-
-                'updated' is changes to lastModificationDate AND metadata changes.
-
-                'filesonly' is changes to lastModificationDate only
-                (which presumably indicates a file change.
-
-        `dvpid` is a Dataverse persistent identifier.
-        `None` in the case of status='new'
-
-        ----------------------------------------
-        Parameters:
-
-        serial : dryad2dataverse.serializer instance
-        ----------------------------------------
-        '''
-        # Last mod date is indicator of change.
-        # From email w/Ryan Scherle 10 Nov 2020
-        doi = serial.dryadJson['identifier']
-        # lastMod = serial.dryadJson['lastModificationDate']
-        self.cursor.execute('SELECT * FROM dryadStudy WHERE doi = ?',
-                            (doi,))
-        result = self.cursor.fetchall()
-
-        if not result:
-            return {'status': 'new', 'dvpid': None}
-        # dvjson = json.loads(result[-1][4])
-        # Check the fresh vs. updated jsons for the keys
-        try:
-            dryaduid = result[-1][0]
-            self.cursor.execute('SELECT dvpid from dvStudy WHERE \
-                                 dryaduid = ?', (dryaduid,))
-            dvpid = self.cursor.fetchall()[-1][0]
-            serial.dvpid = dvpid
-        except TypeError:
-            try:
-                raise exceptions.DatabaseError
-            except exceptions.DatabaseError as e:
-                LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
-                LOGGER.exception(e)
-                raise
-
-        newfile = copy.deepcopy(serial.dryadJson)
-        testfile = copy.deepcopy(json.loads(result[-1][3]))
-        if newfile == testfile:
-            return {'status': 'unchanged', 'dvpid': dvpid}
-        del newfile['lastModificationDate']
-        del testfile['lastModificationDate']
-        if newfile == testfile:
-            return {'status': 'filesonly', 'dvpid': dvpid}
-        return {'status': 'updated', 'dvpid': dvpid}
-
     def diff_metadata(self, serial):
         '''
         Analyzes differences in metadata between current serializer
@@ -312,75 +251,6 @@ class Monitor():
 
         return None
 
-    def diff_files_old(self, serial):
-        '''
-        Returns a dict with additions and deletions from previous Dryad
-        to dataverse upload.
-
-        Because checksums are not necessarily included in Dryad file
-        metadata, this method uses dryad file IDs, size, or
-        whatever is available.
-
-        If dryad2dataverse.monitor.Monitor.status()
-        indicates a change it will produce dictionary output with a list
-        of additions or deletions, as below:
-
-        `{'add':[dyadfiletuples], 'delete:[dryadfiletuples]}`
-
-        ----------------------------------------
-        Parameters:
-
-        serial : dryad2dataverse.serializer.Serializer instance
-        ----------------------------------------
-        '''
-
-        diffReport = {}
-        if self.status(serial)['status'] == 'new':
-            return {}
-        self.cursor.execute('SELECT uid from dryadStudy WHERE doi = ?',
-                            (serial.doi,))
-        mostRecent = self.cursor.fetchall()[-1][0]
-        self.cursor.execute('SELECT dryfilesjson from dryadFiles WHERE \
-                             dryaduid = ?', (mostRecent,))
-        oldFileList = self.cursor.fetchall()[-1][0]
-        if not oldFileList:
-            oldFileList = []
-        else:
-            out = []
-            #With Dryad API change, files are paginated
-            #now stored as list
-            for old in json.loads(oldFileList):
-            #for old in oldFileList:
-                oldFiles = old['_embedded'].get('stash:files')
-                # comparing file tuples from dryad2dataverse.serializer.
-                # Maybe JSON is better?
-                # because of code duplication below.
-                for f in oldFiles:
-                    downLink = f['_links']['stash:file-download']['href']
-                    downLink = f'{constants.DRYURL}{downLink}'
-                    name = f['path']
-                    mimeType = f['mimeType']
-                    size = f['size']
-                    descr = f.get('description', '')
-                    md5 = f.get('md5', '')
-                    out.append((downLink, name, mimeType, size, descr, md5))
-                oldFiles = out
-
-        newFiles = serial.files
-        # Tests go here
-        # Can't use set on a list of dicts. Joder!
-        must = set(oldFiles).issuperset(set(newFiles))
-        if not must:
-            needsadd = set(newFiles) - (set(oldFiles) & set(newFiles))
-            diffReport.update({'add': list(needsadd)})
-
-        must = set(newFiles).issuperset(oldFiles)
-        if not must:
-            needsdel = set(oldFiles) - (set(newFiles) & set(oldFiles))
-
-            diffReport.update({'delete': list(needsdel)})
-        return diffReport
-
     def diff_files(self, serial):
         '''
         Returns a dict with additions and deletions from previous Dryad
@@ -413,9 +283,6 @@ class Monitor():
         self.cursor.execute('SELECT dryfilesjson from dryadFiles WHERE \
                              dryaduid = ?', (mostRecent,))
         oldFileList = self.cursor.fetchall()[-1][0]
-        #import pickle
-        #with open('/Users/paul/tmp/_jan.pickle', 'wb') as f:
-        #    pickle.dump(oldFileList, f)
         if not oldFileList:
             oldFileList = []
         else:
@@ -430,50 +297,46 @@ class Monitor():
                 # because of code duplication below.
                 for f in oldFiles:
                     #Download links are not persistent. Be warned
-                    #downLink = f['_links']['stash:file-download']['href']
-                    #downLink = f'{constants.DRYURL}{downLink}'
-                    #TODO make sure downLink is included in output. Joder!
+                    downLink = f['_links']['stash:file-download']['href']
+                    downLink = f'{constants.DRYURL}{downLink}'
                     name = f['path']
                     mimeType = f['mimeType']
                     size = f['size']
                     descr = f.get('description', '')
                     digestType = f.get('digestType', '')
                     digest = f.get('digest', '')
-                    out.append((name, mimeType, size, descr, digestType, digest))
+                    out.append((downLink, name, mimeType, size, descr, digestType, digest))
                 oldFiles = out
-
-        #Because file paths are not constant, strip download links
-        #serial.files. Why can't they use persistent IDs!
-        #Dryad also ADDED HASHES while reporting no metadata changes.
-        #So how to test that?
-        #x[1:] because the file IDs are still in serial.files but
-        #not used for testing because they're changeable
-        newFiles = [(x[1:]) for x in serial.files]
-
+        newFiles = serial.files[:]
         # Tests go here
-        # Can't use set on a list of dicts. Joder!
         #Check for identity first
+        #if returned here there are definitely no changes
         if (set(oldFiles).issuperset(set(newFiles)) and
                 set(newFiles).issuperset(oldFiles)):
             return diffReport
-        #filenames for checking hash changes
-        old_no_hash = [x[:4] for x in oldFiles]
-        new_no_hash = [x[:4] for x in newFiles]
+        #filenames for checking hash changes.
+        #Can't use URL or hashes for comparisons because they can change
+        #without warning, despite the fact that the API says that 
+        #file IDs are unique. They aren't. Verified by Ryan Scherle at 
+        #Dryad December 2021
+        old_map = {x:{'orig':y, 'no_hash':y[1:4]} for x,y in enumerate(oldFiles)}
+        new_map = {x:{'orig':y, 'no_hash':y[1:4]} for x,y in enumerate(newFiles)}
+        old_no_hash = [old_map[x]['no_hash'] for x in old_map]
+        new_no_hash = [new_map[x]['no_hash'] for x in new_map]
+        
         #check for added hash only
-        hash_change =  self.__added_hashes(oldFiles, newFiles)
+        hash_change = self.__added_hashes(oldFiles, newFiles)
 
-        #must = set(oldFiles).issuperset(set(newFiles))
         must = set(old_no_hash).issuperset(set(new_no_hash))
         if not must:
-            #needsadd = set(newFiles) - (set(oldFiles) & set(newFiles))
             needsadd = set(new_no_hash) - (set(old_no_hash) & set(new_no_hash))
-            diffReport.update({'add': [newFiles[new_no_hash.index(x)] 
+            #Use the map created above to return the full file info
+            diffReport.update({'add': [new_map[new_no_hash.index(x)]['orig']
                                        for x in needsadd]})
         must = set(new_no_hash).issuperset(old_no_hash)
         if not must:
-            #needsdel = set(oldFiles) - (set(newFiles) & set(oldFiles))
             needsdel = set(old_no_hash) - (set(new_no_hash) & set(old_no_hash))
-            diffReport.update({'delete' : [oldFiles[old_no_hash.index(x)]
+            diffReport.update({'delete' : [old_map[old_no_hash.index(x)]['orig']
                                            for x in needsdel]})
         if hash_change:
             diffReport.update({'hash_change': hash_change})
@@ -495,9 +358,11 @@ class Monitor():
             (name, mimeType, size, descr, digestType, digest)
         '''
         hash_change = []
-        old =[x[:-2] for x in oldFiles]
+        old = [x[1:-2] for x in oldFiles]
+        #URLs are not permanent
+        old_no_url = [x[1:] for x in oldFiles]
         for fi in newFiles:
-            if fi[:-2] in old and fi not in oldFiles:
+            if fi[1:-2] in old and fi[1:] not in old_no_url:
                 hash_change.append(fi)
         return hash_change
 
