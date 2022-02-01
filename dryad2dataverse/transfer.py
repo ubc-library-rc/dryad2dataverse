@@ -710,8 +710,9 @@ class Transfer():
         for f in files:
             #out.append(self.upload_file(f[0], f[1], f[2], f[3],
             #                             f[4], f[5], pid, fprefix=fprefix))
-            #studyId set explicitly because length of files has changed.
-            out.append(self.upload_file(*[x for x in f],
+            #out.append(self.upload_file(*[x for x in f],
+            #last item in files is not necessary
+            out.append(self.upload_file(*list(f)[:-1],
                                         studyId=pid, fprefix=fprefix,
                                         force_unlock=force_unlock))
         return out
