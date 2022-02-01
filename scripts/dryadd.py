@@ -15,14 +15,16 @@ import logging.handlers
 import os
 import shutil
 import smtplib
+import sys
 import time
 
 import requests
+import dryad2dataverse
 import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
-VERSION = (0, 2, 0)
+VERSION = (0, 3, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -124,6 +126,41 @@ def notify(msgtxt,
     server.sendmail(msg['From'], msg['To'].split(','), msg.as_string())
     server.close()
 
+def __bad_dates(rectuple: tuple, mod_date: str) -> tuple:
+    '''
+    As of 10 December 2021 the Dryad API has a bug which doesn't filter
+    anything if you ask for a date preceding 11 December 2021.
+
+    This convenience function will filter those results until the API
+    works again.
+
+
+    rectuple : tuple
+        output from dryadd.get_records
+
+    mod_date : str
+        Date string in '%Y-%m-%dT%H:%M:%SZ' format
+        None for mod_date doesn't filter results
+    '''
+    fmt = '%Y-%m-%dT%H:%M:%SZ'
+    fmt2 = '%Y-%m-%d'
+
+    #If python3.7, much easier
+    #datetime.strptime(date, fmt)
+    #but python3.6
+    #datetime.datetime(*(time.strptime(date_string, format)[0:6]))
+    #There could also be no mod_date if you are looking for
+    #new files
+    if mod_date:
+        records = [x for x in rectuple
+        if datetime.datetime(*(time.strptime(x[1]['lastModificationDate'],
+                             fmt2)[0:6])) >=
+                             datetime.datetime(*(time.strptime(mod_date,
+                                               fmt)[0:6]))
+                  ]
+        return tuple(records)
+    return rectuple
+
 def get_records(ror: 'str', mod_date=None, verbosity=True):
     '''
     returns a tuple of ((doi, metadata), ...). Dryad searches return complete
@@ -166,8 +203,13 @@ def get_records(ror: 'str', mod_date=None, verbosity=True):
         time.sleep(10) # don't overload their system with API calls
         stud.raise_for_status()
         records += stud.json()['_embedded']['stash:datasets']
-    dois = [x['identifier'] for x in records]
-    return tuple((x, y) for x, y in zip(dois, records))
+
+
+    #return tuple([(x['identifier'], x) for x in records])
+    #This can be removed when they fix the API
+    return __bad_dates(tuple([(x['identifier'], x)
+                              for x in records]),
+                              mod_date)
 
 def argp():
     '''
@@ -265,7 +307,6 @@ def argp():
                         required=False,
                         action='store_false',
                         dest='force_unlock')
-
     parser.add_argument('-x', '--exclude',
                         help='Exclude these DOIs. Separate by spaces',
                         required=False,
@@ -278,8 +319,20 @@ def argp():
                         required=False,
                         type=int,
                         default=3)
+    parser.add_argument('-w', '--warn-too-many',
+                        help=('Warn and halt execution if abnormally large '
+                              'number of updates present.'),
+                        action='store_true',)
+    parser.add_argument('--warn-threshold',
+                        help=('Stop updates if number of updates '
+                              'is greater than or equal to this number.'),
+                        type=int,
+                        dest='warn',
+                        default=15)
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version='%(prog)s '+__version__
+                        +'; dryad2dataverse '+
+                        dryad2dataverse.__version__,
                         help='Show version number and exit')
 
     return parser
@@ -359,6 +412,43 @@ def rotating_log(path, level):
     logger.setLevel(level)
     return logger
 
+def checkwarn(val:int, warn:int, **kwargs) -> None:
+    '''
+    Halt program execution before processing if threshold value of modified
+    Dryad studies exceeded. Useful for checking if the Dryad API has changed
+    and caused havoc.
+
+    val: int
+        Number of modified or new studies
+    warn: int
+        Threshold for number of warnings
+    kwargs: dict
+        Email notification information.
+        {'user': user email,
+         'recipient':[list of recipients],
+         'pwd' ; email server password]}
+        see dryadd.notify for full details of parameters.
+
+        Include log info:
+        {loggers: [logging.logger, logging.logger,...]}
+        Skip check
+        {'warn_too_many': bool}
+
+    '''
+    if not kwargs.get('warn_too_many'):
+        return
+    if val >= warn:
+        mess = ('Large number of updates detected. '
+                f'{val} new studies exceeds threshold of {warn}. '
+                'Program execution halted.')
+        subject = ('Dryad to Dataverse large update warning')
+        for logme in kwargs.get('loggers'):
+            logme.warning(mess)
+        notify(msgtxt=(subject, mess),
+               user=kwargs['user'], pwd=kwargs['pwd'],
+               recipient=kwargs['recipient'])
+        sys.exit()
+
 def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     '''
     Main Dryad transfer daemon
@@ -381,11 +471,12 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
 
 
     logger.info('Beginning update process')
+    monitor = dryad2dataverse.monitor.Monitor(args.dbase)
     #copy the database to make a backup, because paranoia is your friend
     if os.path.exists(dryad2dataverse.constants.DBASE):
         shutil.copyfile(dryad2dataverse.constants.DBASE,
                         dryad2dataverse.constants.DBASE+'.'+
-                        datetime.datetime.now().strftime('%Y-%m-%d'))
+                        datetime.datetime.now().strftime('%Y-%m-%d-%H%M'))
     #list comprehension includes untimestamped dbase name, hence 2+
     fnames = glob.glob(os.path.abspath(dryad2dataverse.constants.DBASE)
                        +'*')
@@ -394,12 +485,17 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     fnames = fnames[args.num_backups:]
     for fil in fnames:
         os.remove(fil)
-    monitor = dryad2dataverse.monitor.Monitor(args.dbase)
     logger.info('Last update time: %s', monitor.lastmod)
-
     #get all updates since the last update check
     updates = get_records(args.ror, monitor.lastmod,
                           verbosity=args.verbosity)
+    logger.info('Total new files: %s', len(updates))
+    elog.info('Total new files: %s', len(updates))
+
+    checkwarn(val=len(updates), warn=args.warn, user=args.user,
+              pwd=args.pwd, recipient=args.recipients,
+              loggers=[logger],
+              warn_too_many=args.warn_too_many)
 
     #update all the new files
     try:
@@ -448,7 +544,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                        user=args.user, pwd=args.pwd,
                        recipient=args.recipients)
 
-            if update_type == 'updated':
+            elif update_type == 'updated':
                 logger.info('Updated metadata: %s', doi[0])
                 logger.info('Updating metadata')
                 transfer.upload_study(dvpid=study.dvpid)
@@ -461,7 +557,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                        user=args.user, pwd=args.pwd,
                        recipient=args.recipients)
 
-            if update_type == 'unchanged':
+                #new, identical, updated, lastmodsame
+            elif update_type in ('unchanged', 'lastmodsame'):
                 logger.info('Unchanged metadata %s', doi[0])
                 continue
 
@@ -479,7 +576,6 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 #now send them to Dataverse
                 transfer.upload_files(diff['add'], pid=study.dvpid,
                                       force_unlock=args.force_unlock)
-
             #Update the tracking database for that record
             monitor.update(transfer)
 
