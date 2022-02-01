@@ -24,7 +24,7 @@ import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
-VERSION = (0, 3, 0)
+VERSION = (0, 4, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -449,6 +449,18 @@ def checkwarn(val:int, warn:int, **kwargs) -> None:
                recipient=kwargs['recipient'])
         sys.exit()
 
+def verbo(verbosity:bool, **kwargs)->None:
+    '''
+    verbosity: bool
+        if True, print dict
+    kwargs : dict
+        Dictionary to print out
+    '''
+    if verbosity:
+        for key, value in kwargs.items():
+            print(f'{key}: {value}')
+
+
 def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     '''
     Main Dryad transfer daemon
@@ -498,6 +510,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
               warn_too_many=args.warn_too_many)
 
     #update all the new files
+    verbo(args.verbosity, **{'Total to process': len(updates)})
     try:
         count = 0
         for doi in updates:
@@ -512,11 +525,16 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 continue
             #Create study object
             study = dryad2dataverse.serializer.Serializer(doi[0])
+            #verbose output
+            verbo(args.verbosity,
+                  **{'Processing': count,
+                     'DOI': study.doi,
+                     'Title': study.dryadJson['title']})
             if study.embargo:
                 logger.warning('Study %s is embargoed. Skipping', study.doi)
                 elog.warning('Study %s is embargoed. Skipping', study.doi)
+                verbo(args.verbosity, **{'Embargoed':study.embargo})
                 continue
-
             #it turns out that the Dryad API sends all the metadata
             #from the study in their search, so it's not necessary
             #to download it again
@@ -524,7 +542,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
 
             #check to see what sort of update it is.
             update_type = monitor.status(study)['status']
-
+            verbo(args.verbosity, **{'Status': update_type})
             #create a transfer object to copy the files over
             transfer = dryad2dataverse.transfer.Transfer(study)
 
