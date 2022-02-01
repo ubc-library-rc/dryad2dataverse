@@ -302,7 +302,9 @@ class Monitor():
         '''
         diffReport = {}
         if self.status(serial)['status'] == 'new':
-            return {}
+            #do we want to show what needs to be added?
+            return {'add': serial.files}
+            #return {}
         self.cursor.execute('SELECT uid from dryadStudy WHERE doi = ?',
                             (serial.doi,))
         mostRecent = self.cursor.fetchall()[-1][0]
