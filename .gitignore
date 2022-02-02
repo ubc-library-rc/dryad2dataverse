@@ -30,4 +30,5 @@ docs/.readthe*
 scripts/dryadd_testing.py
 site/
 tests/basic_file_JSON.json
-
+binary_files
+binary_files/**
