@@ -1,4 +1,4 @@
-#!python
+#! python
 '''
 Dryad daemon for monitoring and automatically uploading studies associated with a particular ROR
 
