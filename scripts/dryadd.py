@@ -24,7 +24,7 @@ import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
-VERSION = (0, 4, 0)
+VERSION = (0, 4, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -460,7 +460,6 @@ def verbo(verbosity:bool, **kwargs)->None:
         for key, value in kwargs.items():
             print(f'{key}: {value}')
 
-
 def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     '''
     Main Dryad transfer daemon
@@ -551,10 +550,9 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 logger.info('New study: %s, %s', doi[0], doi[1]['title'])
                 logger.info('Uploading study metadata')
                 transfer.upload_study(targetDv=args.target)
-                logger.info('Downloading study files')
-                transfer.download_files()
-                logger.info('Uploading files to Dataverse')
-                transfer.upload_files(force_unlock=args.force_unlock)
+                #New files are in now in monitor.diff_files()['add']
+                #with 2 Feb 2022 API change
+                #so we can ignore them here
                 logger.info('Uploading Dryad JSON metadata')
                 transfer.upload_json()
                 transfer.set_correct_date()
