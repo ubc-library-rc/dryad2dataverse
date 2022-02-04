@@ -1,0 +1,31 @@
+h1 {
+  color: #343131;
+}
+h2 {
+    color: orange
+}
+.wy-side-nav-search{
+    background-color:orange
+}
+
+button  {
+	/*background-color: #2980B9;*/
+	background-color: orange;
+	color: white;
+	border: 0.1em solid white;
+	border-radius: .6em;
+	padding: .5em .5em;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 1.3em;
+ }
+
+button:hover {
+	background-color: #ce8404;
+}
+
+code {
+  white-space : pre-wrap !important;
+  /*color : black !important;*/
+}

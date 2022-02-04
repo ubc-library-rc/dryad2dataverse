@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
@@ -62,8 +63,6 @@
                 <ul class="current">
                     <li class="toctree-l1 current"><a class="reference internal current" href="./">Other utilities</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#dv_bulk_releaser">dv_bulk_releaser</a>
-    </li>
     </ul>
                     </li>
                 </ul>
@@ -128,32 +127,9 @@
             <div class="section">
               
                 <h1 id="other-useful-dataverse-utilities">Other useful dataverse utilities<a class="headerlink" href="#other-useful-dataverse-utilities" title="Permanent link">&para;</a></h1>
-<h3 id="dv_bulk_releaser">dv_bulk_releaser<a class="headerlink" href="#dv_bulk_releaser" title="Permanent link">&para;</a></h3>
-<p>While the dryad2dataverse library and utility doesn&rsquo;t automatically release files, that doens&rsquo;t necessarily mean that you don&rsquo;t want to do that. To facilitate rapid release, there is a simple command line utility available as a Python script in the <a href="https://github.com/ubc-library-rc/dryad2dataverse/blob/master/scripts/dv_bulk_releaser.py">scripts folder on Github</a> and as a <a href="https://github.com/ubc-library-rc/dryad2dataverse/tree/master/binaries">binary file for Windows and Mac</a></p>
-<p>Unlike the <a href="../script/">dryadd</a> utility, the script doesn&rsquo;t technically require the installation of dryad2dataverse, requiring only the <a href="https://docs.python-requests.org/en/master/">requests</a> library. Binaries, of course, are self-contained. This makes it more generally useful even for those not moving Dryad data around.</p>
-<p>Basic usage is very straighforward. To release all the unreleased files in a dataverse called <em>test</em> on a host called <em>iheartdataverse.org</em>:</p>
-<p><code>dv_bulk_releaser -u https://iheartdataverse.org -k your-lengthy-apikey-string-here -d test</code></p>
-<p>Of course, depending on what you&rsquo;re using it could be invoked with <code>dv_bulk_releaser.exe</code> or <code>python dv_bulk_release.py</code>, etc.</p>
-<p>The utility will wait for all locks to be removed from a study before continuing to the next, and pauses between lock checks and uploads to reduce server burden.</p>
-<p>There are more options available:</p>
-<div class="codehilite"><pre><span></span><code><span class="n">usage</span><span class="o">:</span> <span class="n">dv_bulk_releaser</span> <span class="o">[-</span><span class="n">h</span><span class="o">]</span> <span class="o">[-</span><span class="n">u</span> <span class="n">URL</span><span class="o">]</span> <span class="o">-</span><span class="n">k</span> <span class="n">KEY</span> <span class="o">[-</span><span class="n">i</span><span class="o">]</span> <span class="o">[--</span><span class="n">time</span> <span class="n">STIME</span><span class="o">]</span> <span class="o">[-</span><span class="n">v</span><span class="o">]</span> <span class="o">[-</span><span class="n">r</span><span class="o">]</span> <span class="o">[-</span><span class="n">d</span> <span class="n">DV</span> <span class="o">|</span> <span class="o">-</span><span class="n">p</span> <span class="n">PID</span> <span class="o">[</span><span class="n">PID</span> <span class="o">...]]</span> <span class="o">[--</span><span class="n">version</span><span class="o">]</span>
-
-<span class="n">Bulk</span> <span class="n">file</span> <span class="n">releaser</span> <span class="k">for</span> <span class="n">unpublished</span> <span class="n">Dataverse</span> <span class="n">files</span><span class="o">.</span> <span class="n">Either</span> <span class="n">releases</span> <span class="n">individual</span> <span class="n">studies</span> <span class="n">or</span> <span class="n">all</span> <span class="n">unreleased</span> <span class="n">files</span> <span class="k">in</span> <span class="n">a</span> <span class="n">single</span> <span class="n">dataverse</span><span class="o">.</span>
-
-<span class="n">optional</span> <span class="k">arguments</span><span class="o">:</span>
-  <span class="o">-</span><span class="n">h</span><span class="o">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="k">this</span> <span class="n">help</span> <span class="n">message</span> <span class="n">and</span> <span class="n">exit</span>
-  <span class="o">-</span><span class="n">u</span> <span class="n">URL</span><span class="o">,</span> <span class="o">--</span><span class="n">url</span> <span class="n">URL</span>     <span class="n">Dataverse</span> <span class="n">base</span> <span class="n">URL</span>
-  <span class="o">-</span><span class="n">k</span> <span class="n">KEY</span><span class="o">,</span> <span class="o">--</span><span class="n">key</span> <span class="n">KEY</span>     <span class="n">API</span> <span class="n">key</span>
-  <span class="o">-</span><span class="n">i</span><span class="o">,</span> <span class="o">--</span><span class="n">interactive</span>     <span class="n">Manually</span> <span class="n">confirm</span> <span class="k">each</span> <span class="n">release</span>
-  <span class="o">--</span><span class="n">time</span> <span class="n">STIME</span><span class="o">,</span> <span class="o">-</span><span class="n">t</span> <span class="n">STIME</span>
-                        <span class="n">Time</span> <span class="n">between</span> <span class="n">release</span> <span class="n">attempts</span> <span class="k">in</span> <span class="n">seconds</span><span class="o">.</span> <span class="n">Default</span> <span class="mi">10</span>
-  <span class="o">-</span><span class="n">v</span>                    <span class="n">Verbose</span> <span class="n">mode</span>
-  <span class="o">-</span><span class="n">r</span><span class="o">,</span> <span class="o">--</span><span class="n">dry</span><span class="o">-</span><span class="n">run</span>         <span class="n">Only</span> <span class="n">output</span> <span class="n">a</span> <span class="n">list</span> <span class="n">of</span> <span class="n">studies</span> <span class="n">to</span> <span class="n">be</span> <span class="n">released</span>
-  <span class="o">-</span><span class="n">d</span> <span class="n">DV</span><span class="o">,</span> <span class="o">--</span><span class="n">dv</span> <span class="n">DV</span>        <span class="n">Short</span> <span class="n">name</span> <span class="n">of</span> <span class="n">Dataverse</span> <span class="n">to</span> <span class="n">process</span> <span class="o">(</span><span class="n">eg</span><span class="o">:</span> <span class="n">UBC_DRYAD</span><span class="o">)</span>
-  <span class="o">-</span><span class="n">p</span> <span class="n">PID</span> <span class="o">[</span><span class="n">PID</span> <span class="o">...],</span> <span class="o">--</span><span class="n">pid</span> <span class="n">PID</span> <span class="o">[</span><span class="n">PID</span> <span class="o">...]</span>
-                        <span class="n">Handles</span> <span class="n">or</span> <span class="n">DOIs</span> <span class="n">to</span> <span class="n">delete</span> <span class="k">in</span> <span class="n">format</span> <span class="n">hdl</span><span class="o">:</span><span class="mf">11272.1</span><span class="sr">/FK2/12345 or doi:10.80240/FK2/</span><span class="n">NWRABI</span><span class="o">.</span> <span class="n">Multiple</span> <span class="n">values</span> <span class="n">OK</span>
-  <span class="o">--</span><span class="n">version</span>             <span class="n">Show</span> <span class="n">version</span> <span class="n">number</span> <span class="n">and</span> <span class="n">exit</span>
-</code></pre></div>
+<p>Other utilities, such as bulk release and delete utilities, can be very useful when dealing with Dataverse installations. These utilities are now in one collection, installable as a separate product:</p>
+<p><a href="https://ubc-library-rc.github.io/dataverse_utils"><button>Get dataverse_utils</button></a></p>
+<p>The tools formerly included on this page are there, as well as other potentially useful utilities.</p>
               
             </div>
           </div>
