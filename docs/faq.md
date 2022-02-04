@@ -5,6 +5,14 @@ nav_order: 20
 ---
 # Frequently asked questions
 
+#### **Why did dryadd just download everything again?**
+
+The Dryad API has not yet reached a stable state and the output from the API is subject to format changes. This has the possibility of triggering a potentially false positive change indication in `dryad2dataverse.monitor.Monitor`.
+
+Using _dryad2dataverse_ >= v0.3.1 uses (hopefully) a more robust change checking mechanism which will eliminate (or at least drastically reduce) the number of false positive hits. In addition _dryadd_ >= v0.4.1 includes a warning mechanism and auto-shutdown if the number of studies to be uploaded exceeds a user specified threshold, allowing the user to examine the nature of the problem to see if, in fact, there **are** multiple studies with changes.
+
+Note that the false positives do not upload incorrect data; they will just create a new version of the _same_ data set. This is can be annoying and potentially use a lot of storage space, but for small collections it is more of an annoyance than a problem.
+
 #### **Why is the upload script (dryadd.py) constantly crashing with SMTP errors?**
 
 If you are using Gmail to send messages about your migration, there are a few potential hurdles.

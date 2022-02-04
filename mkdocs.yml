@@ -13,12 +13,16 @@ nav:
   - Changelog: changelog.md
   - FAQ: faq.md
   - Credits: credits.md
-
+extra_css:
+  - css/extra.css
 markdown_extensions:
   - smarty
   - toc:
       permalink: True
-  - codehilite
+  - codehilite:
+      guess_lang: False
+      linenums: False
+      use_pygments: False
   - attr_list
 
 theme: readthedocs

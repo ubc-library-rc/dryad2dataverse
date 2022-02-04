@@ -17,7 +17,9 @@ and possibly:
 
 * Checking for updates and handling **those** automatically
 
-Included with **dryad2dataverse** is a [script](https://github.com/ubc-library-rc/dryad2dataverse/blob/master/scripts/dryadd.py) and [binary files for Windows and Mac](https://github.com/ubc-library-rc/dryad2dataverse/tree/master/binaries) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process. Depending on what you use and the plaform, the application will be called `dryadd.py, dryadd` or `dryadd.exe`
+Included with **dryad2dataverse** is a [script](https://github.com/ubc-library-rc/dryad2dataverse/blob/master/scripts/dryadd.py) as as well as [binary files for Windows, MacOS and Linux](https://github.com/ubc-library-rc/dryad2dataverse/releases) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process. Depending on what you use and the plaform, the application will be called `dryadd.py, dryadd`, `dryadd_linux` or `dryadd.exe`. Note that there are a wide variety of system architectures available. The binaries are c
+
+Note that these utilities are *console* programs. That is, they do not have a GUI and are meant to be run from the command line in a Windows DOS prompt or PowerShell session or a terminal in the case of other platforms.
 
 ### An important caveat
 
@@ -33,7 +35,7 @@ This product **will not** publish anything in a Dataverse installation (at this 
 
 **Hardware**
 
-* You will need sufficient storage space on your system to hold the contents of the largest Dryad record that you are transferring. This is not necessarily a small amount; Dryad studies can range into the tens or hundreds of Gb, which means that a "normal" `/tmp` directory will normally not have enough space allocated to it.
+* You will need sufficient storage space on your system to hold the contents of the largest Dryad record that you are transferring. This is not necessarily a small amount; Dryad studies can range into the tens or hundreds of Gb, which means that a "normal" `/tmp` directory will normally not have enough space allocated to it. The software will work on one study at a time and delete the files as it goes, but there are studies in the Dryad repository that are huge, even if most of them are quite small.
 
 **Other**
 
@@ -52,24 +54,27 @@ This product **will not** publish anything in a Dataverse installation (at this 
 
 Although the script is set up to use GMail by default, it likely won't work off the bat. You will need to allow _less secure app access_ and possibly deal with a capture as outlined in the [FAQ](faq.md).
 
+**Updates to Dryad studies**
+
+The software is designed to automatically update changed studies. Simply run the utility with the same parameters as the previous run and any studies in Dataverse will be updated
+
 
 **Miscellaneous**
 
-This software is still new; it doesn't actually run as a daemon [yet]. To update, just run the script again at whatever interval you desire, and it will find Dryad material that has been updated since the last run.
+The **dryadd/.py/.exe** works best if run at intervals. This can easily be achieved by adding it to your system's _crontab_ or using the Windows scheduler. Currently it does not run as a system or service, although it may in the future.
 
-At this time, the best solution would be to run **dryadd.py** at predifined intervals using `cron`.
+Dryad itself is constantly changing, as is Dataverse. Although the software should work predictably, changes in both the Dryad API and Dataverse API can cause unforeseen consequences.
 
-To act as a backup against catastrophic error, the database is automatically copied to $DBASE.bak. Obviously, if you check once a minute this isn't helpful, but it could be if you update once a month.
-
+To act as a backup against catastrophic error, the monitoring database is automatically copied and renamed with a timestamp. Although the default number of backups is 3 by default, any number of backups can be kept. Obviously, if you run the software once a minute this isn't helpful, but it could be if you update once a month.
 
 ### Usage
 
 The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest. The help menu below is available from the command line by either running the script without inputs or by using the `-h` switch.
 
 
-```
+```nohighlight
 usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP] [--db DBASE]
-                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [--version]
+                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
 
 Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are REQUIRED. Arguments in [square brackets] are not required. The "optional arguments" below refers to
 the use of the option switch, (like -u), meaning "not a positional argument."
@@ -100,5 +105,10 @@ optional arguments:
                         No forcible file unlock. Requiredif /lock endpint is restricted
   -x EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
                         Exclude these DOIs. Separate by spaces
+  -b NUM_BACKUPS, --num-backups NUM_BACKUPS
+                        Number of database backups to keep. Default 3
+  -w, --warn-too-many   Warn and halt execution if abnormally large number of updates present.
+  --warn-threshold WARN
+                        Stop updates if number of updates is greater than or equal to this number.
   --version             Show version number and exit
 ```

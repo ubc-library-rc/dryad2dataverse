@@ -51,14 +51,14 @@ There are a few reasons why you might find this product useful.
 
 ## Quick install
 
-```
+```nohighlight
 pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master
 ```
 
 ## Basic usage
 
 #### Converting JSON
-```
+```nohighlight
 >>> #Convert Dryad JSON to Dataverse JSON and save to a file
 >>> import dryad2dataverse.serializer
 >>> i_heart_dryad = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
@@ -72,7 +72,7 @@ pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master
 
 Note: a number of variables must be set [correctly] for this to work, such as your target dataverse. This example continues with the Serializer instance above.
 
-```
+```nohighlight
 >>> import dryad2dataverse.transfer
 >>> dv = dryad2dataverse.transfer.Transfer(i_heart_dryad)
 >>> # Files must first be downloaded; there is no direct transfer
@@ -95,7 +95,7 @@ In theory you could run it from a Raspberry Pi Zero that you have in a desk draw
 
 Monitoring changes requires both the `Serializer` and `Transfer` objects from above.
 
-```
+```nohighlight
 >>> # Create the Monitor instance
 >>> monitor = dryad2dataverse.monitor.Monitor()
 >>> # Check status of your serializer object

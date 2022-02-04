@@ -7,7 +7,7 @@ nav_order: 5
 
 # Installation
 
-This is not a complete list of installation methods. For a complete guide to Python package installation, please see <https://packaging.python.org/tutorials/installing-packages/>. As a baseline, you will need to install a version of [Python](https;//python.org) >= 3.6.
+This is not a complete list of installation methods. For a complete guide to Python package installation, please see <https://packaging.python.org/tutorials/installing-packages/>. As a baseline, you will need to install a version of [Python](https://python.org) >= 3.6.
 
 ## Simple installation using Pip
 
@@ -15,8 +15,10 @@ Once you've installed Python, installation via `pip` is very simple. Dryad2datav
 
 `pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master`
 
+Of course, if you want to use a branch other than _master_, you can switch _master_ for the branch you want. This is not recommended, though, as the _master_ branch contains the most current [stable] release.
 
 ## Manual Download
+
 The source code for this project is available at <https://github.com/ubc-library-rc/dryad2dataverse>
 
 To install, first clone the repository:
@@ -47,7 +49,7 @@ More information on virtual environments can be found on the Python website: <ht
 
 ## Keeping up to date
 
-If you have installed with pip, upgrading is easy:
+If you have installed with pip, upgrading is easy and very similar to the normal upgrade procedure:
 
 `pip install --upgrade git+https://github.com/ubc-library-rc/dryad2dataverse.git@master`
 
