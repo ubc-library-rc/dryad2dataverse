@@ -16,7 +16,7 @@ Changes to the Dryad API sparked a few changes to dryad2dataverse and dryadd.py.
 *  Monitor.status() now includes `notes` key
 *  Monitor.diff\_files() now outputs a list of files for new studies using the `add` key instead of producing an empty dict.
 *  Monitor.diff\_files() outputs of `hash_change` key listing files whose names and sizes are identical but have either a changed hash or a new one.. Note that this does not necessarily indicate a changed file as hashes have been added to existing files.
-*  Monitor.get\_dv\_fid() now explictly selects highest ROWID when returning a Dryad UID as UIDs are not considered persistent identifiers (as per email from Dryad January 2022)
+*  Monitor.get\_dv\_fid() now explicitly selects highest ROWID when returning a Dryad UID as UIDs are not considered persistent identifiers (as per email from Dryad January 2022)
 
 **dryadd.py**
 
@@ -32,7 +32,7 @@ Changes to the Dryad API sparked a few changes to dryad2dataverse and dryadd.py.
 
 **Other**
 
-* Binary files are now only included as part of a github release
+* Binary files are now only included as part of a Github release
 * Binary release now includes linux x86-64
 * Dataverse utilities scripts removed; use [dataverse_utils](https://github.com/ubc-library-rc/dataverse_utils) instead.
 
