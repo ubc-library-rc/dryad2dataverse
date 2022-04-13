@@ -410,6 +410,32 @@ Creates a dryad2dataverse.transfer.Transfer instance.
 
 Expunges files from constants.TMP on deletion
 
+<a name="dryad2dataverse.transfer.Transfer.test_api_key"></a>
+
+##### test\_api\_key
+
+```python
+ | test_api_key(url=None, apikey=None)
+```
+
+Tests for an expired API key and raises
+dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
+the API key is bad.
+
+----------------------------------------
+
+**Arguments**:
+
+  
+  url : str
+  — Base URL to Dataverse installation.
+  Defaults to dryad2dataverse.constants.DVURL
+  
+  apikey : str
+  — Default dryad2dataverse.constants.APIKEY.
+  
+  ----------------------------------------
+
 <a name="dryad2dataverse.transfer.Transfer.dvpid"></a>
 
 ##### dvpid
@@ -1143,4 +1169,14 @@ class DataverseDownloadError(Dryad2DataverseError)
 ```
 
 Returned on not OK respose (ie, not requests.status_code == 200).
+
+<a name="dryad2dataverse.exceptions.DataverseBadApiKeyError"></a>
+
+### DataverseBadApiKeyError Objects
+
+```python
+class DataverseBadApiKeyError(Dryad2DataverseError)
+```
+
+Returned on not OK respose (ie, request.request.json()['message'] == 'Bad api key ').
 

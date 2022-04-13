@@ -53,8 +53,9 @@ class Transfer():
 
     def test_api_key(self, url=None, apikey=None):
         '''
-        Tests for an expired API key and "gracefully" quits if
-        the API key is bad
+        Tests for an expired API key and raises
+        dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
+        the API key is bad.
 
         ----------------------------------------
         Parameters:
