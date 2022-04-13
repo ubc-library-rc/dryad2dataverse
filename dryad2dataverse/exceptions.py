@@ -37,3 +37,8 @@ class DataverseDownloadError(Dryad2DataverseError):
     '''
     Returned on not OK respose (ie, not requests.status_code == 200).
     '''
+
+class DataverseBadApiKeyError(Dryad2DataverseError):
+    '''
+    Returned on not OK respose (ie, request.request.json()['message'] == 'Bad api key ').
+    '''

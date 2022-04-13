@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import time
+import traceback
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -18,7 +19,6 @@ from dryad2dataverse import exceptions
 
 LOGGER = logging.getLogger(__name__)
 URL_LOGGER = logging.getLogger('urllib3')
-
 
 class Transfer():
     '''
@@ -50,6 +50,47 @@ class Transfer():
         for f in self.files:
             if os.path.exists(f'{constants.TMP}{os.sep}{f[1]}'):
                 os.remove(f'{constants.TMP}{os.sep}{f[1]}')
+
+    def test_api_key(self, url=None, apikey=None):
+        '''
+        Tests for an expired API key and "gracefully" quits if
+        the API key is bad
+
+        ----------------------------------------
+        Parameters:
+
+        url : str
+            — Base URL to Dataverse installation.
+              Defaults to dryad2dataverse.constants.DVURL
+
+        apikey : str
+            — Default dryad2dataverse.constants.APIKEY.
+
+        ----------------------------------------
+        '''
+        #API validity check appears to come before a PID validity check
+        params = {'persistentId': 'doi:000/000/000'} # PID is irrelevant
+        if not url:
+            url = constants.DVURL
+        headers = {'X-Dataverse-key': apikey if apikey else constants.APIKEY}
+        bad_test = self.session.get(f'{url}/api/datasets/:persistentId',
+                                headers=headers,
+                                params=params)
+        #There's an extra space in the message which Harvard
+        #will probably find out about, so . . .
+        if bad_test.json().get('message').startswith('Bad api key'):
+            try:
+                raise exceptions.DataverseBadApiKeyError('Bad API key')
+            except exceptions.DataverseBadApiKeyError as e:
+                LOGGER.exception(e)
+                LOGGER.exception(traceback.format_exc())
+                raise exceptions.DataverseBadApiKeyError
+        try: #other errors
+            bad_test.raise_for_status()
+        except Exception as e:
+            LOGGER.exception(e)
+            LOGGER.exception(traceback.format_exc())
+            raise
 
     @property
     def dvpid(self):
@@ -266,16 +307,22 @@ class Transfer():
             #self._dvrecord = upload.json()
             LOGGER.debug(upload.text)
 
-        upload.raise_for_status()
-        updata = upload.json()
-        self.dvStudy = updata
-        #probably should raise something specific here
-        if updata.get('status') != 'OK':
-            try:
-                raise exceptions.DataverseUploadError('Status return is not OK')
-            except exceptions.DataverseUploadError as e:
-                LOGGER.exception(e)
-                raise
+        try:
+            updata = upload.json()
+            self.dvStudy = updata
+            if updata.get('status') != 'OK':
+                try:
+                    raise exceptions.DataverseUploadError('Status return is not OK')
+                except exceptions.DataverseUploadError as e:
+                    LOGGER.exception(e)
+                    LOGGER.exception(traceback.format_exc())
+                    raise exceptions.DataverseUploadError('Status return is not OK')
+            upload.raise_for_status()
+        except Exception as e: # Only accessible via non-requests exception
+            LOGGER.exception(e)
+            LOGGER.exception(traceback.format_exc())
+            raise
+
         if targetDv:
             self.dryad.dvpid = updata['data'].get('persistentId')
         if dvpid:
