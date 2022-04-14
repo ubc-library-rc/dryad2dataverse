@@ -119,6 +119,8 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#_del__">_del__</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#test_api_key">test_api_key</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dvpid">dvpid</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#auth">auth</a>
@@ -200,6 +202,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#dataverseuploaderror-objects">DataverseUploadError Objects</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#dataversedownloaderror-objects">DataverseDownloadError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dataversebadapikeyerror-objects">DataverseBadApiKeyError Objects</a>
     </li>
         </ul>
     </li>
@@ -522,6 +526,22 @@ Dryad installation to Dataverse installation.</p>
 
 
 <p>Expunges files from constants.TMP on deletion</p>
+<p><a name="dryad2dataverse.transfer.Transfer.test_api_key"></a></p>
+<h5 id="test_api_key">test_api_key<a class="headerlink" href="#test_api_key" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | test_api_key(url=None, apikey=None)</code></pre>
+
+
+<p>Tests for an expired API key and raises
+dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
+the API key is bad.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>url : str
+  — Base URL to Dataverse installation.
+  Defaults to dryad2dataverse.constants.DVURL</p>
+<p>apikey : str
+  — Default dryad2dataverse.constants.APIKEY.</p>
+<hr />
 <p><a name="dryad2dataverse.transfer.Transfer.dvpid"></a></p>
 <h5 id="dvpid">dvpid<a class="headerlink" href="#dvpid" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | @property
@@ -990,6 +1010,12 @@ Dryad file size.</p>
 
 
 <p>Returned on not OK respose (ie, not requests.status_code == 200).</p>
+<p><a name="dryad2dataverse.exceptions.DataverseBadApiKeyError"></a></p>
+<h3 id="dataversebadapikeyerror-objects">DataverseBadApiKeyError Objects<a class="headerlink" href="#dataversebadapikeyerror-objects" title="Permanent link">&para;</a></h3>
+<pre class="codehilite"><code class="language-python">class DataverseBadApiKeyError(Dryad2DataverseError)</code></pre>
+
+
+<p>Returned on not OK respose (ie, request.request.json()[&lsquo;message&rsquo;] == &lsquo;Bad api key &lsquo;).</p>
               
             </div>
           </div>

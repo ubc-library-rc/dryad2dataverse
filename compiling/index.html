@@ -69,7 +69,7 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#windows">Windows</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#mac">Mac</a>
+    <li class="toctree-l2"><a class="reference internal" href="#mac-and-linux">Mac and Linux</a>
     </li>
     </ul>
                     </li>
@@ -131,11 +131,11 @@
             <div class="section">
               
                 <h1 id="compiling-andor-packaging-the-dryadd-script">Compiling and/or packaging the dryadd script<a class="headerlink" href="#compiling-andor-packaging-the-dryadd-script" title="Permanent link">&para;</a></h1>
-<p>While binaries for Windows and Mac are <a href="https://github.com/ubc-library-rc/dryad2dataverse/tree/master/binaries">supplied</a>, should you wish to create them yourself from the dryadd.py script, you can so so following the procedure below. This can be done with either <a href="https://nuitka.net/">nuitka</a> or <a href="https://pyinstaller.readthedocs.io/en/stable/">PyInstaller</a>.</p>
+<p>While binaries for Windows, Mac and Linux are <a href="https://github.com/ubc-library-rc/dryad2dataverse/releases">supplied</a>, should you wish to create them yourself from the dryadd.py script, you can so so following the procedure below. This can be done with either <a href="https://nuitka.net/">nuitka</a> or <a href="https://pyinstaller.readthedocs.io/en/stable/">PyInstaller</a>.</p>
 <p>Note that <em>nuitka</em> will compile to a C application, but PyInstaller packages everything to create a standalone application that is not a pure C application. Whether this matters is open for debate. </p>
 <h3 id="windows">Windows<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h3>
 <p>With <em>nuitka</em>:</p>
-<pre class="codehilite"><code>nuitka --follow-imports --onefile --windows-product-name=dryadd --windows-product-version=0.1.1 --windows-company-name=&quot;University of British Columbia Library&quot;  \path\to\dryad2dataverse\scripts\dryadd.py</code></pre>
+<pre class="codehilite"><code>nuitka --onefile --windows-product-name=dryadd --windows-product-version=0.1.1 --windows-company-name=&quot;University of British Columbia Library&quot;  \path\to\dryad2dataverse\scripts\dryadd.py</code></pre>
 
 
 <p>Note that the &ndash;windows-product-[x] options are required, but there&rsquo;s nothing preventing you from using whatever information you prefer. Also, the version string listed on this page is only an example; use the current version.</p>
@@ -143,12 +143,12 @@
 <pre class="codehilite"><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py</code></pre>
 
 
-<h3 id="mac">Mac<a class="headerlink" href="#mac" title="Permanent link">&para;</a></h3>
+<h3 id="mac-and-linux">Mac and Linux<a class="headerlink" href="#mac-and-linux" title="Permanent link">&para;</a></h3>
 <p>with <em>nuitka</em>:</p>
-<p>The <em>nuitka</em> <code>--onefile</code> option is currently not available for MacOS. It&rsquo;s possible to compile using the <code>--standalone</code> flag, but the utility of this is debatable.</p>
-<pre class="codehilite"><code>nuitka  --follow-imports --standalone /path/to/dryad2dataverse/scripts/dryadd.py</code></pre>
+<pre class="codehilite"><code>nuitka --onefile /path/to/dryad2dataverse/scripts/dryadd.py</code></pre>
 
 
+<p>Note that with some installations of linux, you may be required to supply a Python icon if one is not found on your system. Either download or create one (and a PNG will work) and suppy it with <code>--linux-onefile-icon=ICON_PATH</code></p>
 <p>with <em>PyInstaller</em>:</p>
 <pre class="codehilite"><code>python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py</code></pre>
               
