@@ -24,7 +24,7 @@ import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 
-VERSION = (0, 4, 1)
+VERSION = (0, 4, 2)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -161,7 +161,7 @@ def __bad_dates(rectuple: tuple, mod_date: str) -> tuple:
         return tuple(records)
     return rectuple
 
-def get_records(ror: 'str', mod_date=None, verbosity=True):
+def get_records(ror: 'str', mod_date=None, verbosity=True, timeout=100):
     '''
     returns a tuple of ((doi, metadata), ...). Dryad searches return complete
     study metadata from the search, surprisingly.
@@ -178,6 +178,9 @@ def get_records(ror: 'str', mod_date=None, verbosity=True):
 
     verbosity : bool
        Output some data to stdout
+
+    timeout : int
+        request timeout in seconds
     '''
     headers = {'accept':'application/json',
                'Content-Type':'application/json'}
@@ -187,7 +190,7 @@ def get_records(ror: 'str', mod_date=None, verbosity=True):
     if mod_date:
         params['modifiedSince'] = mod_date
     stud = requests.get(f'{DRY}/search', headers=headers,
-                        params=params)
+                        params=params, timeout=timeout)
     records = []
     total = stud.json()['total']
     if verbosity:
@@ -199,7 +202,8 @@ def get_records(ror: 'str', mod_date=None, verbosity=True):
         params['page'] = data+1
         stud = requests.get(f'{DRY}/search',
                             headers=headers,
-                            params=params)
+                            params=params,
+                            timeout=timeout)
         time.sleep(10) # don't overload their system with API calls
         stud.raise_for_status()
         records += stud.json()['_embedded']['stash:datasets']
@@ -544,6 +548,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
             verbo(args.verbosity, **{'Status': update_type})
             #create a transfer object to copy the files over
             transfer = dryad2dataverse.transfer.Transfer(study)
+            transfer.test_api_key()
 
             #Now start the action
             if update_type == 'new':
@@ -607,6 +612,11 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                      f'Log available at: {log}'))
         notify(finished, user=args.user, pwd=args.pwd,
                recipient=args.recipients)
+    except dryad2dataverse.exceptions.DataverseBadApiKeyError as api_err:
+        logger.exception(api_err)
+        elog.exception(api_err)
+        print(f'Error: {api_err}. Exiting. For details see log at {args.log}.')
+        sys.exit()#graceful exit is graceful
     except Exception as err:
         logger.critical('Critical failure with DOI: %s, '
                         'Dryad URL: https://datadryad.org/stash/dataset/%s, '
@@ -621,8 +631,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                       dryad2dataverse.constants.DVURL+
                       '/dataset.xhtml?persistentId='+transfer.dvpid)
         elog.exception(err)
-        #elog.critical(err)
-        raise
+        print(f'Error: {err}. Exiting. For details see log at {args.log}.')
+        sys.exit()
 
 if __name__ == '__main__':
     main()

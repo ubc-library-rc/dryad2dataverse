@@ -84,8 +84,8 @@ class Transfer():
                 raise exceptions.DataverseBadApiKeyError('Bad API key')
             except exceptions.DataverseBadApiKeyError as e:
                 LOGGER.exception(e)
-                LOGGER.exception(traceback.format_exc())
-                raise exceptions.DataverseBadApiKeyError
+                #LOGGER.exception(traceback.format_exc()) #not really necessary
+                raise 
         try: #other errors
             bad_test.raise_for_status()
         except Exception as e:
