@@ -29,10 +29,8 @@ python -m PyInstaller -F \path\to\dryad2dataverse\scripts\dryadd.py
 
 with *nuitka*:
 
-The *nuitka* `--onefile` option is currently not available for MacOS. It's possible to compile using the `--standalone` flag, but the utility of this is debatable.
-
 ```
-nuitka  --follow-imports --standalone /path/to/dryad2dataverse/scripts/dryadd.py
+nuitka  --follow-imports --onefile /path/to/dryad2dataverse/scripts/dryadd.py
 ```
 
 with *PyInstaller*:
