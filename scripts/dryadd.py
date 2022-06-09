@@ -430,7 +430,8 @@ def checkwarn(val:int, warn:int, **kwargs) -> None:
         Email notification information.
         {'user': user email,
          'recipient':[list of recipients],
-         'pwd' ; email server password]}
+         'pwd' ; email server password],
+         'mailserv' : smtp mail server}
         see dryadd.notify for full details of parameters.
 
         Include log info:
@@ -450,6 +451,7 @@ def checkwarn(val:int, warn:int, **kwargs) -> None:
             logme.warning(mess)
         notify(msgtxt=(subject, mess),
                user=kwargs['user'], pwd=kwargs['pwd'],
+               mailserv=kwargs['mailserv'],
                recipient=kwargs['recipient'])
         sys.exit()
 
@@ -563,6 +565,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 transfer.set_correct_date()
                 notify(new_content(study),
                        user=args.user, pwd=args.pwd,
+                       mailserv=args.mailserv,
                        recipient=args.recipients)
 
             elif update_type == 'updated':
@@ -576,6 +579,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 transfer.set_correct_date()
                 notify(changed_content(study, monitor),
                        user=args.user, pwd=args.pwd,
+                       mailserv=args.mailserv,
                        recipient=args.recipients)
 
                 #new, identical, updated, lastmodsame
@@ -611,7 +615,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                     ('Dryad to Dataverse transfer daemon has completed.\n'
                      f'Log available at: {log}'))
         notify(finished, user=args.user, pwd=args.pwd,
-               recipient=args.recipients)
+               mailserv=args.mailserv, recipient=args.recipients)
     except dryad2dataverse.exceptions.DataverseBadApiKeyError as api_err:
         logger.exception(api_err)
         elog.exception(api_err)
