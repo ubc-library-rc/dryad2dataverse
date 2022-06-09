@@ -55,7 +55,7 @@ class Transfer():
         '''
         Tests for an expired API key and raises
         dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
-        the API key is bad.
+        the API key is bad. Ignores other HTTP errors.
 
         ----------------------------------------
         Parameters:
@@ -83,11 +83,14 @@ class Transfer():
             try:
                 raise exceptions.DataverseBadApiKeyError('Bad API key')
             except exceptions.DataverseBadApiKeyError as e:
+                LOGGER.critical('API key has expired or is otherwise invalid')
                 LOGGER.exception(e)
                 #LOGGER.exception(traceback.format_exc()) #not really necessary
-                raise 
+                raise
         try: #other errors
             bad_test.raise_for_status()
+        except requests.exceptions.HTTPError:
+            pass
         except Exception as e:
             LOGGER.exception(e)
             LOGGER.exception(traceback.format_exc())
