@@ -8,6 +8,7 @@ Requires Python 3.6+ and requests library
 
 from  email.message import EmailMessage as Em
 import argparse
+import ast
 import datetime
 import glob
 import logging
@@ -16,6 +17,7 @@ import os
 import shutil
 import smtplib
 import sys
+import textwrap
 import time
 
 import requests
@@ -23,8 +25,9 @@ import dryad2dataverse
 import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
+from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 4, 2)
+VERSION = (0, 5, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -71,10 +74,49 @@ def changed_content(serial, monitor):
             \n{serial.oversize}'
     return (subject, content)
 
+def __clean_msg(msg:str, width=100) -> str:
+    '''
+    Cleans a string for nice, legible emailing
+
+    Who knew there were limits to email sizes?
+    https://www.rfc-editor.org/rfc/rfc2821#section-4.5.3.1
+    '''
+    msg = msg.split('\n')
+    msg = [x.strip() for x in msg]
+    for num, val in enumerate(msg):
+        #list with tuples
+        if val.startswith('[('):
+            details = ast.literal_eval(val)
+            details = [list(x) for x in details]
+            for num2, val2 in enumerate(details):
+                #print('val2')
+                #print (val2)
+                details[num2] = '\n'.join(textwrap.wrap(', '.join([str(x) for x in val2]),
+                                                        width=width))
+                #print(details)
+            msg[num] = '\n'.join(details)
+        #single list
+        elif val.startswith('['):
+            msg[num] = '\n'.join(textwrap.wrap(str(val), width=width))
+    msg = [x for x in msg if x]
+    msg = '\n'.join(msg)
+    return msg
+
+def __fyahoo(user:str, mailserv:str) -> str:
+    '''
+    If yahoo, returns formatted username
+    '''
+    print(mailserv)
+    if 'yahoo' in mailserv.lower():
+        if not user.endswith('@yahoo.com'):
+            return user + '@yahoo.com'
+    return user
+
 def notify(msgtxt,
            user=None, pwd=None,
            mailserv='smtp.gmail.com',
-           port=None, recipient=None):
+           port=None, recipient=None,
+           width=100):
     '''
     Basic email change notifier. Will sent email outlining metadata changes
     to recipient. Uses SSL.
@@ -106,19 +148,26 @@ def notify(msgtxt,
         Mailserver port. Default 465
     recipient : list
         List of email addresses of recipients
+    width : int
+        Maximum line length. Max 1000
     '''
-
+    #pylint: disable=too-many-arguments
     if not port:
         #port = 587
         port = 465
+    #EABOD yahoo
+
+    user = __fyahoo(user, mailserv)
+
     msg = Em()
     msg['Subject'] = msgtxt[0]
     msg['From'] = user
     msg['To'] = recipient
 
-    content = msgtxt[1]
+    content = __clean_msg(msgtxt[1], max(width, 1000))
     msg.set_content(content)
     server = smtplib.SMTP_SSL(mailserv, port)
+
     server.login(user, pwd)
     #To must be split. See
     #https://stackoverflow.com/questions/8856117/
@@ -211,8 +260,8 @@ def get_records(ror: 'str', mod_date=None, verbosity=True, timeout=100):
 
     #return tuple([(x['identifier'], x) for x in records])
     #This can be removed when they fix the API
-    return __bad_dates(tuple([(x['identifier'], x)
-                              for x in records]),
+    return __bad_dates(tuple((x['identifier'], x)
+                              for x in records),
                               mod_date)
 
 def argp():
@@ -268,7 +317,8 @@ def argp():
                         'Mail is sent using SSL.',
                         required=False,
                         type=int,
-                        default=587,
+                        #default=587,
+                        default=465,
                         dest='port')
     parser.add_argument('-c', '--contact',
                         help='REQUIRED: Contact email address for Dataverse records. '
@@ -353,8 +403,8 @@ def set_constants(args):
     if args.dbase:
         dryad2dataverse.constants.DBASE = args.dbase
 
-def email_log(mailhost, fromaddr, toaddrs, credentials, secure=(),
-              level=logging.WARNING):
+def email_log(mailhost, fromaddr, toaddrs, credentials, port=465, secure=(),
+              level=logging.WARNING, timeout=100):
     '''
     Emails log error messages to recipient
 
@@ -366,6 +416,7 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, secure=(),
         Recipient of email
     credentials : tuple
         (Username, password) tuple
+    port : Mailserver port. Default 465
     secure : tuple
         The tuple should be either an empty tuple, or a single-value tuple with
         the name of a keyfile, or a 2-value tuple with the names of the keyfile
@@ -374,15 +425,22 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, secure=(),
     level : int
         logging level. Default logging.WARNING
     '''
+    #pylint: disable=too-many-arguments
+    #Because consistency is for suckers and yahoo requires full hostname
+    credentials = (__fyahoo(credentials[0], mailhost), credentials[1])
     subject = 'Dryad to Dataverse transfer error'
     elog = logging.getLogger('email_log')
-    mailer = logging.handlers.SMTPHandler(mailhost=mailhost, fromaddr=fromaddr,
-                                          toaddrs=toaddrs, subject=subject,
-                                          credentials=credentials, secure=secure)
+    print((mailhost, port), fromaddr, toaddrs, credentials, secure, level, subject, timeout)
+    mailer = SSLSMTPHandler(mailhost=(mailhost, port),
+                            fromaddr=fromaddr,
+                            toaddrs=toaddrs, subject=subject,
+                            credentials=credentials, secure=secure,
+                            timeout=timeout)
     l_format = logging.Formatter('%(name)s - %(asctime)s'
                                  ' - %(levelname)s - %(funcName)s - '
                                  '%(message)s')
     mailer.setFormatter(l_format)
+    mailer.setLevel(level)
     elog.addHandler(mailer)
     elog.setLevel(level)
     return elog
@@ -401,10 +459,10 @@ def rotating_log(path, level):
     #Set all the logs to the same level:
     #https://stackoverflow.com/questions/35325042/
     #python-logging-disable-logging-from-imported-modules
-    for na in ['dryad2dataverse.serializer',
+    for name in ['dryad2dataverse.serializer',
                'dryad2dataverse.transfer',
                'dryad2dataverse.monitor']:
-        logging.getLogger(na).setLevel(level)
+        logging.getLogger(name).setLevel(level)
     rotator = logging.handlers.RotatingFileHandler(filename=path,
                                                    maxBytes=10*1024**2,
                                                    backupCount=10)
@@ -413,6 +471,7 @@ def rotating_log(path, level):
                                  ' - %(levelname)s - %(funcName)s - '
                                  '%(message)s')
     rotator.setFormatter(l_format)
+    rotator.setLevel(level)
     logger.setLevel(level)
     return logger
 
@@ -475,6 +534,9 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     level : int
         log level, usually one of logging.LOGLEVEL (ie, logging.warning)
     '''
+    #pylint: disable=too-many-branches
+    #pylint: disable=too-many-statements
+    #pylint: disable=too-many-locals
     parser = argp()
     args = parser.parse_args()
     if args.log:
@@ -482,9 +544,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     logger = rotating_log(log, level)
 
     set_constants(args)
-
-    elog = email_log((args.mailserv, args.port), args.contact, args.recipients,
-                     (args.user, args.pwd))
+    elog = email_log(args.mailserv, args.contact, args.recipients,
+                     (args.user, args.pwd), port=args.port)
 
 
     logger.info('Beginning update process')
@@ -504,7 +565,9 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         os.remove(fil)
     logger.info('Last update time: %s', monitor.lastmod)
     #get all updates since the last update check
-    updates = get_records(args.ror, monitor.lastmod,
+    #updates = get_records(args.ror, monitor.lastmod,
+    #                      verbosity=args.verbosity)
+    updates = get_records(args.ror, '2022-10-01T00:00:00Z',
                           verbosity=args.verbosity)
     logger.info('Total new files: %s', len(updates))
     elog.info('Total new files: %s', len(updates))
@@ -518,7 +581,8 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     verbo(args.verbosity, **{'Total to process': len(updates)})
     try:
         count = 0
-        for doi in updates:
+        #for doi in updates:
+        for doi in [x for x in updates if x[0]=='doi:10.5061/dryad.2b906']:
             count += 1
             logger.info('Start processing %s of %s', count, len(updates))
             logger.info('DOI: %s, Dryad URL: https://datadryad.org/stash/dataset/%s',
@@ -551,7 +615,15 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
             #create a transfer object to copy the files over
             transfer = dryad2dataverse.transfer.Transfer(study)
             transfer.test_api_key()
-
+            #--------------
+            #study.dvpid='000000'
+            #notify(new_content(study),
+            #       user=args.user, pwd=args.pwd,
+            #       mailserv=args.mailserv,
+            #       recipient=args.recipients)
+            #sys.exit()
+            #print('I should have stopped here')
+            #--------------
             #Now start the action
             if update_type == 'new':
                 logger.info('New study: %s, %s', doi[0], doi[1]['title'])
@@ -621,7 +693,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         elog.exception(api_err)
         print(f'Error: {api_err}. Exiting. For details see log at {args.log}.')
         sys.exit()#graceful exit is graceful
-    except Exception as err:
+    except Exception as err: # pylint: disable=broad-except
         logger.critical('Critical failure with DOI: %s, '
                         'Dryad URL: https://datadryad.org/stash/dataset/%s, '
                         'Dataverse URL: %s', transfer.doi, transfer.doi,
