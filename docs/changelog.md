@@ -2,6 +2,21 @@
 
 Perfection on the first attempt is rare.
 
+## v0.5.0 - 7 December 2022
+
+**dataverse.handlers**
+
+* New handler component
+* Custom SSL log handler `SSLSMTPHandler` added which reduces frequency of email problems
+
+**dryadd.py**
+
+* Mail formatting changed to ensure lines are less than 1000 characters in length to adhere to [RFC 2825 4.5.3.5] (https://www.rfc-editor.org/rfc/rfc2821#section-4.5.3.1).
+* Logging messages contain more information
+* Default mail service changed to Yahoo mail
+* Default dataverse server destination changed to `https://borealisdata.ca`
+* Help text cleanup
+
 ## v0.3.1 - 4 February 2022
 
 Changes to the Dryad API sparked a few changes to dryad2dataverse and dryadd.py. More specifically, the Dryad `/search` API endpoint can produce false positive results, which can result in bulk study replacement when none is required. Additionally, as file IDs are not unique in Dryad (contrary to the documentation), files are no longer identified on the basis of Dryad file ID.

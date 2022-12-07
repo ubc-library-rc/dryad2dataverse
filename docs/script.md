@@ -43,7 +43,8 @@ This product **will not** publish anything in a Dataverse installation (at this 
 * The API key must have sufficient privileges to create new studies and upload data.
 * You will need an email address for contact information as this is a required field in Dataverse (but not necessarily in Dryad) and a name to go with it. For example, `i_heart_data@test.invalid` and `Dataverse Support`. Note: Use a valid email address (unlike the example) because uploads will also fail if the address is invalid.
 * Information for an email address which *sends* notifications
-	* For this, you need the user name ("user" from "user@test.invalid")
+	* The sending email address  ("user@test.invalid")
+	* The user name (usually, but not always, "user" from "user@test.invalid")
 	* The password for this account
 	* The smtp server address which sends mail. For example, if using gmail, it's `smtp.gmail.com`
 	* The port required to send email via SSL.
@@ -52,7 +53,7 @@ This product **will not** publish anything in a Dataverse installation (at this 
 
 **A note about GMail**
 
-Although the script is set up to use GMail by default, it likely won't work off the bat. You will need to allow _less secure app access_ and possibly deal with a capture as outlined in the [FAQ](faq.md).
+Dryad2dataverse is now set up to use yahoo email by default, because it doesn't require two-factor authentication to use. If you decide to use Google mail, you will need to follow the procedure outlined here <https://support.google.com/accounts/answer/185833?hl=en>. Note that it will require enabling two-factor authentication.
 
 **Updates to Dryad studies**
 
@@ -73,24 +74,25 @@ The implementation is relatively straightforward. Simply supply the required par
 
 
 ```nohighlight
-usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP] [--db DBASE]
-                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
+usage: dryadd.py [-h] [-u URL] -k KEY -t TARGET -e EMAIL -s USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP]
+                 [--db DBASE] [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
 
-Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are REQUIRED. Arguments in [square brackets] are not required. The "optional arguments" below refers to
-the use of the option switch, (like -u), meaning "not a positional argument."
+Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are required for the script to run but some may already have defaults, specified by "Default". The
+"optional arguments" below refers to the use of the option switch, (like -u), meaning "not a positional argument."
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -u URL, --dv-url URL  REQUIRED: Destination dataverse root url. Default: https://dataverse.scholarsportal.info
+  -u URL, --dv-url URL  Destination Dataverse root url. Default: https://borealisdata.ca
   -k KEY, --key KEY     REQUIRED: API key for dataverse user
   -t TARGET, --target TARGET
                         REQUIRED: Target dataverse short name
-  -e USER, --email USER
-                        REQUIRED: Username for email address which sends update notifications. ie, the "user" portion of "user@website.invalid".
+  -e EMAIL, --email EMAIL
+                        REQUIRED: Email address which sends update notifications. ie: "user@website.invalid".
+  -s USER, --user USER  REQUIRED: User name for SMTP server. Check your server for details.
   -r RECIPIENTS [RECIPIENTS ...], --recipient RECIPIENTS [RECIPIENTS ...]
                         REQUIRED: Recipient(s) of email notification. Separate addresses with spaces
   -p PWD, --pwd PWD     REQUIRED: Password for sending email account. Enclose in single quotes to avoid OS errors with special characters.
-  --server MAILSERV     Mail server for sending account. Default: smtp.gmail.com
+  --server MAILSERV     Mail server for sending account. Default: smtp.mail.yahoo.com
   --port PORT           Mail server port. Default: 465. Mail is sent using SSL.
   -c CONTACT, --contact CONTACT
                         REQUIRED: Contact email address for Dataverse records. Must pass Dataverse email validation rules (so "test@test.invalid" is not acceptable).

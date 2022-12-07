@@ -27,7 +27,7 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 5, 0)
+VERSION = (0, 5, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -250,16 +250,18 @@ def argp():
     Argument parser
     '''
     description = ('Dryad to Dataverse import daemon. '
-                   'All arguments NOT enclosed by square brackets are REQUIRED. '
-                   'Arguments in [square brackets] are not required. '
+                   'All arguments NOT enclosed by square brackets are required for '
+                   'the script to run but some may already have defaults, specified '
+                   'by "Default". '
                    'The "optional arguments" below refers to the use of the option switch, '
                    '(like -u), meaning "not a positional argument."'
                    )
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-u', '--dv-url',
-                        help='REQUIRED: Destination dataverse root url. '
-                        'Default: https://dataverse.scholarsportal.info',
-                        required=True,
+                        help='Destination Dataverse root url. '
+                        'Default: https://borealisdata.ca',
+                        required=False,
+                        default='https://borealisdata.ca',
                         dest='url')
     parser.add_argument('-k', '--key',
                         help='REQUIRED: API key for dataverse user',
@@ -270,13 +272,13 @@ def argp():
                         required=True,
                         dest='target')
     parser.add_argument('-e', '--email',
-                        help='REQUIRED:  Email address '
+                        help='REQUIRED: Email address '
                         'which sends update notifications. ie: '
                         '"user@website.invalid".',
                         required=True,
                         dest='email')
     parser.add_argument('-s', '--user',
-                        help=('User name for SMTP server. Check '
+                        help=('REQUIRED: User name for SMTP server. Check '
                               'your server for details. '),
                         required=True,
                         dest='user')

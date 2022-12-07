@@ -19,6 +19,11 @@ Of course, if you want to use a branch other than _master_, you can switch _mast
 
 ## Manual Download
 
+### Precompiled binaries
+
+Compiled versions of the `dryadd` migrator for selected operating systems and architectures are available at the [releases page](https://github.com/ubc-library-rc/dryad2dataverse/releases). Note that binary releases may lag behind the Python, and of course the binary files don't include the Python package.
+
+### Source code
 The source code for this project is available at <https://github.com/ubc-library-rc/dryad2dataverse>
 
 To install, first clone the repository:

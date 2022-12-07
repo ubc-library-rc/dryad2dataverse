@@ -15,6 +15,12 @@ Note that the false positives do not upload incorrect data; they will just creat
 
 #### **Why is the upload script (dryadd.py) constantly crashing with SMTP errors?**
 
+**Updated 7 December 2022**
+
+Version 0.5.0 + should solve this issue. Google authentication using app passwords is now supported, but requires that the account use two-factor authentication.
+
+**If you are not at v0.5.0+, the old, deprecated answer is:**
+
 If you are using Gmail to send messages about your migration, there are a few potential hurdles.
 
 1. You *must* enable [**less secure app access**](https://support.google.com/accounts/answer/6010255?hl=en).

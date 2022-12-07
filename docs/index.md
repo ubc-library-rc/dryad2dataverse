@@ -45,7 +45,7 @@ There are a few reasons why you might find this product useful.
 
 * You want to write your Dryad JSON and have it convert automatically.
 
-* Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution's research data (for example, the Dataverse repository at <https://dataverse.scholarsportal.info>).
+* Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution's research data (for example, the Dataverse repository at <https://borealisdata.ca>).
 
 * And on top of that, you don't want to keep checking to see if there were any updates, so you wish to automate the process.
 
@@ -54,6 +54,8 @@ There are a few reasons why you might find this product useful.
 ```nohighlight
 pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master
 ```
+
+or, if you want to stay clear of anything related to a command line, download a compiled version of the migrator `dryadd` only for your computer system at the [releases page](https://github.com/ubc-library-rc/dryad2dataverse/releases). Note that binary releases may lag behind the Python though.
 
 ## Basic usage
 
