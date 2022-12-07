@@ -1,63 +1,56 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Command line application - Dryad2dataverse</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../css/theme.css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  <link href="../css/extra.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Command line application";
-    var mkdocs_page_input_path = "script.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Command line application - Dryad2dataverse</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Command line application";
+        var mkdocs_page_input_path = "script.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dryad2dataverse</a>
-        <div role="search">
+          <a href=".." class="icon icon-home"> Dryad2dataverse
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
-                    </li>
-                </ul>
-                <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Command line application</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Command line application</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#an-important-caveat">An important caveat</a>
     </li>
@@ -66,71 +59,62 @@
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
     </ul>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../other_utils/">Other utilities</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../compiling/">Compiling or packaging the application</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../reference/">General Reference</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API Reference</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
-                    </li>
-                </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../other_utils/">Other utilities</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../compiling/">Compiling or packaging the application</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../reference/">General Reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API Reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
+                </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Dryad2dataverse</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Dryad2dataverse</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Command line application</li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Command line application</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h1 id="automated-migrator-and-tracker-dryadd">Automated migrator and tracker - dryadd<a class="headerlink" href="#automated-migrator-and-tracker-dryadd" title="Permanent link">&para;</a></h1>
 <hr />
@@ -167,7 +151,8 @@
 <li>The API key must have sufficient privileges to create new studies and upload data.</li>
 <li>You will need an email address for contact information as this is a required field in Dataverse (but not necessarily in Dryad) and a name to go with it. For example, <code>i_heart_data@test.invalid</code> and <code>Dataverse Support</code>. Note: Use a valid email address (unlike the example) because uploads will also fail if the address is invalid.</li>
 <li>Information for an email address which <em>sends</em> notifications<ul>
-<li>For this, you need the user name (&ldquo;user&rdquo; from &ldquo;user@test.invalid&rdquo;)</li>
+<li>The sending email address  (&ldquo;user@test.invalid&rdquo;)</li>
+<li>The user name (usually, but not always, &ldquo;user&rdquo; from &ldquo;user@test.invalid&rdquo;)</li>
 <li>The password for this account</li>
 <li>The smtp server address which sends mail. For example, if using gmail, it&rsquo;s <code>smtp.gmail.com</code></li>
 <li>The port required to send email via SSL.</li>
@@ -177,7 +162,7 @@
 <li>A place to store your sqlite3 tracking database.</li>
 </ul>
 <p><strong>A note about GMail</strong></p>
-<p>Although the script is set up to use GMail by default, it likely won&rsquo;t work off the bat. You will need to allow <em>less secure app access</em> and possibly deal with a capture as outlined in the <a href="../faq/">FAQ</a>.</p>
+<p>Dryad2dataverse is now set up to use yahoo email by default, because it doesn&rsquo;t require two-factor authentication to use. If you decide to use Google mail, you will need to follow the procedure outlined here <a href="https://support.google.com/accounts/answer/185833?hl=en">https://support.google.com/accounts/answer/185833?hl=en</a>. Note that it will require enabling two-factor authentication.</p>
 <p><strong>Updates to Dryad studies</strong></p>
 <p>The software is designed to automatically update changed studies. Simply run the utility with the same parameters as the previous run and any studies in Dataverse will be updated</p>
 <p><strong>Miscellaneous</strong></p>
@@ -186,24 +171,25 @@
 <p>To act as a backup against catastrophic error, the monitoring database is automatically copied and renamed with a timestamp. Although the default number of backups is 3 by default, any number of backups can be kept. Obviously, if you run the software once a minute this isn&rsquo;t helpful, but it could be if you update once a month.</p>
 <h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
 <p>The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest. The help menu below is available from the command line by either running the script without inputs or by using the <code>-h</code> switch.</p>
-<pre class="codehilite"><code class="language-nohighlight">usage: dryadd.py [-h] -u URL -k KEY -t TARGET -e USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP] [--db DBASE]
-                 [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
+<pre><code class="language-nohighlight">usage: dryadd.py [-h] [-u URL] -k KEY -t TARGET -e EMAIL -s USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP]
+                 [--db DBASE] [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
 
-Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are REQUIRED. Arguments in [square brackets] are not required. The &quot;optional arguments&quot; below refers to
-the use of the option switch, (like -u), meaning &quot;not a positional argument.&quot;
+Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are required for the script to run but some may already have defaults, specified by &quot;Default&quot;. The
+&quot;optional arguments&quot; below refers to the use of the option switch, (like -u), meaning &quot;not a positional argument.&quot;
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -u URL, --dv-url URL  REQUIRED: Destination dataverse root url. Default: https://dataverse.scholarsportal.info
+  -u URL, --dv-url URL  Destination Dataverse root url. Default: https://borealisdata.ca
   -k KEY, --key KEY     REQUIRED: API key for dataverse user
   -t TARGET, --target TARGET
                         REQUIRED: Target dataverse short name
-  -e USER, --email USER
-                        REQUIRED: Username for email address which sends update notifications. ie, the &quot;user&quot; portion of &quot;user@website.invalid&quot;.
+  -e EMAIL, --email EMAIL
+                        REQUIRED: Email address which sends update notifications. ie: &quot;user@website.invalid&quot;.
+  -s USER, --user USER  REQUIRED: User name for SMTP server. Check your server for details.
   -r RECIPIENTS [RECIPIENTS ...], --recipient RECIPIENTS [RECIPIENTS ...]
                         REQUIRED: Recipient(s) of email notification. Separate addresses with spaces
   -p PWD, --pwd PWD     REQUIRED: Password for sending email account. Enclose in single quotes to avoid OS errors with special characters.
-  --server MAILSERV     Mail server for sending account. Default: smtp.gmail.com
+  --server MAILSERV     Mail server for sending account. Default: smtp.mail.yahoo.com
   --port PORT           Mail server port. Default: 465. Mail is sent using SSL.
   -c CONTACT, --contact CONTACT
                         REQUIRED: Contact email address for Dataverse records. Must pass Dataverse email validation rules (so &quot;test@test.invalid&quot; is not acceptable).
@@ -223,32 +209,25 @@ optional arguments:
   -w, --warn-too-many   Warn and halt execution if abnormally large number of updates present.
   --warn-threshold WARN
                         Stop updates if number of updates is greater than or equal to this number.
-  --version             Show version number and exit</code></pre>
+  --version             Show version number and exit
+</code></pre>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../installation/" class="btn btn-neutral float-left" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../other_utils/" class="btn btn-neutral float-right" title="Other utilities">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../installation/" class="btn btn-neutral" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -256,18 +235,19 @@ optional arguments:
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="../installation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../other_utils/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../installation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../other_utils/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="../search/main.js" defer></script>
     <script defer>
