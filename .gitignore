@@ -32,3 +32,5 @@ site/
 tests/basic_file_JSON.json
 binary_files
 binary_files/**
+scripts/testpickle
+scripts/dryadd_t.py

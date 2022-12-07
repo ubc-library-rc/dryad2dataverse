@@ -7,7 +7,6 @@ import smtplib
 from logging.handlers import SMTPHandler
 from  email.message import EmailMessage
 
-
 class SSLSMTPHandler(SMTPHandler):
     '''
     An SSL handler for logging.handlers

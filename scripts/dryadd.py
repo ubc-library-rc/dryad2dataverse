@@ -89,11 +89,8 @@ def __clean_msg(msg:str, width=100) -> str:
             details = ast.literal_eval(val)
             details = [list(x) for x in details]
             for num2, val2 in enumerate(details):
-                #print('val2')
-                #print (val2)
                 details[num2] = '\n'.join(textwrap.wrap(', '.join([str(x) for x in val2]),
                                                         width=width))
-                #print(details)
             msg[num] = '\n'.join(details)
         #single list
         elif val.startswith('['):
@@ -102,21 +99,7 @@ def __clean_msg(msg:str, width=100) -> str:
     msg = '\n'.join(msg)
     return msg
 
-def __fyahoo(user:str, mailserv:str) -> str:
-    '''
-    If yahoo, returns formatted username
-    '''
-    print(mailserv)
-    if 'yahoo' in mailserv.lower():
-        if not user.endswith('@yahoo.com'):
-            return user + '@yahoo.com'
-    return user
-
-def notify(msgtxt,
-           user=None, pwd=None,
-           mailserv='smtp.gmail.com',
-           port=None, recipient=None,
-           width=100):
+def notify(msgtxt, width=100, **kwargs):
     '''
     Basic email change notifier. Will sent email outlining metadata changes
     to recipient. Uses SSL.
@@ -138,41 +121,39 @@ def notify(msgtxt,
 
     msgtext : tuple
         Tuple containing strings of ('subject', 'message content')
+    width : int
+        Maximum line length. Max 1000
+
+    From the argument parser these keys and values are required:
+    email : str
+        From address for account
     user : str
-        User name for email account (NOT full email address)
+        User name for email account
     pwd : str
         Password for email account
     mailserv : str
         SMTP server for sending mail
     port : int
         Mailserver port. Default 465
-    recipient : list
+    recipients : list
         List of email addresses of recipients
-    width : int
-        Maximum line length. Max 1000
     '''
-    #pylint: disable=too-many-arguments
-    if not port:
-        #port = 587
-        port = 465
-    #EABOD yahoo
-
-    user = __fyahoo(user, mailserv)
 
     msg = Em()
     msg['Subject'] = msgtxt[0]
-    msg['From'] = user
-    msg['To'] = recipient
-
+    msg['From'] = kwargs['email']
+    msg['To'] = kwargs['recipients']
     content = __clean_msg(msgtxt[1], max(width, 1000))
     msg.set_content(content)
-    server = smtplib.SMTP_SSL(mailserv, port)
 
-    server.login(user, pwd)
+    server = smtplib.SMTP_SSL(kwargs['mailserv'], kwargs.get('port', 465))
+
+    server.login(kwargs['user'], kwargs['pwd'])
     #To must be split. See
     #https://stackoverflow.com/questions/8856117/
     #how-to-send-email-to-multiple-recipients-using-python-smtplib
-    server.sendmail(msg['From'], msg['To'].split(','), msg.as_string())
+    #server.sendmail(msg['From'], msg['To'].split(','), msg.as_string())
+    server.send_message(msg)
     server.close()
 
 def __bad_dates(rectuple: tuple, mod_date: str) -> tuple:
@@ -289,9 +270,14 @@ def argp():
                         required=True,
                         dest='target')
     parser.add_argument('-e', '--email',
-                        help='REQUIRED: Username for email address '
-                        'which sends update notifications. ie, the "user" portion '
-                        'of "user@website.invalid".',
+                        help='REQUIRED:  Email address '
+                        'which sends update notifications. ie: '
+                        '"user@website.invalid".',
+                        required=True,
+                        dest='email')
+    parser.add_argument('-s', '--user',
+                        help=('User name for SMTP server. Check '
+                              'your server for details. '),
                         required=True,
                         dest='user')
     parser.add_argument('-r', '--recipient',
@@ -308,9 +294,9 @@ def argp():
                         dest='pwd')
     parser.add_argument('--server',
                         help='Mail server for sending account. '
-                        'Default: smtp.gmail.com',
+                        'Default: smtp.mail.yahoo.com',
                         required=False,
-                        default='smtp.gmail.com',
+                        default='smtp.mail.yahoo.com',
                         dest='mailserv')
     parser.add_argument('--port',
                         help='Mail server port. Default: 465. '
@@ -427,10 +413,8 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, port=465, secure=(),
     '''
     #pylint: disable=too-many-arguments
     #Because consistency is for suckers and yahoo requires full hostname
-    credentials = (__fyahoo(credentials[0], mailhost), credentials[1])
     subject = 'Dryad to Dataverse transfer error'
     elog = logging.getLogger('email_log')
-    print((mailhost, port), fromaddr, toaddrs, credentials, secure, level, subject, timeout)
     mailer = SSLSMTPHandler(mailhost=(mailhost, port),
                             fromaddr=fromaddr,
                             toaddrs=toaddrs, subject=subject,
@@ -475,7 +459,7 @@ def rotating_log(path, level):
     logger.setLevel(level)
     return logger
 
-def checkwarn(val:int, warn:int, **kwargs) -> None:
+def checkwarn(val:int, **kwargs) -> None:
     '''
     Halt program execution before processing if threshold value of modified
     Dryad studies exceeded. Useful for checking if the Dryad API has changed
@@ -483,14 +467,13 @@ def checkwarn(val:int, warn:int, **kwargs) -> None:
 
     val: int
         Number of modified or new studies
-    warn: int
-        Threshold for number of warnings
     kwargs: dict
         Email notification information.
         {'user': user email,
-         'recipient':[list of recipients],
+         'recipients':[list of recipients],
          'pwd' ; email server password],
-         'mailserv' : smtp mail server}
+         'mailserv' : smtp mail server,
+         'warn': Threshold for number of warnings (int)}
         see dryadd.notify for full details of parameters.
 
         Include log info:
@@ -501,17 +484,15 @@ def checkwarn(val:int, warn:int, **kwargs) -> None:
     '''
     if not kwargs.get('warn_too_many'):
         return
-    if val >= warn:
+    if val >= kwargs.get('warn',0):
         mess = ('Large number of updates detected. '
-                f'{val} new studies exceeds threshold of {warn}. '
+                f'{val} new studies exceeds threshold of {kwargs.get("warn", 0)}. '
                 'Program execution halted.')
         subject = ('Dryad to Dataverse large update warning')
         for logme in kwargs.get('loggers'):
             logme.warning(mess)
         notify(msgtxt=(subject, mess),
-               user=kwargs['user'], pwd=kwargs['pwd'],
-               mailserv=kwargs['mailserv'],
-               recipient=kwargs['recipient'])
+               **vars(kwargs))
         sys.exit()
 
 def verbo(verbosity:bool, **kwargs)->None:
@@ -544,7 +525,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
     logger = rotating_log(log, level)
 
     set_constants(args)
-    elog = email_log(args.mailserv, args.contact, args.recipients,
+    elog = email_log(args.mailserv, args.email, args.recipients,
                      (args.user, args.pwd), port=args.port)
 
 
@@ -565,24 +546,20 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         os.remove(fil)
     logger.info('Last update time: %s', monitor.lastmod)
     #get all updates since the last update check
-    #updates = get_records(args.ror, monitor.lastmod,
-    #                      verbosity=args.verbosity)
-    updates = get_records(args.ror, '2022-10-01T00:00:00Z',
+    updates = get_records(args.ror, monitor.lastmod,
                           verbosity=args.verbosity)
     logger.info('Total new files: %s', len(updates))
     elog.info('Total new files: %s', len(updates))
 
-    checkwarn(val=len(updates), warn=args.warn, user=args.user,
-              pwd=args.pwd, recipient=args.recipients,
+    checkwarn(val=len(updates),
               loggers=[logger],
-              warn_too_many=args.warn_too_many)
+              **vars(args))
 
     #update all the new files
     verbo(args.verbosity, **{'Total to process': len(updates)})
     try:
         count = 0
-        #for doi in updates:
-        for doi in [x for x in updates if x[0]=='doi:10.5061/dryad.2b906']:
+        for doi in updates:
             count += 1
             logger.info('Start processing %s of %s', count, len(updates))
             logger.info('DOI: %s, Dryad URL: https://datadryad.org/stash/dataset/%s',
@@ -615,15 +592,6 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
             #create a transfer object to copy the files over
             transfer = dryad2dataverse.transfer.Transfer(study)
             transfer.test_api_key()
-            #--------------
-            #study.dvpid='000000'
-            #notify(new_content(study),
-            #       user=args.user, pwd=args.pwd,
-            #       mailserv=args.mailserv,
-            #       recipient=args.recipients)
-            #sys.exit()
-            #print('I should have stopped here')
-            #--------------
             #Now start the action
             if update_type == 'new':
                 logger.info('New study: %s, %s', doi[0], doi[1]['title'])
@@ -636,9 +604,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 transfer.upload_json()
                 transfer.set_correct_date()
                 notify(new_content(study),
-                       user=args.user, pwd=args.pwd,
-                       mailserv=args.mailserv,
-                       recipient=args.recipients)
+                       **vars(args))
 
             elif update_type == 'updated':
                 logger.info('Updated metadata: %s', doi[0])
@@ -650,9 +616,7 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
                 transfer.upload_json()
                 transfer.set_correct_date()
                 notify(changed_content(study, monitor),
-                       user=args.user, pwd=args.pwd,
-                       mailserv=args.mailserv,
-                       recipient=args.recipients)
+                       **vars(args))
 
                 #new, identical, updated, lastmodsame
             elif update_type in ('unchanged', 'lastmodsame'):
@@ -686,27 +650,21 @@ def main(log='/var/log/dryadd.log', level=logging.DEBUG):
         finished = ('Dryad to Dataverse transfers completed',
                     ('Dryad to Dataverse transfer daemon has completed.\n'
                      f'Log available at: {log}'))
-        notify(finished, user=args.user, pwd=args.pwd,
-               mailserv=args.mailserv, recipient=args.recipients)
+        notify(finished, **vars(args))
+
     except dryad2dataverse.exceptions.DataverseBadApiKeyError as api_err:
         logger.exception(api_err)
         elog.exception(api_err)
         print(f'Error: {api_err}. Exiting. For details see log at {args.log}.')
         sys.exit()#graceful exit is graceful
+
     except Exception as err: # pylint: disable=broad-except
-        logger.critical('Critical failure with DOI: %s, '
-                        'Dryad URL: https://datadryad.org/stash/dataset/%s, '
-                        'Dataverse URL: %s', transfer.doi, transfer.doi,
-                        dryad2dataverse.constants.DVURL+
-                        '/dataset.xhtml?persistentId='+transfer.dvpid)
-        logger.exception(err)
-        logger.critical(err)
-        elog.critical('Critical failure with DOI: %s, '
-                      'Dryad URL: https://datadryad.org/stash/dataset/%s, '
-                      'Dataverse URL: %s', transfer.doi, transfer.doi,
-                      dryad2dataverse.constants.DVURL+
-                      '/dataset.xhtml?persistentId='+transfer.dvpid)
-        elog.exception(err)
+        elog.exception('%s\nCritical failure with DOI: %s : %s\n%s', err,
+                       doi[0], doi[1]['title'], doi[1].get('sharingLink'),
+                       stack_info=True, exc_info=True)
+        logger.exception('%s\nCritical failure with DOI: %s : %s\n%s', err,
+                         doi[0], doi[1]['title'], doi[1].get('sharingLink'),
+                         stack_info=True, exc_info=True)
         print(f'Error: {err}. Exiting. For details see log at {args.log}.')
         sys.exit()
 
