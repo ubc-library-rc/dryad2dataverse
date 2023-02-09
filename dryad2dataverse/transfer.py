@@ -319,14 +319,16 @@ class Transfer():
                     raise exceptions.DataverseUploadError(('Status return is not OK.'
                                                            f'{upload.status_code}: '
                                                            f'{upload.reason}. '
-                                                           f'{upload.request.url}'))
+                                                           f'{upload.request.url} '
+                                                           f'{upload.text}'))
                 except exceptions.DataverseUploadError as e:
                     LOGGER.exception(e)
                     LOGGER.exception(traceback.format_exc())
                     raise exceptions.DataverseUploadError(('Status return is not OK.'
                                                            f'{upload.status_code}: '
                                                            f'{upload.reason}. '
-                                                           f'{upload.request.url}'))
+                                                           f'{upload.request.url} '
+                                                           f'{upload.text}'))
             upload.raise_for_status()
         except Exception as e: # Only accessible via non-requests exception
             LOGGER.exception(e)
