@@ -316,11 +316,16 @@ class Transfer():
             self.dvStudy = updata
             if updata.get('status') != 'OK':
                 try:
-                    raise exceptions.DataverseUploadError('Status return is not OK')
+                    raise exceptions.DataverseUploadError(('Status return is not OK.'
+                                                           f'{updata.status.code}: '
+                                                           f'{updata.reason}'))
                 except exceptions.DataverseUploadError as e:
                     LOGGER.exception(e)
                     LOGGER.exception(traceback.format_exc())
-                    raise exceptions.DataverseUploadError('Status return is not OK')
+                    raise exceptions.DataverseUploadError(('Status return is not OK.'
+                                                           f'{updata.status.code}: '
+                                                           f'{updata.reason}'))
+
             upload.raise_for_status()
         except Exception as e: # Only accessible via non-requests exception
             LOGGER.exception(e)
