@@ -317,14 +317,14 @@ class Transfer():
             if updata.get('status') != 'OK':
                 try:
                     raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                           f'{updata.status_code}: '
-                                                           f'{updata.reason}'))
+                                                           f'{upload.status_code}: '
+                                                           f'{upload.reason}'))
                 except exceptions.DataverseUploadError as e:
                     LOGGER.exception(e)
                     LOGGER.exception(traceback.format_exc())
                     raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                           f'{updata.status_code}: '
-                                                           f'{updata.reason}'))
+                                                           f'{upload.status_code}: '
+                                                           f'{upload.reason}'))
             upload.raise_for_status()
         except Exception as e: # Only accessible via non-requests exception
             LOGGER.exception(e)
