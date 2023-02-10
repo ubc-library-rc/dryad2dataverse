@@ -21,6 +21,10 @@ class Serializer():
     '''
     Serializes Dryad JSON to Dataverse JSON
     '''
+    CC0='''<p>
+    <img src="https://licensebuttons.net/p/zero/1.0/88x31.png" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " style="display:none" onload="this.style.display='inline'" />
+    <a href="http://creativecommons.org/publicdomain/zero/1.0" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " target="_blank">CC0 1.0</a>
+    </p>'''
     def __init__(self, doi):
         '''
         Creates Dryad study metadata instance.
@@ -28,10 +32,10 @@ class Serializer():
         ----------------------------------------
         Parameters:
 
-        doi : str
-            — DOI of Dryad study. Required for downloading.
-            eg: 'doi:10.5061/dryad.2rbnzs7jp'
-        ----------------------------------------
+    doi : str
+        — DOI of Dryad study. Required for downloading.
+        eg: 'doi:10.5061/dryad.2rbnzs7jp'
+    ----------------------------------------
         '''
         self.doi = doi
         self._dryadJson = None
@@ -572,8 +576,7 @@ class Serializer():
         self._dvJson = {'datasetVersion':
                         {'license':{'name': 'CC0 1.0',
                                     'uri': 'http://creativecommons.org/publicdomain/zero/1.0' },
-
-                         #'termsOfUse': 'CC0 Waiver', #I'm not sure if this is required
+                         'termsOfUse': Serializer.CC0,
                          'metadataBlocks':{'citation':
                                            {'displayName': 'Citation Metadata',
                                             'fields': []},
