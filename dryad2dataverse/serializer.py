@@ -566,9 +566,14 @@ class Serializer():
         if not dryJson:
             dryJson = self.dryadJson
         LOGGER.debug(dryJson)
+        #Licence block changes ensure that it will only work with
+        #Dataverse v5.10+
+        #Go back to previous commits to see the earlier "standard"
         self._dvJson = {'datasetVersion':
-                        {'license':'CC0',
-                         'termsOfUse': 'CC0 Waiver',
+                        {'license':{'name': 'CC0 1.0',
+                                    'uri': 'http://creativecommons.org/publicdomain/zero/1.0' },
+
+                         #'termsOfUse': 'CC0 Waiver', #I'm not sure if this is required
                          'metadataBlocks':{'citation':
                                            {'displayName': 'Citation Metadata',
                                             'fields': []},
