@@ -1,0 +1,55 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = ['setuptools>61', 'setuptools_scm[toml]>=6.2']  # PEP 508 specifications.
+build-backend = 'setuptools.build_meta'
+
+[tool.setuptools.packages.find]
+where = ['src']  # list of folders that contain the packages (['.'] by default)
+include = ['dryad2dataverse*']  # package names should match these glob patterns (['*'] by default)
+exclude = ['tests*']  # exclude packages matching these glob patterns (empty by default)
+namespaces = false # to disable scanning PEP 420 namespaces (true by default)
+
+[tool.setuptools.package-data]
+data = ['*md']
+
+[tool.setuptools.dynamic]
+version = {attr = 'dryad2dataverse.VERSION'}
+dependencies = {file = 'requirements.txt'}
+[project]
+name = 'dryad2dataverse'
+description = 'Utility for copying and syncing data from a Dryad data repository to a Dataverse repository'
+readme = 'README.md'
+keywords =['Harvard Dataverse', 'Dataverse', 'research data management', 'data repository',
+		   'Dryad', 'datadryad.org', 'dataverse.org'] 
+authors = [{name='Paul Lesack', email='paul.lesack@ubc.ca'}]
+classifiers = ['Development Status :: 4 - Beta',
+			   'Environment :: Console',
+			   'Intended Audience :: Education',
+			   'License :: OSI Approved :: MIT License',
+			   'Topic :: Education',
+			   'Topic :: Internet :: WWW/HTTP :: Site Management',
+			   'Topic :: Utilities']
+requires-python = '>=3.6'
+dynamic = ['version', 'dependencies']
+#dynamic = ['version']
+[tools.setuptools]
+license-files = ['LICEN[CS]*']
+
+[project.urls]
+Homepage = 'https://ubc-library-rc.github.io/dryad2dataverse'
+Documentation = 'https://ubc-library-rc.github.io/dryad2dataverse'
+Repository = 'https://github.com/ubc-library-rc/dryad2dataverse.git'
+Tracker = 'https://github.com/ubc-library-rc/dryad2dataverse/issues'
+#changelog = 'https://github.com/me/spam/blob/master/CHANGELOG.md'
+
+[project.scripts]
+#This should be restructured one day
+dryadd = 'dryad2dataverse.scripts.dryadd:main'
+dv_ldc_uploader = 'dryad2dataverse.scripts.dv_ldc_uploader:main'
+dv_manifest_gen = 'dryad2dataverse.scripts.dv_manifest_gen:main'
+dv_pg_facet_date = 'dryad2dataverse.scripts.dv_pg_facet_date:main'
+dv_record_copy = 'dryad2dataverse.scripts.dv_record_copy:main'
+dv_release = 'dryad2dataverse.scripts.dv_release:main'
+dv_replace_licenses = 'dryad2dataverse.scripts.dv_replace_licenses:main'
+dv_upload_tsv = 'dryad2dataverse.scripts.dv_upload_tsv:main'
+

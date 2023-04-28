@@ -34,3 +34,5 @@ binary_files
 binary_files/**
 scripts/testpickle
 scripts/dryadd_t.py
+dist/
+dist/**
