@@ -25,6 +25,7 @@ class Serializer():
     <img src="https://licensebuttons.net/p/zero/1.0/88x31.png" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " style="display:none" onload="this.style.display='inline'" />
     <a href="http://creativecommons.org/publicdomain/zero/1.0" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " target="_blank">CC0 1.0</a>
     </p>'''
+    
     def __init__(self, doi):
         '''
         Creates Dryad study metadata instance.

@@ -1,4 +1,4 @@
-from nose.tools import *
+import unittest
 import sqlite3
 import json
 import pickle
@@ -17,35 +17,28 @@ LOGGER = logging.getLogger('dryad2dataverse.transfer')
 #with open('tests/dryadStudy.json') as f:
 #    testCase._dryadJson = json.load(f)
 
+class TestTransfer(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        #print( "Start test")
+        cls.testCase = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
+        cls.testTrans = dryad2dataverse.transfer.Transfer(cls.testCase)
 
-def setup():
-    print( "Start test")
-    global testCase
-    global testTrans
-    testCase = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
-    testTrans = dryad2dataverse.transfer.Transfer(testCase)
+    def test_file_id(self):
+        '''
+        Does file_id even matter? we found out in Dec 2021  that they're changeable.
+        So this test constantly needs updating. Dammit.
+        '''
+        self.assertEqual.__self__.maxDiff = None
+        files = [list(x) for x in self.testCase.files] 
+        ftest = dryad2dataverse.transfer.Transfer(self.testCase)
+        self.assertEqual(files, ftest.files, True)
+        self.assertEqual(267417, ftest._dryad_file_id(ftest.files[0][0]), True)
 
-def teardown():
-    print( "Finish ")
-
-#@with_setup(setup, teardown)
-#@params(testCase)
-def test_file_id():
-    '''
-    Does file_id even matter? we found out in Dec 2021  that they're changeable.
-    So this test constantly needs updating. Dammit.
-    '''
-    assert_equal.__self__.maxDiff = None
-    files = [list(x) for x in testCase.files] 
-    ftest = dryad2dataverse.transfer.Transfer(testCase)
-    assert_equal(files, ftest.files, True)
-    assert_equal(267417, ftest._dryad_file_id(ftest.files[0][0]), True)
-
-@raises(dryad2dataverse.exceptions.DataverseBadApiKeyError)
-@with_setup(setup)
-def test_bad_api_key():
-    '''
-    Produce better results on bad/expired API key
-    '''
-    testTrans.test_api_key(apikey='BADBADKEY')
+    def test_raise(self):
+        with self.assertRaises(dryad2dataverse.exceptions.DataverseBadApiKeyError) as err:
+            self.testTrans.test_api_key(apikey='BADBADKEY')
+        
+    def tearDown(self):
+        print( "Finish ")
 

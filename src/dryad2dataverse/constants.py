@@ -7,6 +7,7 @@ presence of change.
 '''
 
 import os
+import pathlib
 
 #from requests.packages.urllib3.util.retry import Retry
 #Above causes Pylint error. WHY?
@@ -31,7 +32,7 @@ DRYURL = 'https://datadryad.org'
 TMP = '/tmp'
 
 #used in dryad2dataverse.transfer
-DVURL = 'https://dataverse.scholarsportal.info'
+DVURL = 'https://borealisdata.ca'
 APIKEY = None
 MAX_UPLOAD = 3221225472 #Max 3GB upload
 DV_CONTACT_EMAIL = None
@@ -41,4 +42,4 @@ NOTAB = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta',
 
 #used in dryad2dataverse.monitor
 HOME = os.path.expanduser('~')
-DBASE = HOME + os.sep + 'dryad_dataverse_monitor.sqlite3'
+DBASE = pathlib.Path(HOME, 'dryad_dataverse_monitor.sqlite3')
