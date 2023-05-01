@@ -1,6 +1,6 @@
 [build-system]
 # Minimum requirements for the build system to execute.
-requires = ['setuptools>61', 'setuptools_scm[toml]>=6.2']  # PEP 508 specifications.
+requires = ['setuptools>=61', 'setuptools_scm[toml]>=6.2']  # PEP 508 specifications.
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools.packages.find]
@@ -9,12 +9,10 @@ include = ['dryad2dataverse*']  # package names should match these glob patterns
 exclude = ['tests*']  # exclude packages matching these glob patterns (empty by default)
 namespaces = false # to disable scanning PEP 420 namespaces (true by default)
 
-[tool.setuptools.package-data]
-data = ['*md']
-
 [tool.setuptools.dynamic]
 version = {attr = 'dryad2dataverse.VERSION'}
 dependencies = {file = 'requirements.txt'}
+
 [project]
 name = 'dryad2dataverse'
 description = 'Utility for copying and syncing data from a Dryad data repository to a Dataverse repository'
@@ -32,6 +30,7 @@ classifiers = ['Development Status :: 4 - Beta',
 requires-python = '>=3.6'
 dynamic = ['version', 'dependencies']
 #dynamic = ['version']
+
 [tools.setuptools]
 license-files = ['LICEN[CS]*']
 
@@ -45,11 +44,3 @@ Tracker = 'https://github.com/ubc-library-rc/dryad2dataverse/issues'
 [project.scripts]
 #This should be restructured one day
 dryadd = 'dryad2dataverse.scripts.dryadd:main'
-dv_ldc_uploader = 'dryad2dataverse.scripts.dv_ldc_uploader:main'
-dv_manifest_gen = 'dryad2dataverse.scripts.dv_manifest_gen:main'
-dv_pg_facet_date = 'dryad2dataverse.scripts.dv_pg_facet_date:main'
-dv_record_copy = 'dryad2dataverse.scripts.dv_record_copy:main'
-dv_release = 'dryad2dataverse.scripts.dv_release:main'
-dv_replace_licenses = 'dryad2dataverse.scripts.dv_replace_licenses:main'
-dv_upload_tsv = 'dryad2dataverse.scripts.dv_upload_tsv:main'
-

@@ -29,7 +29,7 @@ def argp():
     description = ('Bulk file releaser for unpublished Dataverse files. Either releases individual '
                    'studies or all unreleased files in a single dataverse.')
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-u', '--url', default='https://dataverse.scholarsportal.info',
+    parser.add_argument('-u', '--url', default='https://borealisdata.ca',
                         help='Dataverse base URL')
     parser.add_argument('-k', '--key', required=True,
                         help='API key')
