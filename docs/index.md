@@ -12,9 +12,25 @@ nav_order: 1
 
 ## Introduction
 
-**dryad2dataverse** is an oddly specific [Python](https://python.org) programming language library and an associated [application](script.md) which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
+**dryad2dataverse** is an oddly specific [Python](https://python.org) package/library which comes with the highly-sought after [**script** application](script.md) which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
 
-With these tools it's possible to: 
+### The app is probably what you want 
+----
+
+If you're interested in moving Dryad studies to Dataverse, being notified on changes and largely automating everything, the [dryadd application](dryadd.md) can do *all* of these things without requiring any knowledge of Python or programming. All you need is basic command line knowledge and a platform with enough storage to (temporarily) hold the contents of a few Dryad records.
+
+----
+## Quick install
+
+```nohighlight
+pip install dryad2dataverse
+```
+
+or, if you want to stay clear of anything related to a command line, download a compiled version of the migrator `dryadd` only for your computer system at the [releases page](https://github.com/ubc-library-rc/dryad2dataverse/releases). Note that binary releases are not available for all platforms, and if you want the most recent version you're better off using `pip`.
+
+### I know how to program in Python. What does this do?
+
+With these tools it’s possible to:
 
 a) Serialize Dryad metadata to Dataverse JSON
 
@@ -22,40 +38,17 @@ b) Transfer Dryad studies to Dataverse without any knowledge of the somewhat com
 
 c) Monitor changes in status
 
-The minimum required Python version for **dryad2dataverse** is Python **3.6**, as it is the earliest version which supports [f-strings](https://www.python.org/dev/peps/pep-0498/). It was developed using version 3.7.2, and it runs just fine under the [now current] 3.9.2. You can find Python at <https://www.python.org/downloads/>. _No testing was done with Anaconda, only stock Python_. That said, it probably works fine with Anaconda.
+#### So why would I need this?
 
-### Not just a library - no programming required
-----
-
-If you hate programming, are pressed for time and/or don't want to read any documentation, **dryad2dataverse** also comes with a [command line tool](script.md) to do all of these things without requiring any knowledge of Python or programming.
-
-----
-
-The **dryad2dataverse** library is free and open source, released under the MIT license. It's also not written by anyone with a degree in computer science, so as the MIT license says: 
-
-	Software is provided "as is", without warranty of any kind
-
-### Why would I need this?
-
-There are a few reasons why you might find this product useful.
-
-* You are a researcher and you wish to deposit via API into Dataverse repository. 
+* You are a researcher and you wish to deposit via API into Dataverse repository. You can use the tools with this package to that without needing to understand the APIs and formats of two separate platforms.
 
 * You've used Dryad, but the Dataverse JSON and API is unfamiliar and [complex](https://guides.dataverse.org/en/latest/_downloads/dataset-create-new-all-default-fields.json "Complex Dataverse JSON"). 
 
-* You want to write your Dryad JSON and have it convert automatically.
+* You want to write your Dryad JSON and have it convert automatically to Dataverse's much more complex one.
 
 * Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution's research data (for example, the Dataverse repository at <https://borealisdata.ca>).
 
 * And on top of that, you don't want to keep checking to see if there were any updates, so you wish to automate the process.
-
-## Quick install
-
-```nohighlight
-pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master
-```
-
-or, if you want to stay clear of anything related to a command line, download a compiled version of the migrator `dryadd` only for your computer system at the [releases page](https://github.com/ubc-library-rc/dryad2dataverse/releases). Note that binary releases may lag behind the Python though.
 
 ## Basic usage
 
@@ -116,3 +109,8 @@ Monitoring changes requires both the `Serializer` and `Transfer` objects from ab
 >>> monitor.set_timestamp()
 ```
 
+### That's great! I'm going to use this for my very important data for which I have no backup.
+
+The **dryad2dataverse** library is free and open source, released under the MIT license. It's also not written by anyone with a degree in computer science, so as the MIT license says: 
+
+	Software is provided "as is", without warranty of any kind

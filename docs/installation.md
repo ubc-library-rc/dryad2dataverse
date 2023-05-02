@@ -11,11 +11,19 @@ This is not a complete list of installation methods. For a complete guide to Pyt
 
 ## Simple installation using Pip
 
-Once you've installed Python, installation via `pip` is very simple. Dryad2dataverse isn't on [PyPi](https://pypi.org/) yet, but you can still use Python's package manager, `pip`:
+Once you've installed Python, installation via `pip` is very simple:
+
+`pip install dryad2dataverse`
+
+Of course, if you want to use a branch other than _master_, you can switch _master_ for the branch you want. This is not recommended, though, as the _master_ branch contains the most current [stable] release.
+
+### Installing from the Github repository
+
+If you require a specific commit, branch, etc, you can install directly from Github using `pip`:
 
 `pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master`
 
-Of course, if you want to use a branch other than _master_, you can switch _master_ for the branch you want. This is not recommended, though, as the _master_ branch contains the most current [stable] release.
+Of course, you can also install other branches or specific commits as required; see the documentation for `pip` on how to do that.
 
 ## Manual Download
 
@@ -23,16 +31,21 @@ Of course, if you want to use a branch other than _master_, you can switch _mast
 
 Compiled versions of the `dryadd` migrator for selected operating systems and architectures are available at the [releases page](https://github.com/ubc-library-rc/dryad2dataverse/releases). Note that binary releases may lag behind the Python, and of course the binary files don't include the Python package.
 
-### Source code
+### From local source code
 The source code for this project is available at <https://github.com/ubc-library-rc/dryad2dataverse>
 
 To install, first clone the repository:
 
 `git clone https://github.com/ubc-library-rc/dryad2dataverse.git`
 
+This will place the source at `whatever/directory/you/are/in/dryad2dataverse`
+
 If you wish to install with `pip`, you can use:
 
-`pip install .'
+```
+cd dryad2dataverse
+pip install .
+```
 
 or, if you are planning to tinker with the source code:
 
@@ -57,5 +70,3 @@ More information on virtual environments can be found on the Python website: <ht
 If you have installed with pip, upgrading is easy and very similar to the normal upgrade procedure:
 
 `pip install --upgrade git+https://github.com/ubc-library-rc/dryad2dataverse.git@master`
-
-If you used one of the other methods, you should upgrade manually.

@@ -17,7 +17,9 @@ and possibly:
 
 * Checking for updates and handling **those** automatically
 
-Included with **dryad2dataverse** is a [script](https://github.com/ubc-library-rc/dryad2dataverse/blob/master/scripts/dryadd.py) as as well as [binary files for Windows, MacOS and Linux](https://github.com/ubc-library-rc/dryad2dataverse/releases) which do exactly this. The binary files, if available for your operating system, should not even require a Python installation; they are self-contained programs which will run and monitor the copying process. Depending on what you use and the plaform, the application will be called `dryadd.py, dryadd`, `dryadd_linux` or `dryadd.exe`. Note that there are a wide variety of system architectures available. The binaries are c
+Included with **dryad2dataverse** package is a console application called **dryadd** which does all of this. Or, if you don't even want to install dryad2dtaverse, [binary files for Windows, MacOS and Linux](https://github.com/ubc-library-rc/dryad2dataverse/releases). Depending on what computing platform and installation method you use, the application will be called `dryadd.py, dryadd`, `dryadd_linux` or `dryadd.exe`. Note that there are a wide variety of system architectures available, but not all of them.
+
+**The most current version of _dryadd_ will always be available if you install via _pip_. The binary files may lag behind and/or not get every release** 
 
 Note that these utilities are *console* programs. That is, they do not have a GUI and are meant to be run from the command line in a Windows DOS prompt or PowerShell session or a terminal in the case of other platforms.
 
@@ -25,11 +27,57 @@ Note that these utilities are *console* programs. That is, they do not have a GU
 
 This product **will not** publish anything in a Dataverse installation (at this time, at least). This is intentional to allow a human-based curatorial step before releasing any data onto an unsuspecting audience. There's no error like systemic error, so not automatically releasing material should help alleviate this.
 
+### Usage
+
+The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest. The help menu below is available from the command line by either running the script without inputs or by using the `-h` switch.
+
+
+```nohighlight
+usage: dryadd [-h] [-u URL] -k KEY -t TARGET -e EMAIL -s USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP]
+              [--db DBASE] [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
+
+Dryad to Dataverse importer/monitor. All arguments NOT enclosed by square brackets are required for the script to run but some may already have defaults, specified by "Default". The
+"optional arguments" below refers to the use of the option switch, (like -u), meaning "not a positional argument."
+
+options:
+  -h, --help            show this help message and exit
+  -u URL, --dv-url URL  Destination Dataverse root url. Default: https://borealisdata.ca
+  -k KEY, --key KEY     REQUIRED: API key for dataverse user
+  -t TARGET, --target TARGET
+                        REQUIRED: Target dataverse short name
+  -e EMAIL, --email EMAIL
+                        REQUIRED: Email address which sends update notifications. ie: "user@website.invalid".
+  -s USER, --user USER  REQUIRED: User name for SMTP server. Check your server for details.
+  -r RECIPIENTS [RECIPIENTS ...], --recipient RECIPIENTS [RECIPIENTS ...]
+                        REQUIRED: Recipient(s) of email notification. Separate addresses with spaces
+  -p PWD, --pwd PWD     REQUIRED: Password for sending email account. Enclose in single quotes to avoid OS errors with special characters.
+  --server MAILSERV     Mail server for sending account. Default: smtp.mail.yahoo.com
+  --port PORT           Mail server port. Default: 465. Mail is sent using SSL.
+  -c CONTACT, --contact CONTACT
+                        REQUIRED: Contact email address for Dataverse records. Must pass Dataverse email validation rules (so "test@test.invalid" is not acceptable).
+  -n CNAME, --contact-name CNAME
+                        REQUIRED: Contact name for Dataverse records
+  -v, --verbosity       Verbose output
+  -i ROR, --ror ROR     REQUIRED: Institutional ROR URL. Eg: "https://ror.org/03rmrcq20". This identifies the institution in Dryad repositories.
+  --tmpfile TMP         Temporary file location. Default: /tmp
+  --db DBASE            Tracking database location and name. Default: $HOME/dryad_dataverse_monitor.sqlite3
+  --log LOG             Complete path to log. Default: /var/log/dryadd.log
+  -l, --no_force_unlock
+                        No forcible file unlock. Required if /lock endpint is restricted
+  -x EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
+                        Exclude these DOIs. Separate by spaces
+  -b NUM_BACKUPS, --num-backups NUM_BACKUPS
+                        Number of database backups to keep. Default 3
+  -w, --warn-too-many   Warn and halt execution if abnormally large number of updates present.
+  --warn-threshold WARN
+                        Do not transfer studies if number of updates is greater than or equal to this number. Default: 15
+  --version             Show version number and exit
+```
 ### Requirements
 
 **Software**
 
-* If you are using the pure Python version of the migrator (ie, **dryadd.py**) and you have successfully installed the **dryad2dataverse** library, the requirements will be filled by default (see the [installation document](installation.md) for more details).
+* If you installed using _pip_ the requirements will be filled by default (see the [installation document](installation.md) for more details).
 
 * If using a binary file, it must be supported by your operating system and system architecture (eg. Intel Mac).
 
@@ -68,49 +116,3 @@ Dryad itself is constantly changing, as is Dataverse. Although the software shou
 
 To act as a backup against catastrophic error, the monitoring database is automatically copied and renamed with a timestamp. Although the default number of backups is 3 by default, any number of backups can be kept. Obviously, if you run the software once a minute this isn't helpful, but it could be if you update once a month.
 
-### Usage
-
-The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest. The help menu below is available from the command line by either running the script without inputs or by using the `-h` switch.
-
-
-```nohighlight
-usage: dryadd.py [-h] [-u URL] -k KEY -t TARGET -e EMAIL -s USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP]
-                 [--db DBASE] [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
-
-Dryad to Dataverse import daemon. All arguments NOT enclosed by square brackets are required for the script to run but some may already have defaults, specified by "Default". The
-"optional arguments" below refers to the use of the option switch, (like -u), meaning "not a positional argument."
-
-options:
-  -h, --help            show this help message and exit
-  -u URL, --dv-url URL  Destination Dataverse root url. Default: https://borealisdata.ca
-  -k KEY, --key KEY     REQUIRED: API key for dataverse user
-  -t TARGET, --target TARGET
-                        REQUIRED: Target dataverse short name
-  -e EMAIL, --email EMAIL
-                        REQUIRED: Email address which sends update notifications. ie: "user@website.invalid".
-  -s USER, --user USER  REQUIRED: User name for SMTP server. Check your server for details.
-  -r RECIPIENTS [RECIPIENTS ...], --recipient RECIPIENTS [RECIPIENTS ...]
-                        REQUIRED: Recipient(s) of email notification. Separate addresses with spaces
-  -p PWD, --pwd PWD     REQUIRED: Password for sending email account. Enclose in single quotes to avoid OS errors with special characters.
-  --server MAILSERV     Mail server for sending account. Default: smtp.mail.yahoo.com
-  --port PORT           Mail server port. Default: 465. Mail is sent using SSL.
-  -c CONTACT, --contact CONTACT
-                        REQUIRED: Contact email address for Dataverse records. Must pass Dataverse email validation rules (so "test@test.invalid" is not acceptable).
-  -n CNAME, --contact-name CNAME
-                        REQUIRED: Contact name for Dataverse records
-  -v, --verbosity       Verbose output
-  -i ROR, --ror ROR     REQUIRED: Institutional ROR URL. Eg: "https://ror.org/03rmrcq20". This identifies the institution in Dryad repositories.
-  --tmpfile TMP         Temporary file location. Default: /tmp)
-  --db DBASE            Tracking database location and name. Default: $HOME/dryad_dataverse_monitor.sqlite3
-  --log LOG             Complete path to log. Default: /var/log/dryadd.log
-  -l, --no_force_unlock
-                        No forcible file unlock. Requiredif /lock endpint is restricted
-  -x EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
-                        Exclude these DOIs. Separate by spaces
-  -b NUM_BACKUPS, --num-backups NUM_BACKUPS
-                        Number of database backups to keep. Default 3
-  -w, --warn-too-many   Warn and halt execution if abnormally large number of updates present.
-  --warn-threshold WARN
-                        Stop updates if number of updates is greater than or equal to this number.
-  --version             Show version number and exit
-```

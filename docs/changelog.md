@@ -2,6 +2,28 @@
 
 Perfection on the first attempt is rare.
 
+## v0.6.0 - 2 May 2023
+
+* Updated to current Python packaging standards
+* Installation can now be done straight from `pip` without resorting to `git+http. . .`
+* Test framework now `unittest`
+* Documentation updated
+
+**dryad2dataverse.constants**
+
+* `constants.dvurl` now defaults to <https://borealisdata.ca>
+* `pathlib` instead of `os.path` for greater cross-platform compatibility.
+
+## v0.5.8 - 10 February 2023
+
+* Good lord I misspelled "February" initially
+* certifi requirements updated
+* somewhat better error logging for odd requests failures
+* Dataverse JSON change to be in compliance with new standards for v5.12+
+
+Note that  binaries will no longer be produced for dryad2dataverse. If you want one, you can either contact me and I will create one and add it to the release, or you can make one yourself using PyInstaller or Nuitka. The effort of making them vs the lack of downloads has led to this decision. If this is a problem please create an issue for discussion.
+
+
 ## v0.5.0 - 7 December 2022
 
 **dataverse.handlers**
