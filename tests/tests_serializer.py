@@ -3,7 +3,11 @@ import os
 import sqlite3
 import json
 import pickle
+import pathlib
+
 import  dryad2dataverse.serializer as dryad
+
+BADURL = pathlib.Path(pathlib.Path(__file__).parent, 'badURL.json')
 
 class TestSerialize(unittest.TestCase): 
     #@classmethod
@@ -201,9 +205,11 @@ class TestSerialize(unittest.TestCase):
         '''
         Dryad doesn't do validation checking on URLs, but may later
         So this reads a [currently] badly formatted URL and checks it.
+
+        BADURL orginally came out of Dryad.
         '''
         fprefix = os.path.dirname(os.path.realpath(__file__))
-        with open(f'{fprefix}{os.sep}badUrl.json') as f:
+        with open(BADURL) as f:
             dry = json.load(f)
         badJson = dryad.Serializer('irrelevant')
         badJson._dryadJson = dry

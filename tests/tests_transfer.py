@@ -2,6 +2,7 @@ import unittest
 import sqlite3
 import json
 import pickle
+import sys
 import  dryad2dataverse.serializer
 import  dryad2dataverse.transfer
 import logging
@@ -20,7 +21,6 @@ LOGGER = logging.getLogger('dryad2dataverse.transfer')
 class TestTransfer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        #print( "Start test")
         cls.testCase = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
         cls.testTrans = dryad2dataverse.transfer.Transfer(cls.testCase)
 
@@ -39,10 +39,24 @@ class TestTransfer(unittest.TestCase):
         self.assertEqual(files, ftest.files, True)
         self.assertEqual(267417, ftest._dryad_file_id(ftest.files[0][0]), True)
 
-    def test_raise(self):
-        with self.assertRaises(dryad2dataverse.exceptions.DataverseBadApiKeyError) as err:
-            self.testTrans.test_api_key(apikey='BADBADKEY')
-        
-    def tearDown(self):
-        print( "Finish ")
+#    def test_raise(self):
+#        #https://stackoverflow.com/questions/17784849/print-an-error-message-without-printing-a-traceback-and-close-the-program-when-a
+#        sys.tracebacklimit = -1
+#        with self.assertRaises(dryad2dataverse.exceptions.DataverseBadApiKeyError) as err:
+#            self.testTrans.test_api_key(apikey='BADBADKEY')
+#            self.assertTrue('BAD API key', str(err.exception))
+#        sys.tracebacklimit = None
 
+
+    def test_raise2(self):
+        #https://stackoverflow.com/questions/17784849/print-an-error-message-without-printing-a-traceback-and-close-the-program-when-a
+        try:
+            #https://stackoverflow.com/questions/5255657/how-can-i-disable-logging-while-running-unit-tests-in-python-django
+            logging.disable(logging.CRITICAL)
+            sys.tracebacklimit = -1
+            self.testTrans.test_api_key(apikey='BADBADKEY')
+            sys.tracebacklimit = None
+        except Exception as err:
+            logging.disable(logging.NOTSET)
+            sys.tracebacklimit = None
+            self.assertTrue('BAD API key', err)

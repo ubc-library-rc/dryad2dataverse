@@ -8,9 +8,6 @@ import  dryad2dataverse.serializer
 import  dryad2dataverse.transfer
 import  dryad2dataverse.monitor
 
-#Don't rely on relative path for loading files
-fprefix = os.path.dirname(os.path.realpath(__file__))+os.sep
-
 class TestMonitor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -21,23 +18,17 @@ class TestMonitor(unittest.TestCase):
     def tearDownClass(cls):
         cls.testCase.session.close()
 
-    #def setUp(self):
-    #    print( "Start test")
-
-    #def tearDown(self):
-    #    print( "Finish ")
-
-    def test_file_id(self):
+    def test_00_file_id(self):
         ftest = dryad2dataverse.transfer.Transfer(self.testCase)
         self.assertEqual(self.testCase.files, [tuple(x) for x in ftest.files], True)
         #FILE IDS change. This is for 14 Jan 2022
         self.assertEqual(267417, ftest._dryad_file_id(ftest.files[0][0]), True)
 
-    def test_newmeta(self):
+    def test_01_newmeta(self):
         diff = self.montest.status(self.testCase)
         self.assertEqual(diff['status'], 'new', True)
 
-    def test_identical_meta(self):
+    def test_02_identical_meta(self):
         lastmod = self.testCase.dryadJson['lastModificationDate']
         dvjson = {'dvdata' : 'no dv data'}
         dvjson = json.dumps(dvjson)
@@ -48,22 +39,22 @@ class TestMonitor(unittest.TestCase):
         diff = self.montest.status(self.testCase)
         self.assertEqual(diff['status'], 'identical', True)
 
-    def test_lastmodsame(self):
+    def test_03_lastmodsame(self):
         visi = self.testCase.dryadJson['visibility']
         self.testCase.dryadJson['visibility'] = 'VISIBILITY CHANGED'
         diff = self.montest.status(self.testCase)
         self.assertEqual(diff['status'], 'lastmodsame', True)
         self.assertEqual(diff['notes'], 'metadata_changed', True)
         self.testCase.dryadJson['visibility'] = visi
-
-    def test_changed_date(self):
+    
+    def test_04_changed_date(self):
         ordate = self.testCase.dryadJson['lastModificationDate']
         self.testCase.dryadJson['lastModificationDate'] = '1941-12-07'
         diff = self.montest.status(self.testCase)
         self.assertEqual(diff['status'], 'updated', True)
         self.testCase.dryadJson['lastModificationDate'] = ordate
-
-    def test_unchanged_files(self):
+    
+    def test_06_unchanged_files(self):
         doi = self.testCase.doi
         self.montest.cursor.execute('SELECT uid from dryadStudy WHERE doi = ?',(doi,))
         dryuid = self.montest.cursor.fetchone()[0]
@@ -76,7 +67,7 @@ class TestMonitor(unittest.TestCase):
         self.assertEqual.__self__.maxDiff = None
         self.assertEqual({}, diff, True)
 
-    def test_added_files(self):
+    def test_07_added_files(self):
         self.assertEqual.__self__.maxDiff = None
         newdata=copy.copy(self.testCase.fileJson[0]['_embedded']['stash:files'][-1])
         newdata['_links']['stash:file-download']['href'] = '/api/v2/files/999999/download' 
@@ -85,7 +76,6 @@ class TestMonitor(unittest.TestCase):
         newdata['digestType'] = 'md5'
         newdata['digest'] = '6f953c01804e4fc8ec97f7c45d8259b8'
         self.testCase.fileJson[0]['_embedded']['stash:files'].append(newdata)
-        #print(self.testCase.files)
         diff = self.montest.diff_files(self.testCase)
         self.assertNotEqual({}, diff)
         expect = {'add': [( 
@@ -100,7 +90,7 @@ class TestMonitor(unittest.TestCase):
         #restore state
         del self.testCase.fileJson[0]['_embedded']['stash:files'][-1]
 
-    def test_deleted_files(self):
+    def test_08_deleted_files(self):
         newdata=copy.copy(self.testCase.fileJson[0]['_embedded']['stash:files'][0])
         del self.testCase.fileJson[0]['_embedded']['stash:files'][0]
         diff = self.montest.diff_files(self.testCase)
@@ -116,24 +106,24 @@ class TestMonitor(unittest.TestCase):
         #and restore
         self.testCase.fileJson[0]['_embedded']['stash:files'].insert(0,newdata)
 
-    def test_added_hash(self):
+
+    def test_09_added_hash(self):
         self.testCase.fileJson[-1]['_embedded']['stash:files'][-1]['digestType']='md5'
         self.testCase.fileJson[-1]['_embedded']['stash:files'][-1]['digest']='6c994262e3e31a972ba63b4e07f0test'
         diff = self.montest.diff_files(self.testCase)
         self.assertEqual.__self__.maxDiff = None 
         self.assertNotEqual({}, diff)
-        print(diff)
         self.assertEqual(diff, {'hash_change' : 
             [x for x in self.testCase.files if x[-1].endswith('test')]})
         #restore state
         self.testCase._fileJson = None
-
-    def test_no_transfer(self):
+    
+    def test_10_no_transfer(self):
         ftest = dryad2dataverse.transfer.Transfer(self.testCase)
         self.assertEqual(ftest.fileUpRecord,  [])
         self.assertEqual(ftest.fileDelRecord, [])
 
-    def test_find_dvfid(self):
+    def test_11_find_dvfid(self):
         #admittedly, this is kind of a garbage test
         ins = 'INSERT INTO dvfiles VALUES (?, ?, ?, ?, ?, ?);'
         data_a = (203, 16247, "02d78d74c2b7307c5821cf5e92a3478c",152242,"02d78d74c2b7307c5821cf5e92a3478c", '{}')
@@ -143,9 +133,3 @@ class TestMonitor(unittest.TestCase):
         self.montest.conn.commit()
         self.assertEqual(self.montest.get_dv_fid('https://datadryad.org/api/v2/files/16247/download'), '258214')
 
-
-    #def test_uploaded_transfer(self):
-    #    ftest = dryad2dataverse.transfer.Transfer(self.testCase)
-    #    ftest.fileUpRecord.append((385819, json.dumps({'dvn':'simulatedJson'})))
-    #
-    #
