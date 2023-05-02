@@ -27,7 +27,7 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 5, 1)
+VERSION = (0, 5, 2)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -249,7 +249,7 @@ def argp():
     '''
     Argument parser
     '''
-    description = ('Dryad to Dataverse import daemon. '
+    description = ('Dryad to Dataverse importer/monitor. '
                    'All arguments NOT enclosed by square brackets are required for '
                    'the script to run but some may already have defaults, specified '
                    'by "Default". '
@@ -329,7 +329,7 @@ def argp():
                         required=True,
                         dest='ror')
     parser.add_argument('--tmpfile',
-                        help='Temporary file location. Default: /tmp)',
+                        help='Temporary file location. Default: /tmp',
                         required=False,
                         dest='tmp')
     parser.add_argument('--db',
@@ -344,7 +344,7 @@ def argp():
                         dest='log',
                         default='/var/log/dryadd.log')
     parser.add_argument('-l', '--no_force_unlock',
-                        help='No forcible file unlock. Required'
+                        help='No forcible file unlock. Required '
                         'if /lock endpint is restricted',
                         required=False,
                         action='store_false',
@@ -366,8 +366,9 @@ def argp():
                               'number of updates present.'),
                         action='store_true',)
     parser.add_argument('--warn-threshold',
-                        help=('Stop updates if number of updates '
-                              'is greater than or equal to this number.'),
+                        help=('Do not transfer studies if number of updates '
+                              'is greater than or equal to this number. '
+                              'Default: 15'),
                         type=int,
                         dest='warn',
                         default=15)
@@ -508,7 +509,7 @@ def verbo(verbosity:bool, **kwargs)->None:
         for key, value in kwargs.items():
             print(f'{key}: {value}')
 
-def main(log='/var/log/dryadd.log', level=logging.DEBUG):
+def main(log='/var/log/dryadd.log', level=logging.warning):
     '''
     Main Dryad transfer daemon
 
