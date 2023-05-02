@@ -5,33 +5,37 @@ import json
 import pickle
 import  dryad2dataverse.serializer as dryad
 
-NULLVALUES= {x[0]: None for x in testCase.dryadJson['authors'][0].items()}
-
-NOMULT ={'multiple':False, 'typeClass':'primitive'}
-
 class TestSerialize(unittest.TestCase): 
-    @classmethod
-    def setUp(cls):
-        #testing Dryad json 14 January 2022
-        #This JSON is found at ./2rbnzs7jp_14Jan22.json
-        cls.testCase = dryad.Serializer('doi:10.5061/dryad.2rbnzs7jp')
-        #with open('tests/dryadStudy.json') as f:
-        #    testCase._dryadJson = json.load(f)
+    #@classmethod
+    #def setUp(cls):
+    #    #testing Dryad json 14 January 2022
+    #    #This JSON is found at ./2rbnzs7jp_14Jan22.json
+    #    cls.testCase = dryad.Serializer('doi:10.5061/dryad.2rbnzs7jp')
+    #    #with open('tests/dryadStudy.json') as f:
+    #    #    testCase._dryadJson = json.load(f)
+
+    def setUp(self):
+        self.testCase = dryad.Serializer('doi:10.5061/dryad.2rbnzs7jp')
+        self.NULLVALUES= {x[0]: None for x in self.testCase.dryadJson['authors'][0].items()}
+        self.NOMULT ={'multiple':False, 'typeClass':'primitive'}
+
+    def tearDown(self):
+        self.testCase.session.close()
 
 
     def test_generic(self):
         #Test on affiliation
         out = {'authorAffiliation':{'typeName':'authorAffiliation', 'value':'University of Minnesota', 'multiple':False, 'typeClass':'primitive'}}
-        self.assertEqual(isinstance(testCase.dryadJson['authors'][0], dict), True)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson['authors'][0], 
+        self.assertEqual(isinstance(self.testCase.dryadJson['authors'][0], dict), True)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson['authors'][0], 
                     dvField='authorAffiliation',
                     dryField='affiliation'), out)
 
-        # Test NULLVALUES
-        self.assertEqual(testCase._convert_generic(inJson=NULLVALUES,
+        # Test self.NULLVALUES
+        self.assertEqual(self.testCase._convert_generic(inJson=self.NULLVALUES,
                     dvField='authorAffiliation',
                     dryField='affiliation'), {})
-
+        self.testCase.session.close()
 
     def test_abstract(self):
         self.assertEqual.__self__.maxDiff = None
@@ -40,28 +44,30 @@ class TestSerialize(unittest.TestCase):
         abs = {'dsDescriptionValue': 
                 {'typeName':'dsDescriptionValue', 
                   'value':abstract, 'multiple':False, 'typeClass':'primitive'}}
-        self.assertEqual(isinstance(testCase.dryadJson['abstract'], str), True)
-        #self.assertEqual(testCase._convert_abstract(testCase.dryadJson['abstract']), abs)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson, dvField='dsDescriptionValue', dryField='abstract'), abs)
+        self.assertEqual(isinstance(self.testCase.dryadJson['abstract'], str), True)
+        #self.assertEqual(self.testCase._convert_abstract(self.testCase.dryadJson['abstract']), abs)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson, dvField='dsDescriptionValue', dryField='abstract'), abs)
 
     def test_version(self):
-        self.assertEqual(True, isinstance(testCase.dryadJson['versionNumber'], int))
+        self.assertEqual(True, isinstance(self.testCase.dryadJson['versionNumber'], int))
         #removed 
-        #self.assertEqual(True, isinstance(testCase.version, int))
+        #self.assertEqual(True, isinstance(self.testCase.version, int))
+        self.testCase.session.close()
+
 
     def test_author(self):
         #dvAuthor = json.loads("{'authorName':{'typeName':'authorName', 'value': 'Powers, Jennifer'}}")
         dvAuthor = {'authorName':{'typeName':'authorName', 'value': 'Powers, Jennifer','multiple':False, 'typeClass':'primitive'}}
-        self.assertEqual(isinstance(testCase.dryadJson['authors'][0], dict), True)
-        self.assertEqual(testCase._convert_author_names(testCase.dryadJson['authors'][0]), dvAuthor)
+        self.assertEqual(isinstance(self.testCase.dryadJson['authors'][0], dict), True)
+        self.assertEqual(self.testCase._convert_author_names(self.testCase.dryadJson['authors'][0]), dvAuthor)
 
     def test_email(self):
         email = {'datasetContactEmail': 
                 {'typeName':'datasetContactEmail',
                     'value':'powers@umn.edu','multiple':False, 'typeClass':'primitive'}}
-        isinstance(testCase.dryadJson['authors'][0], dict)
-        #self.assertEqual(isinstance(testCase.dryadJson['authors'][0], dict), True)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson['authors'][0], dvField='datasetContactEmail', dryField='email'), email)
+        isinstance(self.testCase.dryadJson['authors'][0], dict)
+        #self.assertEqual(isinstance(self.testCase.dryadJson['authors'][0], dict), True)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson['authors'][0], dvField='datasetContactEmail', dryField='email'), email)
 
     def test_orcid(self):
         addJson={'authorIdentifierScheme': 
@@ -73,51 +79,51 @@ class TestSerialize(unittest.TestCase):
 
         orcid = {'authorIdentifier': {'typeName':'authorIdentifier','value':'0000-0003-3451-4803','multiple':False, 'typeClass':'primitive'}}
         orcid.update(addJson)
-        isinstance(testCase.dryadJson['authors'][0], dict)
+        isinstance(self.testCase.dryadJson['authors'][0], dict)
         self.assertEqual(isinstance(addJson, dict),True)
-        self.assertEqual(isinstance(testCase.dryadJson['authors'][0], dict), True)
-        #self.assertEqual(testCase._convert_orcid(testCase.dryadJson['authors'][0]),orcid)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson['authors'][0], dvField='authorIdentifier', dryField='orcid', addJson=addJson),orcid)
+        self.assertEqual(isinstance(self.testCase.dryadJson['authors'][0], dict), True)
+        #self.assertEqual(self.testCase._convert_orcid(self.testCase.dryadJson['authors'][0]),orcid)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson['authors'][0], dvField='authorIdentifier', dryField='orcid', addJson=addJson),orcid)
 
     def test_affiliation(self):
         affil = {'authorAffiliation': 
                    {'typeName':'authorAffiliation', 'value': 'University of Minnesota'}
                 }
-        affil['authorAffiliation'].update(NOMULT)
-        self.assertEqual(isinstance(testCase.dryadJson['authors'][0], dict), True)
-        #self.assertEqual(testCase._convert_affiliation(testCase.dryadJson['authors'][0]),affil)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson['authors'][0], dvField='authorAffiliation', dryField='affiliation'),affil)
+        affil['authorAffiliation'].update(self.NOMULT)
+        self.assertEqual(isinstance(self.testCase.dryadJson['authors'][0], dict), True)
+        #self.assertEqual(self.testCase._convert_affiliation(self.testCase.dryadJson['authors'][0]),affil)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson['authors'][0], dvField='authorAffiliation', dryField='affiliation'),affil)
 
     def test_isni(self):
         '''Dryad has no ISNI'''
         addJson={'authorIdentifierScheme': 
                     {'typeName':'authorIdentifierScheme', 
                         'value': 'ISNI'}}
-        addJson['authorIdentifierScheme'].update(NOMULT)
+        addJson['authorIdentifierScheme'].update(self.NOMULT)
 
         ident = {'authorIdentifier': {'typeName':'authorIdentifier','value':'0000-0003-3451-4803'}
                    }
-        ident['authorIdentifier'].update(NOMULT)
+        ident['authorIdentifier'].update(self.NOMULT)
            
         self.assertEqual(isinstance(addJson, dict),True)
-        self.assertEqual(isinstance(testCase.dryadJson['authors'][0], dict), True)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson['authors'][0], dvField='authorIdentifier', dryField='affiliationISNI', addJson=addJson),{})
+        self.assertEqual(isinstance(self.testCase.dryadJson['authors'][0], dict), True)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson['authors'][0], dvField='authorIdentifier', dryField='affiliationISNI', addJson=addJson),{})
 
     def test_funders(self):
         funder = {'grantNumberValue': 
                    {'typeName':'grantNumberValue', 'value': 'CAREER grant DEB 1053237'}}
-        funder['grantNumberValue'].update(NOMULT)
-        self.assertEqual(isinstance(testCase.dryadJson['funders'][0], dict), True)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson['funders'][0], dvField='grantNumberValue', dryField='awardNumber') , funder)
+        funder['grantNumberValue'].update(self.NOMULT)
+        self.assertEqual(isinstance(self.testCase.dryadJson['funders'][0], dict), True)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson['funders'][0], dvField='grantNumberValue', dryField='awardNumber') , funder)
 
     def test_doi(self):
         doi  = {'relatedDatasets': 
                 {'typeName':'relatedDatasets', 'value': ['Original dataset in Dryad repository: doi:10.5061/dryad.2rbnzs7jp']}}
-        doi['relatedDatasets'].update(NOMULT)
+        doi['relatedDatasets'].update(self.NOMULT)
         pnotes= 'Original dataset in Dryad repository:'
 
         
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson, 
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson, 
             dvField='relatedDatasets', 
             dryField='identifier', 
             addJson=None,
@@ -132,13 +138,13 @@ class TestSerialize(unittest.TestCase):
                 {'keywordValue':{'typeName':'keywordValue','value':'Costa Rica'}}
                 ]
 
-        self.assertEqual(isinstance(testCase.dryadJson['keywords'], list), True)
-        self.assertEqual(testCase._convert_keywords(*testCase.dryadJson['keywords']), keywords)
+        self.assertEqual(isinstance(self.testCase.dryadJson['keywords'], list), True)
+        self.assertEqual(self.testCase._convert_keywords(*self.testCase.dryadJson['keywords']), keywords)
 
     def test_lastmod(self):
         lastmod= {'distributionDate': 
                 {'typeName':'distributionDate',
-                    'value':'2020-03-17'}.update(NOMULT)}
+                    'value':'2020-03-17'}.update(self.NOMULT)}
 
     def test_notes(self):
         self.assertEqual.__self__.maxDiff = None
@@ -146,14 +152,14 @@ class TestSerialize(unittest.TestCase):
                  'typeClass':'primitive',
                  'multiple':False,
                  'value': '<p><b>Dryad version number:</b> 4</p>\n<p><b>Version status:</b> submitted</p>\n<p><b>Dryad curation status:</b> Published</p>\n<p><b>Sharing link:</b> https://datadryad.org/stash/share/anFoRwjUzvjvpH8RA2T0mNipNsVst0s0N5mFzcTTcJE</p>\n<p><b>Storage size:</b> 23874866</p>\n<p><b>Visibility:</b> public</p>\n'}
-        self.assertEqual(testCase._convert_notes(testCase.dryadJson), notes )
+        self.assertEqual(self.testCase._convert_notes(self.testCase.dryadJson), notes )
 
     def test_pub_date(self):
         pubdate = {'distributionDate': 
                    {'typeName':'distributionDate', 'value': '2020-03-17'}}
-        pubdate['distributionDate'].update(NOMULT)
+        pubdate['distributionDate'].update(self.NOMULT)
 
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson, 
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson, 
                 dvField='distributionDate', 
                 dryField='publicationDate') , pubdate)
 
@@ -161,31 +167,31 @@ class TestSerialize(unittest.TestCase):
         
         addJson = {'publicationIDType': 
                    {'typeName':'publicationIDType', 'value': 'issn'}}
-        addJson['publicationIDType'].update(NOMULT)
+        addJson['publicationIDType'].update(self.NOMULT)
         addJson['publicationIDType']['typeClass']='controlledVocabulary' #remember to do this
         issn = {'publicationIDNumber':
                 {'typeName':'publicationIDNumber', 'value':'TEST'}}
-        issn['publicationIDNumber'].update(NOMULT)
+        issn['publicationIDNumber'].update(self.NOMULT)
 
-        testCase.dryadJson.update({'publicationISSN': 'TEST'})
+        self.testCase.dryadJson.update({'publicationISSN': 'TEST'})
         out = addJson.copy()
         out.update(issn)
         
         self.assertEqual(isinstance(out, dict), True)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson, 
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson, 
             dvField='publicationIDNumber', 
             dryField='publicationISSN', 
             addJson=addJson,
             ), out)
-        del testCase.dryadJson['publicationISSN']
+        del self.testCase.dryadJson['publicationISSN']
 
     def test_title(self):
         #TITLES don't actually have the 'title' prepended BFY
         out= {'title': 
                 {'typeName':'title',
                     'value':'A catastrophic tropical drought kills hydraulically vulnerable tree species'}}
-        out['title'].update(NOMULT)
-        self.assertEqual(testCase._convert_generic(inJson=testCase.dryadJson, 
+        out['title'].update(self.NOMULT)
+        self.assertEqual(self.testCase._convert_generic(inJson=self.testCase.dryadJson, 
             dvField='title', 
             dryField='title', 
             addJson=None,
@@ -220,3 +226,5 @@ class TestSerialize(unittest.TestCase):
     #    #URL with https:// prepended
     #    url = 'https://www.github.com/wood-lab/Quinn_et_al_2021_Proc_B'
     #    self.assertEqual(dvurl, url)
+if __name__ == '__main__':
+    unittest.main()

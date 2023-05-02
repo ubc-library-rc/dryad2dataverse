@@ -16,7 +16,11 @@ class TestMonitor(unittest.TestCase):
     def setUpClass(cls):
         cls.testCase = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
         cls.montest = dryad2dataverse.monitor.Monitor(':memory:')
-    
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.testCase.session.close()
+
     #def setUp(self):
     #    print( "Start test")
 

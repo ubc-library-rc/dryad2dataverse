@@ -36,3 +36,7 @@ scripts/testpickle
 scripts/dryadd_t.py
 dist/
 dist/**
+build/
+build/**
+bin/
+bin/**

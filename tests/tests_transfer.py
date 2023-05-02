@@ -24,6 +24,10 @@ class TestTransfer(unittest.TestCase):
         cls.testCase = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
         cls.testTrans = dryad2dataverse.transfer.Transfer(cls.testCase)
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.testCase.session.close()
+
     def test_file_id(self):
         '''
         Does file_id even matter? we found out in Dec 2021  that they're changeable.
