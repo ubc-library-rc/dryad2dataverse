@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>/Users/paul/tmp/dryad_dataverse_monitor.sqlite3 Database</title>
+        <title>dryad_dataverse_monitor.sqlite3.%</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -46,7 +46,7 @@
                 <nav class="navbar navbar-static-top">
                     <div class="container">
                         <div class="navbar-header">
-                            <a href="index.html" class="navbar-brand"><b>/Users/paul/tmp/dryad_dataverse_monitor.sqlite3</b> Database</a>
+                            <a href="index.html" class="navbar-brand"><b>dryad_dataverse_monitor.sqlite3</b></a><span class="navbar-brand" style="padding-left: 0">.%</span>
                             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
                         </div>
 
@@ -77,12 +77,12 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="callout callout-info">
-                                <h4>SchemaSpy Analysis of /Users/paul/tmp/dryad_dataverse_monitor.sqlite3</h4>
-                                <p>Generated on Wed. Mar. 24 13:34 PDT 2021</p>
+                                <h4>SchemaSpy Analysis of dryad_dataverse_monitor.sqlite3.%</h4>
+                                <p>Generated on Wed May 03 09:15 PDT 2023</p>
                             </div>
                         </div>
                     </div>
-                    <a href="/Users/paul/tmp/dryad_dataverse_monitor.sqlite3.dryad_dataverse_monitor.xml" title="XML Representation">XML Representation</a><br />
+                    <a href="dryad_dataverse_monitor.sqlite3.%.xml" title="XML Representation">XML Representation</a><br />
                     <a href="insertionOrder.txt" title="Useful for loading data into a database">Insertion Order</a>
                     <a href="deletionOrder.txt" title="Useful for purging data from a database">Deletion Order</a>
                 </section>
@@ -177,7 +177,13 @@
                             <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
+                            <table
+                                    id="database_objects"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="true"
+                                    data-page-length="50"
+                                    data-length-change="false">
                                 <thead>
                                     <tr>
                                         <th valign="bottom">Table / View</th>
@@ -200,19 +206,19 @@
                                         <td class="comment detail" style="display: table-cell;"></td>
                                     </tr>
                                     <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="tables/dvStudy.html">dvStudy</a></td>
+                                        <td class="detail"><a href="tables/dryadStudy.html">dryadStudy</a></td>
+                                        <td class="detail" align="right">4</td>
                                         <td class="detail" align="right">0</td>
-                                        <td class="detail" align="right">1</td>
-                                        <td class="detail" align="right">2</td>
+                                        <td class="detail" align="right">5</td>
                                         <td class="detail" align="right">0</td>
                                         <td class="detail" align="right">Table</td>
                                         <td class="comment detail" style="display: table-cell;"></td>
                                     </tr>
                                     <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="tables/dryadStudy.html">dryadStudy</a></td>
-                                        <td class="detail" align="right">4</td>
+                                        <td class="detail"><a href="tables/dvStudy.html">dvStudy</a></td>
                                         <td class="detail" align="right">0</td>
-                                        <td class="detail" align="right">5</td>
+                                        <td class="detail" align="right">1</td>
+                                        <td class="detail" align="right">2</td>
                                         <td class="detail" align="right">0</td>
                                         <td class="detail" align="right">Table</td>
                                         <td class="comment detail" style="display: table-cell;"></td>
@@ -262,7 +268,7 @@
                         <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
                         <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
                     </div>
-                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 6.1.0</a></strong>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 6.2.2</a></strong>
                 </div>
                 <!-- /.container -->
             </footer>

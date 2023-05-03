@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<database name="/Users/paul/tmp/dryad_dataverse_monitor.sqlite3" schema="dryad_dataverse_monitor" type="SQLite - 3.32.3">
+<?xml version="1.0" encoding="UTF-8"?><database name="dryad_dataverse_monitor.sqlite3" schema="%" type="SQLite - 3.32.3">
    <tables>
       <table name="dryadFiles" numRows="0" remarks="" type="TABLE">
          <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="dryaduid" nullable="true" remarks="" size="2000000000" type="INTEGER" typeCode="4">

@@ -67,6 +67,6 @@ More information on virtual environments can be found on the Python website: <ht
 
 ## Keeping up to date
 
-If you have installed with pip, upgrading is easy and very similar to the normal upgrade procedure:
+If you have installed with pip, upgrading is easy:
 
-`pip install --upgrade git+https://github.com/ubc-library-rc/dryad2dataverse.git@master`
+`pip install --upgrade dryad2dataverse.git`

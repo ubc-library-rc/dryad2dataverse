@@ -23,6 +23,7 @@ see all the options available with
 Initiate a transfer from a [Dryad](https://datadryad.org) repository to a [Dataverse](https://dataverse.org) repository.
 
 ### Using the package
+
 ```
 #Serializer
 import dryad2dataverse.serializer
@@ -31,8 +32,15 @@ import dryad2dataverse.transfer
 #Monitor
 #import dryad2dataverse.monitor
 
-[etc]
+i_heart_dryad = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
+dv = dryad2dataverse.transfer.Transfer(i_heart_dryad)
+dv.download_files()
+dv.upload_study(targetDv='dryad')
+dv.upload_files()
 
+#For an explanation look at the more detailed docs
+#You know, like where your API key goes.
+```
 
 ## Documentation
 

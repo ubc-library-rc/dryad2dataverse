@@ -13,7 +13,7 @@ nav_order: 25
 
 No software development is done in a vacuum, and this project is no exception.
 
-Thanks to Eugene Barsky and Doug Brigham of the University of British Columbia library [Research Commons](https://researchcommons.library.ubc.ca) for their assistance and support, to Ryan Scherle of [Dryad](https://datadryad.org) for his help with the Dryad API, and the helpful people at [Dataverse](https://dataverse.org).
+Thanks to Eugene Barsky,Doug Brigham and Jeremy Buhler of the University of British Columbia library [Research Commons](https://researchcommons.library.ubc.ca) for their assistance and support, to Ryan Scherle of [Dryad](https://datadryad.org) for his help with the Dryad API, and the helpful people at [Dataverse](https://dataverse.org).
 
 Without the fabulous [requests](https://requests.readthedocs.io/en/master/) library and [the requests toolbelt](https://toolbelt.readthedocs.io/en/latest/user.html) everything would have taken a great deal longer.
 

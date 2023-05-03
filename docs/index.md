@@ -12,12 +12,12 @@ nav_order: 1
 
 ## Introduction
 
-**dryad2dataverse** is an oddly specific [Python](https://python.org) package/library which comes with the highly-sought after [**script** application](script.md) which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
+**dryad2dataverse** is an oddly specific [Python](https://python.org) package/library which comes with the highly-sought after [**console application**](script.md) which allows easier transfer of metadata and data from a Dryad data repository (ie, <https://datadryad.org>) to a [Dataverse](https://dataverse.org/ "Dataverse software main site") repository.
 
 ### The app is probably what you want 
 ----
 
-If you're interested in moving Dryad studies to Dataverse, being notified on changes and largely automating everything, the [dryadd application](dryadd.md) can do *all* of these things without requiring any knowledge of Python or programming. All you need is basic command line knowledge and a platform with enough storage to (temporarily) hold the contents of a few Dryad records.
+If you're interested in moving Dryad studies to Dataverse, being notified on changes and largely automating everything, the [dryadd application](script.md) can do *all* of these things without requiring any knowledge of Python or programming. All you need is basic command line knowledge and a platform with enough storage to (temporarily) hold the contents of a few Dryad records.
 
 ----
 ## Quick install
