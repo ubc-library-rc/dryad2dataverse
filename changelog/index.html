@@ -50,7 +50,7 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../script/">Command line application</a>
+                <li class="toctree-l1"><a class="reference internal" href="../script/">The dryadd console application</a>
                 </li>
               </ul>
               <ul>
@@ -76,6 +76,10 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="./">Changelog</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#v060-2-may-2023">v0.6.0 - 2 May 2023</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#v058-10-february-2023">v0.5.8 - 10 February 2023</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#v050-7-december-2022">v0.5.0 - 7 December 2022</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#v031-4-february-2022">v0.3.1 - 4 February 2022</a>
@@ -126,6 +130,26 @@
               
                 <h1 id="dryad2dataverse-changelog">Dryad2dataverse changelog<a class="headerlink" href="#dryad2dataverse-changelog" title="Permanent link">&para;</a></h1>
 <p>Perfection on the first attempt is rare.</p>
+<h2 id="v060-2-may-2023">v0.6.0 - 2 May 2023<a class="headerlink" href="#v060-2-may-2023" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Updated to current Python packaging standards</li>
+<li>Installation can now be done straight from <code>pip</code> without resorting to <code>git+http. . .</code></li>
+<li>Test framework now <code>unittest</code></li>
+<li>Documentation updated</li>
+</ul>
+<p><strong>dryad2dataverse.constants</strong></p>
+<ul>
+<li><code>constants.dvurl</code> now defaults to <a href="https://borealisdata.ca">https://borealisdata.ca</a></li>
+<li><code>pathlib</code> instead of <code>os.path</code> for greater cross-platform compatibility.</li>
+</ul>
+<h2 id="v058-10-february-2023">v0.5.8 - 10 February 2023<a class="headerlink" href="#v058-10-february-2023" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Good lord I misspelled &ldquo;February&rdquo; initially</li>
+<li>certifi requirements updated</li>
+<li>somewhat better error logging for odd requests failures</li>
+<li>Dataverse JSON change to be in compliance with new standards for v5.12+</li>
+</ul>
+<p>Note that  binaries will no longer be produced for dryad2dataverse. If you want one, you can either contact me and I will create one and add it to the release, or you can make one yourself using PyInstaller or Nuitka. The effort of making them vs the lack of downloads has led to this decision. If this is a problem please create an issue for discussion.</p>
 <h2 id="v050-7-december-2022">v0.5.0 - 7 December 2022<a class="headerlink" href="#v050-7-december-2022" title="Permanent link">&para;</a></h2>
 <p><strong>dataverse.handlers</strong></p>
 <ul>

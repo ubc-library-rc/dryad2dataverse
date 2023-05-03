@@ -48,13 +48,19 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#not-just-a-library-no-programming-required">Not just a library - no programming required</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#why-would-i-need-this">Why would I need this?</a>
+    <li class="toctree-l3"><a class="reference internal" href="#the-app-is-probably-what-you-want">The app is probably what you want</a>
     </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#quick-install">Quick install</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#i-know-how-to-program-in-python-what-does-this-do">I know how to program in Python. What does this do?</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#so-why-would-i-need-this">So why would I need this?</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic usage</a>
         <ul>
@@ -63,6 +69,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#transferring-data">Transferring data</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#change-monitoring">Change monitoring</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup">That's great! I'm going to use this for my very important data for which I have no backup.</a>
     </li>
         </ul>
     </li>
@@ -74,7 +82,7 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="script/">Command line application</a>
+                <li class="toctree-l1"><a class="reference internal" href="script/">The dryadd console application</a>
                 </li>
               </ul>
               <ul>
@@ -135,31 +143,30 @@
                 <h1 id="dryad2dataverse-translate-transfer-and-track">dryad2dataverse -  translate, transfer and track<a class="headerlink" href="#dryad2dataverse-translate-transfer-and-track" title="Permanent link">&para;</a></h1>
 <h2 id="_1"><img alt="dryad2dataverse logo" src="images/dryad2dataverseLogo.svg" /><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p><strong>dryad2dataverse</strong> is an oddly specific <a href="https://python.org">Python</a> programming language library and an associated <a href="script/">application</a> which allows easier transfer of metadata and data from a Dryad data repository (ie, <a href="https://datadryad.org">https://datadryad.org</a>) to a <a href="https://dataverse.org/" title="Dataverse software main site">Dataverse</a> repository.</p>
-<p>With these tools it&rsquo;s possible to: </p>
+<p><strong>dryad2dataverse</strong> is an oddly specific <a href="https://python.org">Python</a> package/library which comes with the highly-sought after <a href="script/"><strong>console application</strong></a> which allows easier transfer of metadata and data from a Dryad data repository (ie, <a href="https://datadryad.org">https://datadryad.org</a>) to a <a href="https://dataverse.org/" title="Dataverse software main site">Dataverse</a> repository.</p>
+<h3 id="the-app-is-probably-what-you-want">The app is probably what you want<a class="headerlink" href="#the-app-is-probably-what-you-want" title="Permanent link">&para;</a></h3>
+<hr />
+<p>If you&rsquo;re interested in moving Dryad studies to Dataverse, being notified on changes and largely automating everything, the <a href="script/">dryadd application</a> can do <em>all</em> of these things without requiring any knowledge of Python or programming. All you need is basic command line knowledge and a platform with enough storage to (temporarily) hold the contents of a few Dryad records.</p>
+<hr />
+<h2 id="quick-install">Quick install<a class="headerlink" href="#quick-install" title="Permanent link">&para;</a></h2>
+<pre><code class="language-nohighlight">pip install dryad2dataverse
+</code></pre>
+<p>or, if you want to stay clear of anything related to a command line, download a compiled version of the migrator <code>dryadd</code> only for your computer system at the <a href="https://github.com/ubc-library-rc/dryad2dataverse/releases">releases page</a>. Note that binary releases are not available for all platforms, and if you want the most recent version you&rsquo;re better off using <code>pip</code>.</p>
+<h3 id="i-know-how-to-program-in-python-what-does-this-do">I know how to program in Python. What does this do?<a class="headerlink" href="#i-know-how-to-program-in-python-what-does-this-do" title="Permanent link">&para;</a></h3>
+<p>With these tools it’s possible to:</p>
 <p>a) Serialize Dryad metadata to Dataverse JSON</p>
 <p>b) Transfer Dryad studies to Dataverse without any knowledge of the somewhat complex Dataverse API</p>
 <p>c) Monitor changes in status</p>
-<p>The minimum required Python version for <strong>dryad2dataverse</strong> is Python <strong>3.6</strong>, as it is the earliest version which supports <a href="https://www.python.org/dev/peps/pep-0498/">f-strings</a>. It was developed using version 3.7.2, and it runs just fine under the [now current] 3.9.2. You can find Python at <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a>. <em>No testing was done with Anaconda, only stock Python</em>. That said, it probably works fine with Anaconda.</p>
-<h3 id="not-just-a-library-no-programming-required">Not just a library - no programming required<a class="headerlink" href="#not-just-a-library-no-programming-required" title="Permanent link">&para;</a></h3>
-<hr />
-<p>If you hate programming, are pressed for time and/or don&rsquo;t want to read any documentation, <strong>dryad2dataverse</strong> also comes with a <a href="script/">command line tool</a> to do all of these things without requiring any knowledge of Python or programming.</p>
-<hr />
-<p>The <strong>dryad2dataverse</strong> library is free and open source, released under the MIT license. It&rsquo;s also not written by anyone with a degree in computer science, so as the MIT license says: </p>
-<pre class="codehilite"><code>Software is provided &quot;as is&quot;, without warranty of any kind
-</code></pre>
-
-<h3 id="why-would-i-need-this">Why would I need this?<a class="headerlink" href="#why-would-i-need-this" title="Permanent link">&para;</a></h3>
-<p>There are a few reasons why you might find this product useful.</p>
+<h4 id="so-why-would-i-need-this">So why would I need this?<a class="headerlink" href="#so-why-would-i-need-this" title="Permanent link">&para;</a></h4>
 <ul>
 <li>
-<p>You are a researcher and you wish to deposit via API into Dataverse repository. </p>
+<p>You are a researcher and you wish to deposit via API into Dataverse repository. You can use the tools with this package to that without needing to understand the APIs and formats of two separate platforms.</p>
 </li>
 <li>
 <p>You&rsquo;ve used Dryad, but the Dataverse JSON and API is unfamiliar and <a href="https://guides.dataverse.org/en/latest/_downloads/dataset-create-new-all-default-fields.json" title="Complex Dataverse JSON">complex</a>. </p>
 </li>
 <li>
-<p>You want to write your Dryad JSON and have it convert automatically.</p>
+<p>You want to write your Dryad JSON and have it convert automatically to Dataverse&rsquo;s much more complex one.</p>
 </li>
 <li>
 <p>Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution&rsquo;s research data (for example, the Dataverse repository at <a href="https://borealisdata.ca">https://borealisdata.ca</a>).</p>
@@ -168,10 +175,6 @@
 <p>And on top of that, you don&rsquo;t want to keep checking to see if there were any updates, so you wish to automate the process.</p>
 </li>
 </ul>
-<h2 id="quick-install">Quick install<a class="headerlink" href="#quick-install" title="Permanent link">&para;</a></h2>
-<pre><code class="language-nohighlight">pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master
-</code></pre>
-<p>or, if you want to stay clear of anything related to a command line, download a compiled version of the migrator <code>dryadd</code> only for your computer system at the <a href="https://github.com/ubc-library-rc/dryad2dataverse/releases">releases page</a>. Note that binary releases may lag behind the Python though.</p>
 <h2 id="basic-usage">Basic usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
 <h4 id="converting-json">Converting JSON<a class="headerlink" href="#converting-json" title="Permanent link">&para;</a></h4>
 <pre><code class="language-nohighlight">&gt;&gt;&gt; #Convert Dryad JSON to Dataverse JSON and save to a file
@@ -216,6 +219,10 @@
 &gt;&gt;&gt; monitor.update(transfer)
 &gt;&gt;&gt; # And then, to make your life easier, update the last time you checked Dryad
 &gt;&gt;&gt; monitor.set_timestamp()
+</code></pre>
+<h3 id="thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup">That&rsquo;s great! I&rsquo;m going to use this for my very important data for which I have no backup.<a class="headerlink" href="#thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup" title="Permanent link">&para;</a></h3>
+<p>The <strong>dryad2dataverse</strong> library is free and open source, released under the MIT license. It&rsquo;s also not written by anyone with a degree in computer science, so as the MIT license says: </p>
+<pre class="codehilite"><code>Software is provided &quot;as is&quot;, without warranty of any kind
 </code></pre>
               
             </div>
@@ -264,5 +271,5 @@
 
 <!--
 MkDocs version : 1.4.2
-Build Date UTC : 2022-12-07 23:44:36.354101+00:00
+Build Date UTC : 2023-05-03 20:29:10.323847+00:00
 -->

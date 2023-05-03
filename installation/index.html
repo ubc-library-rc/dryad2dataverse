@@ -49,12 +49,16 @@
                 <li class="toctree-l1 current"><a class="reference internal current" href="./">Installation</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#simple-installation-using-pip">Simple installation using Pip</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#installing-from-the-github-repository">Installing from the Github repository</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#manual-download">Manual Download</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#precompiled-binaries">Precompiled binaries</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#source-code">Source code</a>
+    <li class="toctree-l3"><a class="reference internal" href="#from-local-source-code">From local source code</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#using-dryad2dataverse-with-a-virtual-environment">Using dryad2dataverse with a virtual environment</a>
     </li>
@@ -66,7 +70,7 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../script/">Command line application</a>
+                <li class="toctree-l1"><a class="reference internal" href="../script/">The dryadd console application</a>
                 </li>
               </ul>
               <ul>
@@ -127,18 +131,25 @@
                 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <p>This is not a complete list of installation methods. For a complete guide to Python package installation, please see <a href="https://packaging.python.org/tutorials/installing-packages/">https://packaging.python.org/tutorials/installing-packages/</a>. As a baseline, you will need to install a version of <a href="https://python.org">Python</a> &gt;= 3.6.</p>
 <h2 id="simple-installation-using-pip">Simple installation using Pip<a class="headerlink" href="#simple-installation-using-pip" title="Permanent link">&para;</a></h2>
-<p>Once you&rsquo;ve installed Python, installation via <code>pip</code> is very simple. Dryad2dataverse isn&rsquo;t on <a href="https://pypi.org/">PyPi</a> yet, but you can still use Python&rsquo;s package manager, <code>pip</code>:</p>
-<p><code>pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master</code></p>
+<p>Once you&rsquo;ve installed Python, installation via <code>pip</code> is very simple:</p>
+<p><code>pip install dryad2dataverse</code></p>
 <p>Of course, if you want to use a branch other than <em>master</em>, you can switch <em>master</em> for the branch you want. This is not recommended, though, as the <em>master</em> branch contains the most current [stable] release.</p>
+<h3 id="installing-from-the-github-repository">Installing from the Github repository<a class="headerlink" href="#installing-from-the-github-repository" title="Permanent link">&para;</a></h3>
+<p>If you require a specific commit, branch, etc, you can install directly from Github using <code>pip</code>:</p>
+<p><code>pip install git+https://github.com/ubc-library-rc/dryad2dataverse.git@master</code></p>
+<p>Of course, you can also install other branches or specific commits as required; see the documentation for <code>pip</code> on how to do that.</p>
 <h2 id="manual-download">Manual Download<a class="headerlink" href="#manual-download" title="Permanent link">&para;</a></h2>
 <h3 id="precompiled-binaries">Precompiled binaries<a class="headerlink" href="#precompiled-binaries" title="Permanent link">&para;</a></h3>
 <p>Compiled versions of the <code>dryadd</code> migrator for selected operating systems and architectures are available at the <a href="https://github.com/ubc-library-rc/dryad2dataverse/releases">releases page</a>. Note that binary releases may lag behind the Python, and of course the binary files don&rsquo;t include the Python package.</p>
-<h3 id="source-code">Source code<a class="headerlink" href="#source-code" title="Permanent link">&para;</a></h3>
+<h3 id="from-local-source-code">From local source code<a class="headerlink" href="#from-local-source-code" title="Permanent link">&para;</a></h3>
 <p>The source code for this project is available at <a href="https://github.com/ubc-library-rc/dryad2dataverse">https://github.com/ubc-library-rc/dryad2dataverse</a></p>
 <p>To install, first clone the repository:</p>
 <p><code>git clone https://github.com/ubc-library-rc/dryad2dataverse.git</code></p>
+<p>This will place the source at <code>whatever/directory/you/are/in/dryad2dataverse</code></p>
 <p>If you wish to install with <code>pip</code>, you can use:</p>
-<p>`pip install .&rsquo;</p>
+<pre><code>cd dryad2dataverse
+pip install .
+</code></pre>
 <p>or, if you are planning to tinker with the source code:</p>
 <p><code>pip install -e .</code></p>
 <h3 id="using-dryad2dataverse-with-a-virtual-environment">Using dryad2dataverse with a virtual environment<a class="headerlink" href="#using-dryad2dataverse-with-a-virtual-environment" title="Permanent link">&para;</a></h3>
@@ -161,15 +172,14 @@
 </ol>
 <p>More information on virtual environments can be found on the Python website: <a href="https://docs.python.org/3.6/tutorial/venv.html">https://docs.python.org/3.6/tutorial/venv.html</a></p>
 <h2 id="keeping-up-to-date">Keeping up to date<a class="headerlink" href="#keeping-up-to-date" title="Permanent link">&para;</a></h2>
-<p>If you have installed with pip, upgrading is easy and very similar to the normal upgrade procedure:</p>
-<p><code>pip install --upgrade git+https://github.com/ubc-library-rc/dryad2dataverse.git@master</code></p>
-<p>If you used one of the other methods, you should upgrade manually.</p>
+<p>If you have installed with pip, upgrading is easy:</p>
+<p><code>pip install --upgrade dryad2dataverse.git</code></p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href=".." class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../script/" class="btn btn-neutral float-right" title="Command line application">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../script/" class="btn btn-neutral float-right" title="The dryadd console application">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
