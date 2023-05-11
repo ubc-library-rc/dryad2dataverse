@@ -2,6 +2,12 @@
 
 Perfection on the first attempt is rare.
 
+## v0.6.1 - 11 May 2023
+
+** dryad2dataverse.constants**
+
+* Eliminated deprecated parameter in call to `urllib3.util.Retry` as per <https://github.com/urllib3/urllib3/issues/2092>
+
 ## v0.6.0 - 2 May 2023
 
 * Updated to current Python packaging standards
