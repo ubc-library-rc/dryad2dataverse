@@ -23,7 +23,7 @@ from urllib3.util import Retry
 #can-i-set-max-retries-for-requests-request
 RETRY_STRATEGY = Retry(total=10,
                        status_forcelist=[429, 500, 502, 503, 504],
-                       method_whitelist=['HEAD', 'GET', 'OPTIONS',
+                       allowed_methods=['HEAD', 'GET', 'OPTIONS',
                                          'POST', 'PUT'],
                        backoff_factor=1)
 
