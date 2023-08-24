@@ -27,7 +27,7 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 5, 2)
+VERSION = (0, 5, 3)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -509,7 +509,7 @@ def verbo(verbosity:bool, **kwargs)->None:
         for key, value in kwargs.items():
             print(f'{key}: {value}')
 
-def main(log='/var/log/dryadd.log', level=logging.warning):
+def main(log='/var/log/dryadd.log', level=logging.WARNING):
     '''
     Main Dryad transfer daemon
 
