@@ -9,7 +9,9 @@ import logging
 import os
 import time
 import traceback
+import zlib #crc32, adler32
 
+import Crypto.Hash.MD2 #md2
 import requests
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -19,6 +21,15 @@ from dryad2dataverse import exceptions
 
 LOGGER = logging.getLogger(__name__)
 URL_LOGGER = logging.getLogger('urllib3')
+
+HASHTABLE = {'adler-32' : zlib.adler32, #zlib?
+             'crc-32' : zlib.crc32, #zlib
+             'md2' : Crypto.Hash.MD2, #insecure
+             'md5' : hashlib.md5,
+             'sha-1' : hashlib.sha1,
+             'sha-256' : hashlib.sha256,
+             'sha-384' : hashlib.sha384,
+             'sha-512': hashlib.sha512}
 
 class Transfer():
     '''
@@ -342,7 +353,7 @@ class Transfer():
         return self.dvpid
 
     @staticmethod
-    def _check_md5(infile):
+    def _check_md5(infile, dig_type):
         '''
         Returns the md5 checksum of a file.
 
@@ -351,25 +362,51 @@ class Transfer():
 
         infile : str
             — Complete path to target file.
+
+        dig_type : str or None
+            — Digest type
         ----------------------------------------
         '''
-        blocksize = 2**16
-        with open(infile, 'rb') as m:
-            fmd5 = hashlib.md5()
-            fblock = m.read(blocksize)
-            while fblock:
-                fmd5.update(fblock)
-                fblock = m.read(blocksize)
-        return fmd5.hexdigest()
+        #From Ryan Scherle
+        #When Dryad calculates a digest, it only uses MD5.
+        #But if you have precomputed some other type of digest, we should accept it.
+        #The list of allowed values is:
+        #('adler-32','crc-32','md2','md5','sha-1','sha-256','sha-384','sha-512')
+        #hashlib doesn't support adler-32, crc-32, md2
 
-    def download_file(self, url, filename, tmp=None,
-                      size=None, chk=None, timeout=45):
+        blocksize = 2**16
+        #Well, this is inelegant
+        with open(infile, 'rb') as m:
+            #fmd5 = hashlib.md5()
+            ## var name kept for posterity. Maybe refactor
+            if dig_type in ['sha-1', 'sha-256', 'sha-384', 'sha-512', 'md5', 'md2']:
+                if dig_type == 'md2':
+                    fmd5 = Crypto.Hash.MD2.new()
+                else:
+                    fmd5 = HASHTABLE[dig_type]()
+                fblock = m.read(blocksize)
+                while fblock:
+                    fmd5.update(fblock)
+                    fblock = m.read(blocksize)
+                return fmd5.hexdigest()
+            if dig_type in ['adler-32', 'crc-32']:
+                fblock = m.read(blocksize)
+                curvalue = HASHTABLE[dig_type](fblock)
+                while fblock:
+                    fblock = m.read(blocksize)
+                    curvalue = HASHTABLE[dig_type](fblock, curvalue)
+                return curvalue
+        raise exceptions.HashError(f'Unable to determine hash type for{infile}: {dig_type}')
+
+
+    def download_file(self, url=None, filename=None, tmp=None,
+                      size=None, chk=None, timeout=45, **kwargs):
         '''
         Downloads a file via requests streaming and saves to constants.TMP.
-        returns md5sum on success and an exception on failure.
+        returns checksum on success and an exception on failure.
 
         ----------------------------------------
-        Parameters:
+        Required keyword arguments:
 
         url : str
             — URL of download.
@@ -388,8 +425,11 @@ class Transfer():
             — Reported file size in bytes.
               Defaults to dryad2dataverse.constants.MAX_UPLOAD.
 
+        digest_type: str
+            — checksum type (ie, md5, sha-256, etc)
+
         chk : str
-            - md5 sum of file (if available and known).
+            —  checksum of file (if available and known).
         ----------------------------------------
         '''
         LOGGER.debug('Start download sequence')
@@ -430,11 +470,13 @@ class Transfer():
                         LOGGER.exception(e)
                         raise
             #now check the md5
-            md5 = Transfer._check_md5(f'{tmp}{os.sep}{filename}')
-            if chk:
+            md5 = None
+            if chk and kwargs.get('digest_type') in HASHTABLE:
+                md5 = Transfer._check_md5(f'{tmp}{os.sep}{filename}',
+                                      kwargs['digest_type'])
                 if md5 != chk:
                     try:
-                        raise exceptions.HashError('Hex digest mismatch: {md5} : {chk}')
+                        raise exceptions.HashError(f'Hex digest mismatch: {md5} : {chk}')
                         #is this really what I want to do on a bad checksum?
                     except exceptions.HashError as e:
                         LOGGER.exception(e)
@@ -474,7 +516,13 @@ class Transfer():
             files = self.files
         try:
             for f in files:
-                self.download_file(f[0], f[1], size=f[3], chk=f[-1])
+                self.download_file(url=f[0],
+                                   filename=f[1],
+                                   mimetype=f[2],
+                                   size=f[3],
+                                   descr=f[4],
+                                   digest_type=f[5],
+                                   chk=f[-1])
         except exceptions.DataverseDownloadError as e:
             LOGGER.exception('Unable to download file with info %s\n%s', f, e)
             raise
