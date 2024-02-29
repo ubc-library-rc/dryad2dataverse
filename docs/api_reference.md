@@ -6,8 +6,6 @@ nav_order: 15
 
 # Complete API reference
 
-<a name="dryad2dataverse"></a>
-
 <a id="dryad2dataverse"></a>
 
 ## dryad2dataverse
@@ -279,14 +277,14 @@ to discover Dataverse file ids for deletion.
   filelist : list
   — List of Dryad file tuples: eg:
   
-  ```
-  [('https://datadryad.org/api/v2/files/385819/download',
-  'GCB_ACG_Mortality_2020.zip',
-  'application/x-zip-compressed', 23787587),
-  ('https://datadryad.org/api/v2/files/385820/download',
-  'Readme_ACG_Mortality.txt',
-  'text/plain', 1350)]
-  ```
+    ```
+    [('https://datadryad.org/api/v2/files/385819/download',
+      'GCB_ACG_Mortality_2020.zip',
+      'application/x-zip-compressed', 23787587),
+     ('https://datadryad.org/api/v2/files/385820/download',
+     'Readme_ACG_Mortality.txt',
+     'text/plain', 1350)]
+     ```
   ----------------------------------------
 
 <a id="dryad2dataverse.monitor.Monitor.get_json_dvfids"></a>
@@ -367,6 +365,12 @@ required to transfer data from Dryad to Dataverse.
 
 "Constants" may be a bit strong, but the only constant is the
 presence of change.
+
+<a id="dryad2dataverse.constants.MAX_UPLOAD"></a>
+
+##### MAX\_UPLOAD
+
+Max 3GB upload
 
 <a id="dryad2dataverse.handlers"></a>
 
@@ -625,37 +629,44 @@ Supplying a `targetDv` kwarg creates a new study and supplying a
 ##### download\_file
 
 ```python
-def download_file(url, filename, tmp=None, size=None, chk=None, timeout=45)
+def download_file(url=None,
+                  filename=None,
+                  tmp=None,
+                  size=None,
+                  chk=None,
+                  timeout=45,
+                  **kwargs)
 ```
 
 Downloads a file via requests streaming and saves to constants.TMP.
-returns md5sum on success and an exception on failure.
+returns checksum on success and an exception on failure.
 
 ----------------------------------------
+Required keyword arguments:
 
-**Arguments**:
+url : str
+    — URL of download.
 
-  
-  url : str
-  — URL of download.
-  
-  filename : str
-  — Output file name.
-  
-  timeout : int
-  — Requests timeout.
-  
-  tmp : str
-  — Temporary directory for downloads.
-  Defaults to dryad2dataverse.constants.TMP.
-  
-  size : int
-  — Reported file size in bytes.
-  Defaults to dryad2dataverse.constants.MAX_UPLOAD.
-  
-  chk : str
-  - md5 sum of file (if available and known).
-  ----------------------------------------
+filename : str
+    — Output file name.
+
+timeout : int
+    — Requests timeout.
+
+tmp : str
+    — Temporary directory for downloads.
+      Defaults to dryad2dataverse.constants.TMP.
+
+size : int
+    — Reported file size in bytes.
+      Defaults to dryad2dataverse.constants.MAX_UPLOAD.
+
+digest_type: str
+    — checksum type (ie, md5, sha-256, etc)
+
+chk : str
+    —  checksum of file (if available and known).
+----------------------------------------
 
 <a id="dryad2dataverse.transfer.Transfer.download_files"></a>
 
@@ -934,6 +945,235 @@ a Dataverse installation.
   key : str
   — API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY.
   ----------------------------------------
+
+<a id="dryad2dataverse.scripts.dryadd"></a>
+
+## dryad2dataverse.scripts.dryadd
+
+Dryad daemon for monitoring and automatically uploading studies associated with a particular ROR
+
+Requires Python 3.6+ and requests library
+
+<a id="dryad2dataverse.scripts.dryadd.new_content"></a>
+
+##### new\_content
+
+```python
+def new_content(serial)
+```
+
+Creates content for new study upload message (potentially redundant
+with Dataverse emailer).
+serial : dryad2dataverse.serializer.Serializer instance
+
+<a id="dryad2dataverse.scripts.dryadd.changed_content"></a>
+
+##### changed\_content
+
+```python
+def changed_content(serial, monitor)
+```
+
+Creates content for file update message.
+serial : dryad2dataverse.serializer.Serializer instance
+monitor : dryad2dataverse.monitor.Monitor instance
+
+<a id="dryad2dataverse.scripts.dryadd.notify"></a>
+
+##### notify
+
+```python
+def notify(msgtxt, width=100, **kwargs)
+```
+
+Basic email change notifier. Will sent email outlining metadata changes
+to recipient. Uses SSL.
+
+Has only really been tested with Gmail (although it should work with anything,
+and Gmail requires 'Allow less secure apps' or whatever they call it.
+If you are having troubles with GMail:
+
+1. Enable less secure access
+
+2. Disable the CAPTCHA:
+https://accounts.google.com/DisplayUnlockCaptcha
+
+Note: Google will automatically revert settings after some arbitrary period
+of time. You have been warned.
+
+If your application worked before but suddenly it crashes with authenication
+errors, this is why.
+
+msgtext : tuple
+Tuple containing strings of ('subject', 'message content')
+width : int
+Maximum line length. Max 1000
+
+From the argument parser these keys and values are required:
+email : str
+From address for account
+user : str
+User name for email account
+pwd : str
+Password for email account
+mailserv : str
+SMTP server for sending mail
+port : int
+Mailserver port. Default 465
+recipients : list
+List of email addresses of recipients
+
+<a id="dryad2dataverse.scripts.dryadd.get_records"></a>
+
+##### get\_records
+
+```python
+def get_records(ror: 'str', mod_date=None, verbosity=True, timeout=100)
+```
+
+returns a tuple of ((doi, metadata), ...). Dryad searches return complete
+study metadata from the search, surprisingly.
+
+ror : str
+    ROR string including http. To find your ROR, see
+    https://ror.org/
+
+mod_date : str
+    UTC datetime string in the format suitable for the Dryad API.
+    eg. 2021-01-21T21:42:40Z
+    or .strftime('%Y-%m-%dT%H:%M:%SZ')
+    if no mod_date is passed, all studies will be retrieved
+
+verbosity : bool
+   Output some data to stdout
+
+timeout : int
+    request timeout in seconds
+
+<a id="dryad2dataverse.scripts.dryadd.argp"></a>
+
+##### argp
+
+```python
+def argp()
+```
+
+Argument parser
+
+<a id="dryad2dataverse.scripts.dryadd.set_constants"></a>
+
+##### set\_constants
+
+```python
+def set_constants(args)
+```
+
+Set the appropriate dryad2dataverse constants
+
+<a id="dryad2dataverse.scripts.dryadd.email_log"></a>
+
+##### email\_log
+
+```python
+def email_log(mailhost,
+              fromaddr,
+              toaddrs,
+              credentials,
+              port=465,
+              secure=(),
+              level=logging.WARNING,
+              timeout=100)
+```
+
+Emails log error messages to recipient
+
+mailhost : str
+    Address of mail server. Eg. smtp.gmail.com
+fromaddr : str
+    "From" address for email
+toaddrs :
+    Recipient of email
+credentials : tuple
+    (Username, password) tuple
+port : Mailserver port. Default 465
+secure : tuple
+    The tuple should be either an empty tuple, or a single-value tuple with
+    the name of a keyfile, or a 2-value tuple with the names of the keyfile
+    and certificate file.
+    See https://docs.python.org/3/library/logging.handlers.html
+level : int
+    logging level. Default logging.WARNING
+
+<a id="dryad2dataverse.scripts.dryadd.rotating_log"></a>
+
+##### rotating\_log
+
+```python
+def rotating_log(path, level)
+```
+
+Create log of transactions
+
+path : str
+    Complete path to log
+level : logging.LOGLEVEL
+    logging level (eg, logging.DEBUG)
+
+<a id="dryad2dataverse.scripts.dryadd.checkwarn"></a>
+
+##### checkwarn
+
+```python
+def checkwarn(val: int, **kwargs) -> None
+```
+
+Halt program execution before processing if threshold value of modified
+Dryad studies exceeded. Useful for checking if the Dryad API has changed
+and caused havoc.
+
+val: int
+    Number of modified or new studies
+kwargs: dict
+    Email notification information.
+    {'user': user email,
+     'recipients':[list of recipients],
+     'pwd' ; email server password],
+     'mailserv' : smtp mail server,
+     'warn': Threshold for number of warnings (int)}
+    see dryadd.notify for full details of parameters.
+
+    Include log info:
+    {loggers: [logging.logger, logging.logger,...]}
+    Skip check
+    {'warn_too_many': bool}
+
+<a id="dryad2dataverse.scripts.dryadd.verbo"></a>
+
+##### verbo
+
+```python
+def verbo(verbosity: bool, **kwargs) -> None
+```
+
+verbosity: bool
+    if True, print dict
+kwargs : dict
+    Dictionary to print out
+
+<a id="dryad2dataverse.scripts.dryadd.main"></a>
+
+##### main
+
+```python
+def main(log='/var/log/dryadd.log', level=logging.WARNING)
+```
+
+Main Dryad transfer daemon
+
+log : str
+    path to logfile
+level : int
+    log level, usually one of logging.LOGLEVEL (ie, logging.warning)
 
 <a id="dryad2dataverse.serializer"></a>
 
