@@ -202,7 +202,11 @@ class Serializer():
             files = page['_embedded'].get('stash:files')
             if files:
                 for f in files:
-                    downLink = f['_links']['stash:file-download']['href']
+                    #This broke with this commit:
+                    # https://github.com/datadryad/dryad-app/commit/b8a333ba34b14e55cbc1d7ed5aa4451e0f41db66
+
+                    #downLink = f['_links']['stash:file-download']['href']
+                    downLink = f['_links']['stash:download']['href']
                     downLink = f'{constants.DRYURL}{downLink}'
                     name = f['path']
                     mimeType = f['mimeType']
