@@ -325,7 +325,10 @@ class Monitor():
                 # because of code duplication below.
                 for f in oldFiles:
                     #Download links are not persistent. Be warned
-                    downLink = f['_links']['stash:file-download']['href']
+                    try:
+                        downLink = f['_links']['stash:file-download']['href']
+                    except KeyError:
+                        downLink = f['_links']['stash:download']['href']
                     downLink = f'{constants.DRYURL}{downLink}'
                     name = f['path']
                     mimeType = f['mimeType']

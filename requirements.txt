@@ -1,7 +1,7 @@
 certifi>=2022.12.7
 charset-normalizer>=2.0.4
 chardet>=3.0.4
-idna>=2.10
+idna>=2.10.0
 pycryptodome>=3.20.0
 requests>=2.26.0
 requests-toolbelt>=0.9.1

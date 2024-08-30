@@ -27,7 +27,7 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 5, 3)
+VERSION = (0, 5, 4)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -485,6 +485,9 @@ def checkwarn(val:int, **kwargs) -> None:
         {'warn_too_many': bool}
 
     '''
+    print(kwargs)
+    #print(vars(kwargs))
+    return
     if not kwargs.get('warn_too_many'):
         return
     if val >= kwargs.get('warn',0):
@@ -495,7 +498,7 @@ def checkwarn(val:int, **kwargs) -> None:
         for logme in kwargs.get('loggers'):
             logme.warning(mess)
         notify(msgtxt=(subject, mess),
-               **vars(kwargs))
+               **kwargs)
         sys.exit()
 
 def verbo(verbosity:bool, **kwargs)->None:
@@ -671,5 +674,23 @@ def main(log='/var/log/dryadd.log', level=logging.WARNING):
         print(f'Error: {err}. Exiting. For details see log at {args.log}.')
         sys.exit()
 
+def main2(log='/var/log/dryadd.log', level=logging.WARNING):
+    '''
+    Main Dryad transfer daemon
+
+    log : str
+        path to logfile
+    level : int
+        log level, usually one of logging.LOGLEVEL (ie, logging.warning)
+    '''
+    #pylint: disable=too-many-branches
+    #pylint: disable=too-many-statements
+    #pylint: disable=too-many-locals
+    parser = argp()
+    args = parser.parse_args()
+    print(args)
+    checkwarn(val=26,
+              loggers=[],
+              **vars(args))
 if __name__ == '__main__':
-    main()
+    main2()
