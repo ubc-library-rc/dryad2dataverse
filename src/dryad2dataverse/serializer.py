@@ -11,11 +11,13 @@ import requests
 from requests.adapters import HTTPAdapter
 
 from  dryad2dataverse import constants
+from dryad2dataverse import USERAGENT
 
 LOGGER = logging.getLogger(__name__)
 #Connection monitoring as per
 #https://stackoverflow.com/questions/16337511/log-all-requests-from-the-python-requests-module
 URL_LOGGER = logging.getLogger('urllib3')
+USER_AGENT = {'User-agent': USERAGENT}
 
 class Serializer():
     '''
@@ -72,6 +74,7 @@ class Serializer():
         try:
             headers = {'accept':'application/json',
                        'Content-Type':'application/json'}
+            headers.update(USER_AGENT)
             doiClean = urllib.parse.quote(self.doi, safe='')
             resp = self.session.get(f'{url}/api/v2/datasets/{doiClean}',
                                     headers=headers, timeout=timeout)
@@ -164,6 +167,7 @@ class Serializer():
                 self._fileJson = []
                 headers = {'accept':'application/json',
                            'Content-Type':'application/json'}
+                headers.update(USER_AGENT)
                 fileList = self.session.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
                                             headers=headers,
                                             timeout=timeout)

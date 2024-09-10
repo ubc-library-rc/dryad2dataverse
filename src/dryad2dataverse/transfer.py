@@ -2,6 +2,7 @@
 This module handles data downloads and uploads from a Dryad instance to a Dataverse instance
 '''
 
+#TODO harmonize headers instead of hideous copypasta
 import hashlib
 import io
 import json
@@ -18,7 +19,9 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from dryad2dataverse import constants
 from dryad2dataverse import exceptions
+from dryad2dataverse import USERAGENT
 
+USER_AGENT = {'User-agent': USERAGENT}
 LOGGER = logging.getLogger(__name__)
 URL_LOGGER = logging.getLogger('urllib3')
 
@@ -85,6 +88,7 @@ class Transfer():
         if not url:
             url = constants.DVURL
         headers = {'X-Dataverse-key': apikey if apikey else constants.APIKEY}
+        headers.update(USER_AGENT)
         bad_test = self.session.get(f'{url}/api/datasets/:persistentId',
                                 headers=headers,
                                 params=params)
@@ -232,6 +236,7 @@ class Transfer():
             else:
                 headers = {'X-Dataverse-key' : constants.APIKEY}
 
+            headers.update(USER_AGENT)
             params = {'persistentId': hdl}
             set_date = self.session.put(f'{url}/api/datasets/:persistentId/citationdate',
                                         headers=headers,
@@ -284,7 +289,7 @@ class Transfer():
         if not apikey:
             apikey = constants.APIKEY
         headers = {'X-Dataverse-key' : apikey}
-
+        headers.update(USER_AGENT)
         targetDv = kwargs.get('targetDv')
         dvpid = kwargs.get('dvpid')
         #dryFid = kwargs.get('dryFid') #Why did I put this here?
@@ -355,7 +360,7 @@ class Transfer():
     @staticmethod
     def _check_md5(infile, dig_type):
         '''
-        Returns the md5 checksum of a file.
+        Returns the hex digest of a file (formerly just md5sum).
 
         ----------------------------------------
         Parameters:
@@ -442,6 +447,7 @@ class Transfer():
 
         if size:
             if size > constants.MAX_UPLOAD:
+                #TOO BIG
                 LOGGER.warning('%s: File %s exceeds '
                                'Dataverse MAX_UPLOAD size. Skipping download.',
                                self.doi, filename)
@@ -485,6 +491,7 @@ class Transfer():
                 if url == i[0]:
                     i[-1] = md5
             LOGGER.debug('Complete download sequence')
+            #This doesn't actually return an md5, just the hash value
             return md5
         except (requests.exceptions.HTTPError,
                 requests.exceptions.ConnectionError) as err:
@@ -560,6 +567,8 @@ class Transfer():
             headers = {'X-Dataverse-key': apikey}
         else:
             headers = self.auth
+
+        headers.update(USER_AGENT)
         params = {'persistentId': study}
         try:
             lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
@@ -608,6 +617,8 @@ class Transfer():
             headers = {'X-Dataverse-key': apikey}
         else:
             headers = self.auth
+
+        headers.update(USER_AGENT)
         params = {'persistentId': study}
         lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
                                        headers=headers,
@@ -641,7 +652,9 @@ class Transfer():
 
     def upload_file(self, dryadUrl=None, filename=None,
                     mimetype=None, size=None, descr=None,
-                    md5=None, studyId=None, dest=None,
+                    hashtype=None,
+                    #md5=None, studyId=None, dest=None,
+                    digest=None, studyId=None, dest=None,
                     fprefix=None, force_unlock=False, timeout=300):
         '''
         Uploads file to Dataverse study. Returns a tuple of the
@@ -668,8 +681,11 @@ class Transfer():
         dest : str
             — Destination dataverse installation url.
               Defaults to constants.DVURL.
+        hashtype: str
+            original Dryad hash type
 
-        md5 : str
+        #md5 : str
+        digest
             — md5 checksum for file.
 
         fprefix : str
@@ -692,6 +708,8 @@ class Transfer():
 
         ----------------------------------------
         '''
+        #return locals()
+        #TODONE remove above
         if not studyId:
             studyId = self.dvpid
         if not dest:
@@ -730,6 +748,7 @@ class Transfer():
         ctype = {'Content-type' : multi.content_type}
         tmphead = self.auth.copy()
         tmphead.update(ctype)
+        tmphead.update(USER_AGENT)
         url = dest + '/api/datasets/:persistentId/add'
         try:
             upload = self.session.post(url, params=params,
@@ -739,9 +758,22 @@ class Transfer():
             upload.raise_for_status()
             self.fileUpRecord.append((fid, upload.json()))
             upmd5 = upload.json()['data']['files'][0]['dataFile']['checksum']['value']
-            if md5 and upmd5 != md5:
+            #Dataverse hash type
+            _type = upload.json()['data']['files'][0]['dataFile']['checksum']['type']
+            if _type.lower() != hashtype.lower():
+                comparator = self._check_md5(upfile, _type.lower())
+            else:
+                comparator = digest
+            #if hashtype.lower () != 'md5':
+            #    #get an md5 because dataverse uses md5s. Or most of them do anyway.
+            #    #One day this will be rewritten properly.
+            #    md5 = self._check_md5(filename, 'md5')
+            #else:
+            #    md5 = digest
+            #if md5 and (upmd5 != md5):
+            if upmd5 != comparator:
                 try:
-                    raise exceptions.HashError(f'md5sum mismatch:\nlocal: {md5}\nuploaded: {upmd5}')
+                    raise exceptions.HashError(f'{_type} mismatch:\nlocal: {comparator}\nuploaded: {upmd5}')
                 except exceptions.HashError as e:
                     LOGGER.exception(e)
                     raise
