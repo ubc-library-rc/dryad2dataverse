@@ -14,6 +14,7 @@ import glob
 import logging
 import logging.handlers
 import os
+import pathlib
 import shutil
 import smtplib
 import sys
@@ -27,7 +28,7 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 5, 4)
+VERSION = (0, 6, 2)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -372,6 +373,21 @@ def argp():
                         type=int,
                         dest='warn',
                         default=15)
+    parser.add_argument('--testmode-on',
+                        help=('Turn on test mode. '
+                              'Number of transfers will be limited '
+                              'to the value in --testmode-limit '
+                              'or 5 if you don\'t set --testmode-limit '),
+                        action='store_true',
+                        dest='testmode')
+    parser.add_argument('--testmode-limit',
+                        help=('Test mode - only transfer first [n] '
+                              'of the total number of (new) records. Old ones will '
+                              'still be updated, though. '
+                              'Default: 5'),
+                        type=int,
+                        default=5,
+                        dest='testlimit')
     parser.add_argument('--version', action='version',
                         version='%(prog)s '+__version__
                         +'; dryad2dataverse '+
@@ -416,7 +432,8 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, port=465, secure=(),
     '''
     #pylint: disable=too-many-arguments
     #Because consistency is for suckers and yahoo requires full hostname
-    subject = 'Dryad to Dataverse transfer error'
+    #subject = 'Dryad to Dataverse transfer error'
+    subject = 'Dryad to Dataverse logger message'
     elog = logging.getLogger('email_log')
     mailer = SSLSMTPHandler(mailhost=(mailhost, port),
                             fromaddr=fromaddr,
@@ -485,16 +502,13 @@ def checkwarn(val:int, **kwargs) -> None:
         {'warn_too_many': bool}
 
     '''
-    print(kwargs)
-    #print(vars(kwargs))
-    return
     if not kwargs.get('warn_too_many'):
         return
     if val >= kwargs.get('warn',0):
         mess = ('Large number of updates detected. '
                 f'{val} new studies exceeds threshold of {kwargs.get("warn", 0)}. '
                 'Program execution halted.')
-        subject = ('Dryad to Dataverse large update warning')
+        subject = 'Dryad to Dataverse large update warning'
         for logme in kwargs.get('loggers'):
             logme.warning(mess)
         notify(msgtxt=(subject, mess),
@@ -539,9 +553,18 @@ def main(log='/var/log/dryadd.log', level=logging.WARNING):
     monitor = dryad2dataverse.monitor.Monitor(args.dbase)
     #copy the database to make a backup, because paranoia is your friend
     if os.path.exists(dryad2dataverse.constants.DBASE):
-        shutil.copyfile(dryad2dataverse.constants.DBASE,
-                        dryad2dataverse.constants.DBASE+'.'+
-                        datetime.datetime.now().strftime('%Y-%m-%d-%H%M'))
+        bu_db = pathlib.Path(dryad2dataverse.constants.DBASE)
+        try:
+            shutil.copyfile( bu_db,
+                            pathlib.Path(bu_db.parent,
+                                         bu_db.stem + '_' +
+                                         datetime.datetime.now().strftime('%Y-%m-%d-%H%M') +
+                                         bu_db.suffix)
+                            )
+        except FileNotFoundError:
+            print(dryad2dataverse.constants.DBASE)
+            print(bu_db)
+            sys.exit()
     #list comprehension includes untimestamped dbase name, hence 2+
     fnames = glob.glob(os.path.abspath(dryad2dataverse.constants.DBASE)
                        +'*')
@@ -557,15 +580,24 @@ def main(log='/var/log/dryadd.log', level=logging.WARNING):
     logger.info('Total new files: %s', len(updates))
     elog.info('Total new files: %s', len(updates))
 
-    checkwarn(val=len(updates),
+    checkwarn(val=len(updates) if not args.testmode else
+              min(args.testlimit, len(updates)),
               loggers=[logger],
               **vars(args))
+    if args.testmode:
+        logger.warning('Test mode is ON - number of updates limited to %s', args.testlimit)
+        elog.warning('Test mode is ON - number of updates limited to %s', args.testlimit)
 
     #update all the new files
     verbo(args.verbosity, **{'Total to process': len(updates)})
+
     try:
         count = 0
+        testcount = 0
         for doi in updates:
+            if args.testmode and (testcount >= args.testlimit):
+                logger.info('Test limit of %s reached', args.testlimit)
+                break
             count += 1
             logger.info('Start processing %s of %s', count, len(updates))
             logger.info('DOI: %s, Dryad URL: https://datadryad.org/stash/dataset/%s',
@@ -611,6 +643,7 @@ def main(log='/var/log/dryadd.log', level=logging.WARNING):
                 transfer.set_correct_date()
                 notify(new_content(study),
                        **vars(args))
+                testcount+=1
 
             elif update_type == 'updated':
                 logger.info('Updated metadata: %s', doi[0])
@@ -674,23 +707,9 @@ def main(log='/var/log/dryadd.log', level=logging.WARNING):
         print(f'Error: {err}. Exiting. For details see log at {args.log}.')
         sys.exit()
 
-def main2(log='/var/log/dryadd.log', level=logging.WARNING):
-    '''
-    Main Dryad transfer daemon
-
-    log : str
-        path to logfile
-    level : int
-        log level, usually one of logging.LOGLEVEL (ie, logging.warning)
-    '''
-    #pylint: disable=too-many-branches
-    #pylint: disable=too-many-statements
-    #pylint: disable=too-many-locals
-    parser = argp()
-    args = parser.parse_args()
-    print(args)
-    checkwarn(val=26,
-              loggers=[],
-              **vars(args))
 if __name__ == '__main__':
-    main2()
+    main()
+    _parser = argp()
+    _args = _parser.parse_args()
+    print('This is what you would have done had you actually run this')
+    print(_args)

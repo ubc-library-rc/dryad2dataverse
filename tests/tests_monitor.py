@@ -70,7 +70,9 @@ class TestMonitor(unittest.TestCase):
     def test_07_added_files(self):
         self.assertEqual.__self__.maxDiff = None
         newdata=copy.copy(self.testCase.fileJson[0]['_embedded']['stash:files'][-1])
-        newdata['_links']['stash:file-download']['href'] = '/api/v2/files/999999/download' 
+        #newdata['_links']['stash:file-download']['href'] = '/api/v2/files/999999/download' 
+        #let's change API output for no reason!
+        newdata['_links']['stash:download']['href'] = '/api/v2/files/999999/download' 
         newdata['path'] = 'ubc_rand1.csv'
         newdata['description'] = 'UBC random data 1'
         newdata['digestType'] = 'md5'
@@ -100,7 +102,8 @@ class TestMonitor(unittest.TestCase):
                'application/x-zip-compressed',
                23787587,
                '',
-               '', '')]}
+               #'', '')]}
+               'sha-256', 'cb1c4f28de8aaec8c8c4b1eca498eace1c2c8c847dd443bd5314d42a70d6e4ae')]}
         self.assertEqual.__self__.maxDiff = None 
         self.assertEqual(expect, diff)
         #and restore
