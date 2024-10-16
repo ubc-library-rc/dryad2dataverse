@@ -34,7 +34,7 @@ The implementation is relatively straightforward. Simply supply the required par
 
 ```nohighlight
 usage: dryadd [-h] [-u URL] -k KEY -t TARGET -e EMAIL -s USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP]
-              [--db DBASE] [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--version]
+              [--db DBASE] [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--testmode-on] [--testmode-limit TESTLIMIT] [--version]
 
 Dryad to Dataverse importer/monitor. All arguments NOT enclosed by square brackets are required for the script to run but some may already have defaults, specified by "Default". The
 "optional arguments" below refers to the use of the option switch, (like -u), meaning "not a positional argument."
@@ -71,6 +71,9 @@ options:
   -w, --warn-too-many   Warn and halt execution if abnormally large number of updates present.
   --warn-threshold WARN
                         Do not transfer studies if number of updates is greater than or equal to this number. Default: 15
+  --testmode-on         Turn on test mode. Number of transfers will be limited to the value in --testmode-limit or 5 if you don't set --testmode-limit
+  --testmode-limit TESTLIMIT
+                        Test mode - only transfer first [n] of the total number of (new) records. Old ones will still be updated, though. Default: 5
   --version             Show version number and exit
 ```
 ### Requirements
