@@ -28,7 +28,7 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 6, 2)
+VERSION = (0, 6, 3)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -407,6 +407,8 @@ def set_constants(args):
         dryad2dataverse.constants.DVURL = args.url
     if args.dbase:
         dryad2dataverse.constants.DBASE = args.dbase
+    if args.tmp:
+        dryad2dataverse.constants.TMP = args.tmp
 
 def email_log(mailhost, fromaddr, toaddrs, credentials, port=465, secure=(),
               level=logging.WARNING, timeout=100):
