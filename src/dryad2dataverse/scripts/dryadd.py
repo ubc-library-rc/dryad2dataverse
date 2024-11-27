@@ -15,6 +15,7 @@ import logging
 import logging.handlers
 import os
 import pathlib
+import pprint
 import shutil
 import smtplib
 import sys
@@ -28,7 +29,7 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 6, 3)
+VERSION = (0, 7, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 DRY = 'https://datadryad.org/api/v2'
@@ -344,6 +345,24 @@ def argp():
                         required=False,
                         dest='log',
                         default='/var/log/dryadd.log')
+    parser.add_argument('--loglevel',
+                        help='Log level of server rotating log. Choose one of '
+                        'debug, info, warning, error or critical. '
+                        'Note: case sensitive. '
+                        'Default: logging.warning.',
+                        required=False,
+                        dest='loglevel',
+                        default='warning',
+                        choices=['debug', 'info', 'warning','error','critical'])
+    parser.add_argument('--email-loglevel',
+                        help='Log level of email log. Choose one of '
+                        'debug, info, warning, error or critical. '
+                        'Note: case sensitive. '
+                        'Default: warning',
+                        required=False,
+                        dest='email_loglevel',
+                        default='warning',
+                        choices=['debug', 'info', 'warning','error','critical'])
     parser.add_argument('-l', '--no_force_unlock',
                         help='No forcible file unlock. Required '
                         'if /lock endpint is restricted',
@@ -398,7 +417,7 @@ def argp():
 
 def set_constants(args):
     '''
-    Set the appropriate dryad2dataverse constants
+    Set the appropriate dryad2dataverse "constants"
     '''
     dryad2dataverse.constants.DV_CONTACT_EMAIL = args.contact
     dryad2dataverse.constants.DV_CONTACT_ = args.contact
@@ -528,7 +547,31 @@ def verbo(verbosity:bool, **kwargs)->None:
         for key, value in kwargs.items():
             print(f'{key}: {value}')
 
-def main(log='/var/log/dryadd.log', level=logging.WARNING):
+def anonymizer(args: argparse.Namespace) -> dict:
+    '''
+    Redacts sensitive info for the log when parsing arguments and returns a dictionary
+    with cleaner values.
+    '''
+    clean_me = args.__dict__.copy()#Don't work on the real thing!
+    cleanser = {x : 'REDACTED' for x in ['email', 'mailserve',
+                                         'key', 'mailserve',
+                                         'pwd', 'recipients', 
+                                         'user']}
+    clean_me.update(cleanser)
+    return clean_me
+
+def bulklog(message, *logfuncs):
+    '''
+    Convenience logging function
+
+    message : str
+        log message
+    logfuncs: logging.Logger[.debug, .info, etc. method]
+    '''
+    for log in logfuncs:
+        log('%s', message)
+
+def main():
     '''
     Main Dryad transfer daemon
 
@@ -542,16 +585,26 @@ def main(log='/var/log/dryadd.log', level=logging.WARNING):
     #pylint: disable=too-many-locals
     parser = argp()
     args = parser.parse_args()
-    if args.log:
-        log = args.log
-    logger = rotating_log(log, level)
+
+    #Ensure log can be written
+    logpath = pathlib.Path(args.log)
+    if not logpath.parent.exists():
+        os.makedirs(logpath.parent)
 
     set_constants(args)
+
+    logger = rotating_log(args.log,
+                          level=logging.getLevelName(args.loglevel.upper()))
+
     elog = email_log(args.mailserv, args.email, args.recipients,
-                     (args.user, args.pwd), port=args.port)
+                     (args.user, args.pwd), port=args.port,
+                     level = logging.getLevelName(args.email_log_level.upper()))
 
 
     logger.info('Beginning update process')
+    for logme in [elog, logger]:
+        logme.debug('Command line arguments: %s' , pprint.pprint(anonymizer(args)))
+
     monitor = dryad2dataverse.monitor.Monitor(args.dbase)
     #copy the database to make a backup, because paranoia is your friend
     if os.path.exists(dryad2dataverse.constants.DBASE):
@@ -690,7 +743,7 @@ def main(log='/var/log/dryadd.log', level=logging.WARNING):
         elog.info('Completed update process')
         finished = ('Dryad to Dataverse transfers completed',
                     ('Dryad to Dataverse transfer daemon has completed.\n'
-                     f'Log available at: {log}'))
+                     f'Log available at: {args.log}'))
         notify(finished, **vars(args))
 
     except dryad2dataverse.exceptions.DataverseBadApiKeyError as api_err:
