@@ -29,8 +29,11 @@ import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 7, 0)
+VERSION = (0, 7, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
+
+USER_AGENT = {'User-agent': dryad2dataverse.USERAGENT}
+
 
 DRY = 'https://datadryad.org/api/v2'
 
@@ -216,6 +219,7 @@ def get_records(ror: 'str', mod_date=None, verbosity=True, timeout=100):
     '''
     headers = {'accept':'application/json',
                'Content-Type':'application/json'}
+    headers.update(USER_AGENT)
     per_page = 1
     params = {'affiliation' : ror,
               'per_page' : per_page}
@@ -408,9 +412,7 @@ def argp():
                         default=5,
                         dest='testlimit')
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__
-                        +'; dryad2dataverse '+
-                        dryad2dataverse.__version__,
+                        version='dryad2dataverse ' + dryad2dataverse.__version__,
                         help='Show version number and exit')
 
     return parser

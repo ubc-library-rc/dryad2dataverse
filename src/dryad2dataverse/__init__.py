@@ -24,7 +24,7 @@ Modules included:
 '''
 import sys
 
-VERSION = (0, 7, 7)
+VERSION = (0, 7, 8)
 __version__ = '.'.join([str(x) for x in VERSION])
 USERAGENT = (f'dryad2dataverse/v{__version__} ({sys.platform.capitalize()}); '
              f'Python {sys.version[:sys.version.find("(")-1]}')
