@@ -600,7 +600,7 @@ def main():
 
     elog = email_log(args.mailserv, args.email, args.recipients,
                      (args.user, args.pwd), port=args.port,
-                     level = logging.getLevelName(args.email_log_level.upper()))
+                     level = logging.getLevelName(args.email_loglevel.upper()))
 
 
     logger.info('Beginning update process')
