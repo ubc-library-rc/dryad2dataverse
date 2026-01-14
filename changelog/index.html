@@ -8,7 +8,8 @@
     <title>Changelog - Dryad2dataverse</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
         <link href="../css/extra.css" rel="stylesheet" />
     
       <script>
@@ -18,12 +19,11 @@
         var mkdocs_page_url = null;
       </script>
     
-    <script src="../js/jquery-3.6.0.min.js" defer></script>
     <!--[if lt IE 9]>
       <script src="../js/html5shiv.min.js"></script>
     <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -74,7 +74,7 @@
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">Changelog</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Changelog</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#v061-11-may-2023">v0.6.1 - 11 May 2023</a>
     </li>
@@ -120,8 +120,8 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-      <li>Changelog</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Changelog</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -133,7 +133,7 @@
                 <h1 id="dryad2dataverse-changelog">Dryad2dataverse changelog<a class="headerlink" href="#dryad2dataverse-changelog" title="Permanent link">&para;</a></h1>
 <p>Perfection on the first attempt is rare.</p>
 <h2 id="v061-11-may-2023">v0.6.1 - 11 May 2023<a class="headerlink" href="#v061-11-may-2023" title="Permanent link">&para;</a></h2>
-<p><strong> dryad2dataverse.constants</strong></p>
+<p>** dryad2dataverse.constants**</p>
 <ul>
 <li>Eliminated deprecated parameter in call to <code>urllib3.util.Retry</code> as per <a href="https://github.com/urllib3/urllib3/issues/2092">https://github.com/urllib3/urllib3/issues/2092</a></li>
 </ul>
@@ -288,14 +288,15 @@
     
   </span>
 </div>
-    <script>var base_url = '..';</script>
-    <script src="../js/theme_extra.js" defer></script>
-    <script src="../js/theme.js" defer></script>
-      <script src="../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>
