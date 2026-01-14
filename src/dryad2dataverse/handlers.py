@@ -12,9 +12,13 @@ class SSLSMTPHandler(SMTPHandler):
     An SSL handler for logging.handlers
     '''
     def emit(self, record:logging.LogRecord):
-        """
+        '''
         Emit a record while using an SSL mail server.
-        """
+        
+        Parameters
+        ----------
+        record : logging.LogRecord
+        '''
         #Praise be to
         #https://stackoverflow.com/questions/36937461/
         #how-can-i-send-an-email-using-python-loggings-

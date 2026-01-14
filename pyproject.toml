@@ -1,6 +1,6 @@
 [project]
 name = "dryad2dataverse"
-version = "0.7.11a0"
+version = "0.7.11a1"
 description = "Utility for copying and syncing data from a Dryad data repository to a Dataverse repository"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}

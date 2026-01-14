@@ -26,3 +26,15 @@ markdown_extensions:
   - attr_list
 
 theme: readthedocs
+
+plugins:
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            docstring_style: numpy
+            show_source: true
+            filters: public
+  - search
