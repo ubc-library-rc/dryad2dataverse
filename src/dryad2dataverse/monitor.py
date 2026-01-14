@@ -34,13 +34,14 @@ class Monitor():
 
         Also creates a database if existing database is not present.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         dbase : str
-            — Path to sqlite3 database. That is:
-              /path/to/file.sqlite3
-        ----------------------------------------
+            Path to sqlite3 database. That is:
+            /path/to/file.sqlite3
+
+        *args : list
+        **kwargs : dict
         '''
         if cls.__instance is None:
             cls.__instance = super(Monitor, cls).__new__(cls)
@@ -51,25 +52,25 @@ class Monitor():
             cls.conn = sqlite3.Connection(cls.dbase)
             cls.cursor = cls.conn.cursor()
             create = ['CREATE TABLE IF NOT EXISTS dryadStudy \
-                      (uid INTEGER PRIMARY KEY AUTOINCREMENT, \
-                      doi TEXT, lastmoddate TEXT, dryadjson TEXT, \
-                      dvjson TEXT);',
-                      'CREATE TABLE IF NOT EXISTS dryadFiles \
-                      (dryaduid INTEGER REFERENCES dryadStudy (uid), \
-                      dryfilesjson TEXT);',
-                      'CREATE TABLE IF NOT EXISTS dvStudy \
-                      (dryaduid INTEGER references dryadStudy (uid), \
-                      dvpid TEXT);',
-                      'CREATE TABLE IF NOT EXISTS dvFiles \
-                      (dryaduid INTEGER references dryadStudy (uid), \
-                      dryfid INT, \
-                      drymd5 TEXT, dvfid TEXT, dvmd5 TEXT, \
-                      dvfilejson TEXT);',
-                      'CREATE TABLE IF NOT EXISTS lastcheck \
-                      (checkdate TEXT);',
-                      'CREATE TABLE IF NOT EXISTS failed_uploads \
-                      (dryaduid INTEGER references dryadstudy (uid), \
-                      dryfid INT, status TEXT);'
+                       (uid INTEGER PRIMARY KEY AUTOINCREMENT, \
+                       doi TEXT, lastmoddate TEXT, dryadjson TEXT, \
+                       dvjson TEXT);',
+                       'CREATE TABLE IF NOT EXISTS dryadFiles \
+                       (dryaduid INTEGER REFERENCES dryadStudy (uid), \
+                       dryfilesjson TEXT);',
+                       'CREATE TABLE IF NOT EXISTS dvStudy \
+                       (dryaduid INTEGER references dryadStudy (uid), \
+                       dvpid TEXT);',
+                       'CREATE TABLE IF NOT EXISTS dvFiles \
+                       (dryaduid INTEGER references dryadStudy (uid), \
+                       dryfid INT, \
+                       drymd5 TEXT, dvfid TEXT, dvmd5 TEXT, \
+                       dvfilejson TEXT);',
+                       'CREATE TABLE IF NOT EXISTS lastcheck \
+                       (checkdate TEXT);',
+                       'CREATE TABLE IF NOT EXISTS failed_uploads \
+                       (dryaduid INTEGER references dryadstudy (uid), \
+                       dryfid INT, status TEXT);'
                       ]
 
             for line in create:
@@ -85,15 +86,13 @@ class Monitor():
         Initialize the Monitor instance if not instantiated already (ie, Monitor
         is a singleton).
 
-        ----------------------------------------
-        Parameters:
-
-        dbase : str
-            — Complete path to desired location of tracking database
-              (eg: /tmp/test.db).
-
-            Defaults to dryad2dataverse.constants.DBASE.
-        ----------------------------------------
+        Parameters
+        ----------
+        dbase : str, default=dryad2datverse.constants.DBASE
+            Complete path to desired location of tracking database
+            (eg: /tmp/test.db).
+        *args : list
+        **kwargs : dict
         '''
         if self.__initialized:
             return
@@ -121,31 +120,40 @@ class Monitor():
             return last_mod[0][0]
         return None
 
-    def status(self, serial):
+    def status(self, serial)->dict:
         '''
         Returns a dictionary with keys 'status' and 'dvpid' and 'notes'.
-        `{status :'updated', 'dvpid':'doi://some/ident'}`.
 
+        Parameters
+        ----------
+        serial :  dryad2dataverse.serializer.Serializer
+
+        Returns
+        -------
+        `{status :'updated', 'dvpid':'doi://some/ident'}`.
+        
+        Notes
+        ------
         `status` is one of 'new', 'identical',  'lastmodsame',
         'updated'
 
-                'new' is a completely new file.
+        'new' is a completely new file.
 
-                'identical' The metadata from Dryad is *identical* to the last time
-                the check was run.
+        'identical' The metadata from Dryad is *identical* to the last time
+        the check was run.
 
-                'lastmodsame' Dryad lastModificationDate ==  last modification date
-                in database AND output JSON is different.
-                This can indicate a Dryad
-                API output change, reindexing or something else.
-                But the lastModificationDate
-                is supposed to be an indicator of meaningful change, so this option
-                exists so you can decide what to do given this option
+        'lastmodsame' Dryad lastModificationDate ==  last modification date
+        in database AND output JSON is different.
+        This can indicate a Dryad
+        API output change, reindexing or something else.
+        But the lastModificationDate
+        is supposed to be an indicator of meaningful change, so this option
+        exists so you can decide what to do given this option
 
-                'updated' Indicates changes to lastModificationDate
+        'updated' Indicates changes to lastModificationDate
 
-                Note that Dryad constantly changes their API output, so the changes
-                may not actually be meaningful.
+        Note that Dryad constantly changes their API output, so the changes
+        may not actually be meaningful.
 
         `dvpid` is a Dataverse persistent identifier.
         `None` in the case of status='new'
@@ -155,12 +163,6 @@ class Monitor():
         not `new` or `identical`. Note that Dryad has no way to indicate *both*
         a file and metadata change, so this value reflects only the *last* change
         in the Dryad state.
-
-        ----------------------------------------
-        Parameters:
-
-        serial : dryad2dataverse.serializer instance
-        ----------------------------------------
         '''
         # Last mod date is indicator of change.
         # From email w/Ryan Scherle 10 Nov 2020
@@ -220,23 +222,25 @@ class Monitor():
         '''
         Analyzes differences in metadata between current serializer
         instance and last updated serializer instance.
-        Returns a list of field changes consisting of:
 
+        Parameters
+        ----------
+        serial : dryad2dataverse.serializer.Serializer
+
+        Returns
+        -------
+        Returns a list of field changes consisting of:
         [{key: (old_value, new_value}] or None if no changes.
 
+        Notes
+        -----
         For example:
-
         ```
         [{'title':
         ('Cascading effects of algal warming in a freshwater community',
          'Cascading effects of algal warming in a freshwater community theatre')}
         ]
         ```
-        ----------------------------------------
-        Parameters:
-
-        serial : dryad2dataverse.serializer.Serializer instance
-        ----------------------------------------
         '''
         if self.status(serial)['status'] == 'updated':
             self.cursor.execute('SELECT dryadjson from dryadStudy \
@@ -261,10 +265,12 @@ class Monitor():
         Assumes name, mimeType, size, descr all unchanged, which is not
         necessarily a valid assumption
 
-        oldFiles: list or tuple:
+        Parameters
+        ----------
+        oldFiles : Union[list, tuple]
             (name, mimeType, size, descr, digestType, digest)
 
-        newFiles: list or tuple:
+        newFiles : Union[list, tuple]
             (name, mimeType, size, descr, digestType, digest)
         '''
         hash_change = []
@@ -294,11 +300,9 @@ class Monitor():
         `{'add':[dyadfiletuples], 'delete:[dryadfiletuples],
           'hash_change': [dryadfiletuples]}`
 
-        ----------------------------------------
-        Parameters:
-
-        serial : dryad2dataverse.serializer.Serializer instance
-        ----------------------------------------
+        Parameters
+        ----------
+        serial : dryad2dataverse.serializer.Serializer
         '''
         diffReport = {}
         if self.status(serial)['status'] == 'new':
@@ -379,13 +383,11 @@ class Monitor():
         file download link.  Normally used for determining dataverse
         file ids for *deletion* in case of dryad file changes.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         url : str
-            — *Dryad* file URL in form of
-              'https://datadryad.org/api/v2/files/385819/download'.
-        ----------------------------------------
+            *Dryad* file URL in form of
+            'https://datadryad.org/api/v2/files/385819/download'.
         '''
         fid = url[url.rfind('/', 0, -10)+1:].strip('/download')
         try:
@@ -413,11 +415,10 @@ class Monitor():
         dryad2dataverse.monitor.Monitor.diff_files['delete']
         to discover Dataverse file ids for deletion.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         filelist : list
-            — List of Dryad file tuples: eg:
+            List of Dryad file tuples: eg:
 
             ```
             [('https://datadryad.org/api/v2/files/385819/download',
@@ -427,7 +428,6 @@ class Monitor():
              'Readme_ACG_Mortality.txt',
              'text/plain', 1350)]
              ```
-        ----------------------------------------
         '''
         fids = []
         for f in filelist:
@@ -435,18 +435,20 @@ class Monitor():
         return fids
         # return [self.get_dv_fid(f[0]) for f in filelist]
 
-    def get_json_dvfids(self, serial):
+    def get_json_dvfids(self, serial)->list:
         '''
         Return a list of Dataverse file ids for Dryad JSONs which were
         uploaded to Dataverse.
         Normally used to discover the file IDs to remove Dryad JSONs
         which have changed.
 
-        ----------------------------------------
-        Parameters:
+        Parameters
+        ----------
+        serial : dryad2dataverse.serializer.Serializer
 
-        serial : dryad2dataverse.serializer.Serializer instance
-        ----------------------------------------
+        Returns
+        -------
+        list
         '''
         self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi=?',
                             (serial.doi,))
@@ -471,11 +473,9 @@ class Monitor():
         This method should be called after all transfers are completed,
         including Dryad JSON updates, as the last action for transfer.
 
-        ----------------------------------------
-        Parameters:
-
-        transfer : dryad2dataverse.transfer.Transfer instance
-        ----------------------------------------
+        Parameters
+        ----------
+        transfer : dryad2dataverse.transfer.Transfer
         '''
         # get the pre-update dryad uid in case we need it.
         self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi = ?',
@@ -612,14 +612,12 @@ class Monitor():
         for subsequent checking for updates. To query last modification time,
         use the dataverse2dryad.monitor.Monitor.lastmod attribute.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         curdate : str
-            — UTC datetime string in the format suitable for the Dryad API.
-              eg. 2021-01-21T21:42:40Z
-              or .strftime('%Y-%m-%dT%H:%M:%SZ').
-        ----------------------------------------
+            UTC datetime string in the format suitable for the Dryad API.
+            eg. 2021-01-21T21:42:40Z
+               or .strftime('%Y-%m-%dT%H:%M:%SZ').
         '''
         #Dryad API uses Zulu time
         if not curdate:

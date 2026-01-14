@@ -3,7 +3,6 @@ Serializes Dryad study JSON to Dataverse JSON, as well as
 producing associated file information.
 '''
 
-
 import logging
 import urllib.parse
 
@@ -27,18 +26,16 @@ class Serializer():
     <img src="https://licensebuttons.net/p/zero/1.0/88x31.png" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " style="display:none" onload="this.style.display='inline'" />
     <a href="http://creativecommons.org/publicdomain/zero/1.0" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " target="_blank">CC0 1.0</a>
     </p>'''
-    
+
     def __init__(self, doi):
         '''
         Creates Dryad study metadata instance.
 
-        ----------------------------------------
-        Parameters:
-
-    doi : str
-        — DOI of Dryad study. Required for downloading.
-        eg: 'doi:10.5061/dryad.2rbnzs7jp'
-    ----------------------------------------
+        Parameters
+        ----------
+        doi : str
+            DOI of Dryad study. Required for downloading.
+            eg: 'doi:10.5061/dryad.2rbnzs7jp'
         '''
         self.doi = doi
         self._dryadJson = None
@@ -59,15 +56,12 @@ class Serializer():
         Saves to self._dryadJson. Querying Serializer.dryadJson
         will call this function automatically.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         url : str
-            — Dryad instance base URL (eg: 'https://datadryad.org').
-
+            Dryad instance base URL (eg: 'https://datadryad.org').
         timeout : int
-            — Timeout in seconds. Default 45.
-        ----------------------------------------
+            Timeout in seconds. Default 45.
         '''
         if not url:
             url = constants.DRYURL
@@ -118,12 +112,10 @@ class Serializer():
         If supplying it, make sure it's correct or you will run into trouble
         with processing later.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         value : dict
-            — Dryad JSON.
-
+            Dryad JSON.
         '''
         if value:
             self._dryadJson = value
@@ -131,9 +123,10 @@ class Serializer():
             self.fetch_record()
 
     @property
-    def embargo(self):
+    def embargo(self)->bool:
         '''
         Check embargo status. Returns boolean True if embargoed.
+        
         '''
         if self.dryadJson.get('curationStatus') == 'Embargoed':
             return True
@@ -155,12 +148,10 @@ class Serializer():
         are paginated, so the return consists of a list of dicts, one
         per page.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         timeout : int
-            — Request timeout in seconds.
-        ----------------------------------------
+            Request timeout in seconds.
         '''
         if not self._fileJson:
             try:
@@ -189,7 +180,7 @@ class Serializer():
         return self._fileJson
 
     @property
-    def files(self):
+    def files(self)->list:
         '''
         Returns a list of tuples with:
 
@@ -241,13 +232,11 @@ class Serializer():
         exceeds maxsize. Maximum size defaults to
         dryad2dataverse.constants.MAX_UPLOAD
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         maxsize : int
-            — Size in bytes in which to flag as oversize.
-              Defaults to constants.MAX_UPLOAD.
-        ----------------------------------------
+            Size in bytes in which to flag as oversize.
+            Defaults to constants.MAX_UPLOAD.
         '''
         if not maxsize:
             maxsize = constants.MAX_UPLOAD
@@ -264,19 +253,17 @@ class Serializer():
         Creates wrapper around single or multiple Dataverse JSON objects.
         Returns a dict *without* the  Dataverse 'value' key'.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         typeName : str
-            — Dataverse typeName (eg: 'author').
+            Dataverse typeName (eg: 'author').
 
         multiple : boolean
-            — "Multiple" value in Dataverse JSON.
+            "Multiple" value in Dataverse JSON.
 
         typeClass : str
-            — Dataverse typeClass. Usually one of 'compound', 'primitive,
+            Dataverse typeClass. Usually one of 'compound', 'primitive,
               'controlledVocabulary').
-        ----------------------------------------
         '''
         return {'typeName':typeName, 'multiple':multiple,
                 'typeClass':typeClass}
@@ -293,29 +280,32 @@ class Serializer():
         Suitable for generalized conversions. Only provides fields with
         multiple: False and typeclass:Primitive
 
-        ----------------------------------------
-        Parameters:
+        Parameters
+        ----------
+        kwargs : dict
+            Dict from Dataverse JSON segment
 
+        Other parameters
+        ----------------
         dvField : str
-            — Dataverse output field
+            Dataverse output field
 
         dryField : str
-            — Dryad JSON field to convert
+            Dryad JSON field to convert
 
         inJson : dict
-            — Dryad JSON **segment** to convert
+            Dryad JSON **segment** to convert
 
         addJSON : dict (optional)
-            — any other JSON required to complete (cf ISNI)
+        	any other JSON required to complete (cf ISNI)
 
         rType : str
-            — 'dict' (default) or 'list'.
+        	'dict' (default) or 'list'.
             Returns 'value' field as dict value or list.
 
         pNotes : str
             Notes to be prepended to list type values.
             No trailing space required.
-        ----------------------------------------
         '''
 
         dvField = kwargs.get('dvField')
@@ -359,12 +349,11 @@ class Serializer():
         '''
         Produces required author json fields.
         This is a special case, requiring concatenation of several fields.
-        ----------------------------------------
-        Parameters:
-
+        
+        Parameters
+        ----------
         author : dict
-            — dryad['author'] JSON segment.
-        ----------------------------------------
+        	dryad['author'] JSON segment.
         '''
         first = author.get('firstName')
         last = author.get('lastName')
@@ -381,13 +370,12 @@ class Serializer():
         Produces the insane keyword structure Dataverse JSON segment
         from a list of words.
 
-        ----------------------------------------
-        Parameters:
-
-        args : list with str elements
-            — Generally input is Dryad JSON 'keywords', ie *Dryad['keywords'].
-              Don't forget to expand the list using *.
-        ----------------------------------------
+        Parameters
+        ----------
+        args : list
+            List with elements as strings.
+        	Generally input is Dryad JSON 'keywords', ie *Dryad['keywords'].
+            Don't forget to expand the list using *.
         '''
         outlist = []
         for arg in args:
@@ -402,12 +390,10 @@ class Serializer():
         Returns formatted notes field with Dryad JSON values that
         don't really fit anywhere into the Dataverse JSON.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         dryJson : dict
-            — Dryad JSON as dict.
-        ----------------------------------------
+        	Dryad JSON as dict.
         '''
         notes = ''
         #these fields should be concatenated into notes
@@ -465,12 +451,16 @@ class Serializer():
         Makes a Dataverse bounding box from appropriate coordinates.
         Returns Dataverse JSON segment as dict.
 
-        ----------------------------------------
-        Parameters:
+        Parameters
+        ----------
+        north : float
+        south : float
+        east : float
+        west : float
 
-        north, south, east, west : float
-            — Coordinates in decimal degrees.
-        ----------------------------------------
+        Notes
+        -----
+            Coordinates in decimal degrees.
         '''
         names = ['north', 'south', 'east', 'west']
         points = [str(x) for x in [north, south, east, west]]
@@ -490,12 +480,10 @@ class Serializer():
         '''
         Outputs Dataverse geospatial metadata block.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         dryJson : dict
-            — Dryad json as dict.
-        ----------------------------------------
+        	Dryad json as dict.
         '''
         if dryJson.get('locations'):
             #out = {}
@@ -556,21 +544,19 @@ class Serializer():
         Assembles Dataverse json from Dryad JSON components.
         Dataverse JSON is a nightmare, so this function is too.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         dryJson : dict
-            — Dryad json as dict.
+        	Dryad json as dict.
 
         dvContact : str
-            — Default Dataverse contact name.
+        	Default Dataverse contact name.
 
         dvEmail : str
-            — Default Dataverse 4 contact email address.
+        	Default Dataverse 4 contact email address.
 
         defContact : boolean
-            — Flag to include default contact information with record.
-        ----------------------------------------
+        	Flag to include default contact information with record.
         '''
         if not dvContact:
             dvContact = constants.DV_CONTACT_NAME
