@@ -1,0 +1,120 @@
+#Sample configuration file dryad2dataverse
+#It will *not* work unless you fill it in, because both
+#Dryad and Dataverse require user information.
+
+#------
+#Dryad configuration
+#------
+#Dryad base URL
+dry_url: https://datadryad.org
+#API path
+api_path: /api/v2
+#Application ID (contact Dryad to get an institutional account)
+app_id: null
+#Secret key, should have come with your application ID.
+secret: null
+
+#------
+#Dataverse configuration
+#------
+#Base url of Dataverse instance (eg: https://borealisdata.ca)
+dvurl: null 
+#Dataverse API KEY
+apikey: null
+#Maximum upload size in bytes (contact Dataverse administrator for value if unknown)
+max_upload: 3221225472
+#Contact email address for Dataverse record, eg: research.data@test.invalid
+dv_contact_email: null
+#Contact name associated with the address (like, say, "[University] Research Data Services
+dv_contact_name: null
+#Dataverse target collection shortname
+target: Null
+#To stop conversion to tabular data, add extensions here. Tabular processing can cause
+#problems and the original files were not processed that way. It is recommended to
+#keep this as is and add more if required.
+notab:
+- .sav
+- .por
+- .zip
+- .csv
+- .tsv
+- .dta
+- .rdata
+- .xslx
+- .xls
+
+#------
+#Monitoring configuration
+#------
+#Location of persistent database which tracks transfers over time.
+#If you ever move the database, you must change this to the new location or everything will be transferred again
+dbase: ~/dryad_dataverse_monitor.sqlite3
+
+#------
+#Transfer information
+#------
+#Institutional ROR. Find your ROR here: https://ror.org/search
+ror: null
+
+#Location of temporarily downloaded files. This doesn't default to the normal
+#temp file location because the files can be gigantic, and so is manually specified
+tempfile_location: /tmp
+
+#Email address which sends update notifications. 
+#Note, OATH2 is not supported. Yahoo is free 
+#and you may as well use it
+sending_email: null
+#Account username. Check provider for details
+sending_email_username: null
+#Account password. Check provider for details; may be different than
+#an ordinary account if using an application
+email_send_password: null
+#SMTP server configuration
+smtp_server: smtp.mail.yahoo.com
+#Mail is sent using SSL; check with provider for details
+ssl_port: 465
+#List of email addresses that will receive notifications
+recipients: 
+- null
+#location of dryadd log
+log: null
+
+#level at which to write a log message. Select from:
+# debug, info, warning, error or critical
+loglevel: warning
+#level at which to send an email message about problems.
+#Same levels as above, obviously.
+email_loglevel: warning
+
+#Forcible file unlock. Forcible file unlocking requires admin privileges in Dataverse.
+#Normally you wouldn't need to change this.
+force_unlock: false
+#Number of database backups to keep
+number_of_backups: 3
+
+#------
+#Troubleshooting options
+#------
+#Number of new Dryad surveys which will trigger a warning and stop execution.
+#This is to prevent accidentally ingesting thousands of surveys if you 
+#misconfigure something
+warning_threshold: 15
+#Force dryadd into test mode
+test_mode: false
+#Test mode - only transfer first [n] of the total number of (new) records. 
+#Old ones will still be updated, though
+test_mode_limit: 5
+
+
+#------
+#Exclusion list
+#------
+#Dryad DOIs to exclude from transfers. This is usually because the files in the
+#study are too large to be ingested into Dataverse, but may also be used for
+#studies with errors or any other reason
+#
+#IMPORTANT!
+#
+#Uncomment below and add dois in place of null, one per line.
+#exclude_list:
+#- null

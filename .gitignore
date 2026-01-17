@@ -40,3 +40,4 @@ build/
 build/**
 bin/
 bin/**
+**/*.bak
