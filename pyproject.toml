@@ -1,6 +1,6 @@
 [project]
 name = "dryad2dataverse"
-version = "0.7.11a1"
+version = "0.8.0"
 description = "Utility for copying and syncing data from a Dryad data repository to a Dataverse repository"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -18,7 +18,9 @@ dependencies = [
     "requests-toolbelt (>=0.9.1)",
     "urllib3 (>=2.6.3)",
     "pydoc-markdown (>=4.8.2,<5.0.0)",
-    "setuptools (>=80.8.0,<81.0.0)"
+    "setuptools (>=80.8.0,<81.0.0)",
+    "tomli-w (>=1.2.0,<2.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)",
 ]
 
 keywords =['Harvard Dataverse',
@@ -42,6 +44,8 @@ Repository = 'https://github.com/ubc-library-rc/dryad2dataverse.git'
 
 
 [tool.poetry]
+include = ["dryad2dataverse/data/dryad2dataverse_config.yml"]
+
 classifiers = ['Development Status :: 4 - Beta',
 			   'Environment :: Console',
 			   'Intended Audience :: Education',
@@ -54,6 +58,7 @@ classifiers = ['Development Status :: 4 - Beta',
 pylint = ">=3.3.6"
 mkdocs = ">=1.6.1"
 pydoc-markdown = ">=4.8.2"
+
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
