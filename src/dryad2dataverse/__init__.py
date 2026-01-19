@@ -25,7 +25,7 @@ downloading and file duplication.
 
 import sys
 
-VERSION = (0, 7, '11a1')
+VERSION = (0, 8, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 USERAGENT = (f'dryad2dataverse/v{__version__} ({sys.platform.capitalize()}); '
              f'Python {sys.version[:sys.version.find("(")-1]}')
