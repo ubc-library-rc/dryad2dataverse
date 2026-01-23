@@ -2,14 +2,13 @@
 Serializes Dryad study JSON to Dataverse JSON, as well as
 producing associated file information.
 '''
-
 import logging
 import urllib.parse
 
 import requests
 from requests.adapters import HTTPAdapter
 
-from  dryad2dataverse import constants
+from dryad2dataverse import constants
 from dryad2dataverse import USERAGENT
 
 LOGGER = logging.getLogger(__name__)
@@ -17,6 +16,9 @@ LOGGER = logging.getLogger(__name__)
 #https://stackoverflow.com/questions/16337511/log-all-requests-from-the-python-requests-module
 URL_LOGGER = logging.getLogger('urllib3')
 USER_AGENT = {'User-agent': USERAGENT}
+
+#pylint: disable=invalid-name, line-too-long
+#Note: Metadata downloads do not (as of 2026-01) require authentication
 
 class Serializer():
     '''
@@ -27,7 +29,7 @@ class Serializer():
     <a href="http://creativecommons.org/publicdomain/zero/1.0" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " target="_blank">CC0 1.0</a>
     </p>'''
 
-    def __init__(self, doi):
+    def __init__(self, doi, **kwargs):
         '''
         Creates Dryad study metadata instance.
 
@@ -36,8 +38,26 @@ class Serializer():
         doi : str
             DOI of Dryad study. Required for downloading.
             eg: 'doi:10.5061/dryad.2rbnzs7jp'
+
+        kwargs : dict
+            Other keyword parameters
+
+        Notes
+        -----
+        Unpacking a dryad2dataverse.constants.Config instance holding
+        global setup should give all of the
+        required kwargs.  ie, Serializer(doi, **config_instance)
+
         '''
         self.doi = doi
+        self.kwargs = kwargs
+        self.kwargs['dry_url'] = kwargs.get('dry_url', 'https://datadryad.org')
+        self.kwargs['api_path'] = kwargs.get('api_path', '/api/v2')
+        self.kwargs['max_upload'] = kwargs.get('max_upload', 3221225472)
+        self.kwargs['dv_contact_name'] = kwargs.get('dv_contact_name')
+        self.kwargs['dv_contact_email'] = kwargs.get('dv_contact_email')
+        #Don't need timeout if have RETRY_STRATEGY
+        self.kwargs['timeout'] = kwargs.get('timeout', 100)
         self._dryadJson = None
         self._fileJson = None
         self._dvJson = None
@@ -49,7 +69,7 @@ class Serializer():
                            HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
         LOGGER.debug('Creating Serializer instance object')
 
-    def fetch_record(self, url=None, timeout=45):
+    def fetch_record(self, url=None) :
         '''
         Fetches Dryad study record JSON from Dryad V2 API at
         https://datadryad.org/api/v2/datasets/.
@@ -60,18 +80,16 @@ class Serializer():
         ----------
         url : str
             Dryad instance base URL (eg: 'https://datadryad.org').
-        timeout : int
-            Timeout in seconds. Default 45.
         '''
         if not url:
-            url = constants.DRYURL
+            url = self.kwargs['dry_url']
         try:
             headers = {'accept':'application/json',
                        'Content-Type':'application/json'}
             headers.update(USER_AGENT)
             doiClean = urllib.parse.quote(self.doi, safe='')
-            resp = self.session.get(f'{url}/api/v2/datasets/{doiClean}',
-                                    headers=headers, timeout=timeout)
+            resp = self.session.get(f'{url}{self.kwargs["api_path"]}/datasets/{doiClean}',
+                                    headers=headers, timeout=self.kwargs['timeout'])
             resp.raise_for_status()
             self._dryadJson = resp.json()
         except (requests.exceptions.HTTPError,
@@ -126,7 +144,7 @@ class Serializer():
     def embargo(self)->bool:
         '''
         Check embargo status. Returns boolean True if embargoed.
-        
+
         '''
         if self.dryadJson.get('curationStatus') == 'Embargoed':
             return True
@@ -141,17 +159,12 @@ class Serializer():
         return self._dvJson
 
     @property
-    def fileJson(self, timeout=45):
+    def fileJson(self):
         '''
         Returns a list of file JSONs from call to Dryad API /files/{id},
         where the ID is parsed from the Dryad JSON. Dryad file listings
         are paginated, so the return consists of a list of dicts, one
         per page.
-
-        Parameters
-        ----------
-        timeout : int
-            Request timeout in seconds.
         '''
         if not self._fileJson:
             try:
@@ -159,19 +172,20 @@ class Serializer():
                 headers = {'accept':'application/json',
                            'Content-Type':'application/json'}
                 headers.update(USER_AGENT)
-                fileList = self.session.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
+                fileList = self.session.get(f'{self.kwargs["dry_url"]}'
+                                            f'{self.kwargs["api_path"]}/versions/{self.id}/files',
                                             headers=headers,
-                                            timeout=timeout)
+                                            timeout=self.kwargs['timeout'])
                 fileList.raise_for_status()
                 #total = fileList.json()['total'] #Not needed
                 lastPage = fileList.json()['_links']['last']['href']
                 pages = int(lastPage[lastPage.rfind('=')+1:])
                 self._fileJson.append(fileList.json())
                 for i in range(2, pages+1):
-                    fileCont = self.session.get(f'{constants.DRYURL}/api/v2'
+                    fileCont = self.session.get(f'{self.kwargs["dry_url"]}{self.kwargs["api_path"]}'
                                                 f'/versions/{self.id}/files?page={i}',
                                                 headers=headers,
-                                                timeout=timeout)
+                                                timeout=self.kwargs['timeout'])
                     fileCont.raise_for_status()
                     self._fileJson.append(fileCont.json())
             except Exception as e:
@@ -202,7 +216,7 @@ class Serializer():
 
                     #downLink = f['_links']['stash:file-download']['href']
                     downLink = f['_links']['stash:download']['href']
-                    downLink = f'{constants.DRYURL}{downLink}'
+                    downLink = f'{self.kwargs["dry_url"]}{downLink}'
                     name = f['path']
                     mimeType = f['mimeType']
                     size = f['size']
@@ -226,20 +240,13 @@ class Serializer():
         return out
 
     @property
-    def oversize(self, maxsize=None):
+    def oversize(self):
         '''
         Returns a list of Dryad files whose size value
         exceeds maxsize. Maximum size defaults to
         dryad2dataverse.constants.MAX_UPLOAD
-
-        Parameters
-        ----------
-        maxsize : int
-            Size in bytes in which to flag as oversize.
-            Defaults to constants.MAX_UPLOAD.
         '''
-        if not maxsize:
-            maxsize = constants.MAX_UPLOAD
+        maxsize = self.kwargs['max_upload']
         toobig = []
         for f in self.files:
             if f[3] >= maxsize:
@@ -349,7 +356,7 @@ class Serializer():
         '''
         Produces required author json fields.
         This is a special case, requiring concatenation of several fields.
-        
+
         Parameters
         ----------
         author : dict
@@ -409,34 +416,24 @@ class Serializer():
                    'storageSize',
                    'visibility',
                    'skipEmails']
+        lookup = {'versionNumber': '<b>Dryad version number:</b>',
+                  'versionStatus': '<b>Version status:</b>',
+                  'manuscriptNumber': '<b>Manuscript number:</b>',
+                  'curationStatus': '<b>Dryad curation status:</b>',
+                  'preserveCurationStatus': '<b>Dryad preserve curation status:</b>',
+                  'invoiceId': '<b>Invoice ID:</b>',
+                  'sharingLink': '<b>Sharing link:</b>',
+                  'loosenValidation': '<b>Loosen validation:</b>',
+                  'skipDataciteUpdate': '<b>Skip Datacite update:</b>',
+                  'storageSize': '<b>Storage size:</b>',
+                  'visibility': '<b>Visibility:</b>',
+                  'skipEmails': '<b>Skip emails:</b>'}
         for note in notable:
             text = dryJson.get(note)
             if text:
                 text = str(text).strip()
-                if note == 'versionNumber':
-                    text = f'<b>Dryad version number:</b> {text}'
-                if note == 'versionStatus':
-                    text = f'<b>Version status:</b> {text}'
-                if note == 'manuscriptNumber':
-                    text = f'<b>Manuscript number:</b> {text}'
-                if note == 'curationStatus':
-                    text = f'<b>Dryad curation status:</b> {text}'
-                if note == 'preserveCurationStatus':
-                    text = f'<b>Dryad preserve curation status:</b> {text}'
-                if note == 'invoiceId':
-                    text = f'<b>Invoice ID:</b> {text}'
-                if note == 'sharingLink':
-                    text = f'<b>Sharing link:</b> {text}'
-                if note == 'loosenValidation':
-                    text = f'<b>Loosen validation:</b> {text}'
-                if note == 'skipDataciteUpdate':
-                    text = f'<b>Skip Datacite update:</b> {text}'
-                if note == 'storageSize':
-                    text = f'<b>Storage size:</b> {text}'
-                if note == 'visibility':
-                    text = f'<b>Visibility:</b> {text}'
-                if note == 'skipEmails':
-                    text = f'<b>Skip emails:</b> {text}'
+                if note in lookup:
+                    text = f'{lookup.get(note)} {text}'
 
                 notes += f'<p>{text}</p>\n'
         concat = {'typeName':'notesText',
@@ -472,7 +469,8 @@ class Serializer():
             out.append(Serializer._convert_generic(inJson=coord[1],
                                                    dvField=coord[0],
                                                    #dryField='north'))
-                                                   dryField=[k for k in coord[1].keys()][0]))
+                                                   #dryField=[k for k in coord[1].keys()][0]))
+                                                   dryField=list(coord[1].keys())[0]))
         return out
 
     @staticmethod
@@ -540,7 +538,9 @@ class Serializer():
 
     def _assemble_json(self, dryJson=None, dvContact=None,
                        dvEmail=None, defContact=True):
+        #pylint: disable = too-many-statements, too-many-locals, too-many-branches
         '''
+
         Assembles Dataverse json from Dryad JSON components.
         Dataverse JSON is a nightmare, so this function is too.
 
@@ -559,9 +559,9 @@ class Serializer():
         	Flag to include default contact information with record.
         '''
         if not dvContact:
-            dvContact = constants.DV_CONTACT_NAME
+            dvContact = self.kwargs['dv_contact_name']
         if not dvEmail:
-            dvEmail = constants.DV_CONTACT_EMAIL
+            dvEmail = self.kwargs['dv_contact_email']
         if not dryJson:
             dryJson = self.dryadJson
         LOGGER.debug(dryJson)
