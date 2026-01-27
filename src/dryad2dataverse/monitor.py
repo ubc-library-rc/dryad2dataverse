@@ -8,14 +8,14 @@ The monitor's primary function is to allow for state checking
 for Dryad studies so that files and studies aren't downloaded
 unneccessarily.
 '''
-
+#pylint: disable=invalid-name
 import copy
-import logging
-import json
-import sqlite3
 import datetime
+import json
+import logging
+import pathlib
+import sqlite3
 
-from dryad2dataverse import constants
 from dryad2dataverse import exceptions
 
 LOGGER = logging.getLogger(__name__)
@@ -26,31 +26,61 @@ class Monitor():
     Dryad files can be monitored and updated over time. Monitor is a singleton,
     but is not thread-safe.
     '''
-    __instance = None
-
-    def __new__(cls, dbase=None, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         '''
         Creates a new singleton instance of Monitor.
 
-        Also creates a database if existing database is not present.
+        Parameters
+        ----------
+        *args
+        **kwargs
+        '''
+        if not hasattr(cls, 'inst'):
+            cls.inst = super().__new__(cls)
+            #This ensures only the first set of kwargs (on instantiation)
+            #are used.
+            cls.init = 0
+            cls.kwargs = kwargs
+            if not cls.kwargs.get('dbase'):
+                try:
+                    cls.kwargs['dbase'] = args[0]
+                except ValueError as e:
+                    raise KeyError from e
+            cls.conn = sqlite3.connect(pathlib.Path(cls.kwargs['dbase']).expanduser())
+            cls.cursor = cls.conn.cursor()
+            LOGGER.info('Open database %s', cls.kwargs['dbase'])
+        return cls.inst
+
+    def __init__(self, *args, **kwargs):
+        '''
+        Initialize singleton instance of Monitor
 
         Parameters
         ----------
-        dbase : str
-            Path to sqlite3 database. That is:
-            /path/to/file.sqlite3
+        *args
+            Positional arguments. Only the first is used
+        **kwargs
+            Keyword arguments. Only dbase is used, and it overwrites args[0] if present
 
-        *args : list
-        **kwargs : dict
+        Notes
+        -----
+        Normally you would just pass a dryad2dataverse.constants.Config object,
+        ie. Monitor(**config)
+
+        These keyword parameters are required at a minimum, and are included as part of a
+        Config instance.
+        dbase : str
+            Path to dryad2dataverse monitor database
+        dry_url : str
+            Dryad base URL
         '''
-        if cls.__instance is None:
-            cls.__instance = super(Monitor, cls).__new__(cls)
-            cls.__instance.__initialized = False
-            cls.dbase = dbase
-            if not cls.dbase:
-                cls.dbase = constants.DBASE
-            cls.conn = sqlite3.Connection(cls.dbase)
-            cls.cursor = cls.conn.cursor()
+        #pylint: disable=unused-argument
+        #arguments are parsed in __new__ to make a singleton
+        #but they need to be passed in __init__
+        if not self.init:
+
+            conn = sqlite3.connect(pathlib.Path(self.kwargs['dbase']).expanduser())
+            cursor = conn.cursor()
             create = ['CREATE TABLE IF NOT EXISTS dryadStudy \
                        (uid INTEGER PRIMARY KEY AUTOINCREMENT, \
                        doi TEXT, lastmoddate TEXT, dryadjson TEXT, \
@@ -74,33 +104,11 @@ class Monitor():
                       ]
 
             for line in create:
-                cls.cursor.execute(line)
-            cls.conn.commit()
-            LOGGER.info('Using database %s', cls.dbase)
+                cursor.execute(line)
+            conn.commit()
+            conn.close()
+        self.init = 1
 
-        return cls.__instance
-
-    def __init__(self, dbase=None, *args, **kwargs):
-        # remove args and kwargs when you find out how init interacts with new.
-        '''
-        Initialize the Monitor instance if not instantiated already (ie, Monitor
-        is a singleton).
-
-        Parameters
-        ----------
-        dbase : str, default=dryad2datverse.constants.DBASE
-            Complete path to desired location of tracking database
-            (eg: /tmp/test.db).
-        *args : list
-        **kwargs : dict
-        '''
-        if self.__initialized:
-            return
-        self.__initialized = True
-        if not dbase:
-            self.dbase = constants.DBASE
-        else:
-            self.dbase = dbase
 
     def __del__(self):
         '''
@@ -131,7 +139,7 @@ class Monitor():
         Returns
         -------
         `{status :'updated', 'dvpid':'doi://some/ident'}`.
-        
+
         Notes
         ------
         `status` is one of 'new', 'identical',  'lastmodsame',
@@ -201,13 +209,11 @@ class Monitor():
                                  dryaduid = ?', (dryaduid,))
             dvpid = self.cursor.fetchall()[-1][0]
             serial.dvpid = dvpid
-        except TypeError:
-            try:
-                raise exceptions.DatabaseError
-            except exceptions.DatabaseError as e:
-                LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
-                LOGGER.exception(e)
-                raise
+        except TypeError as exc:
+            LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
+            LOGGER.exception(exc)
+            raise exceptions.DatabaseError from exc
+
         newfile = copy.deepcopy(serial.dryadJson)
         testfile = copy.deepcopy(json.loads(result[-1][3]))
         if newfile == testfile:
@@ -304,6 +310,8 @@ class Monitor():
         ----------
         serial : dryad2dataverse.serializer.Serializer
         '''
+        #pylint: disable=too-many-locals
+
         diffReport = {}
         if self.status(serial)['status'] == 'new':
             #do we want to show what needs to be added?
@@ -333,7 +341,7 @@ class Monitor():
                         downLink = f['_links']['stash:file-download']['href']
                     except KeyError:
                         downLink = f['_links']['stash:download']['href']
-                    downLink = f'{constants.DRYURL}{downLink}'
+                    downLink = f'{self.kwargs.get("dry_url", "https://datadryad.org")}{downLink}'
                     name = f['path']
                     mimeType = f['mimeType']
                     size = f['size']
@@ -477,6 +485,7 @@ class Monitor():
         ----------
         transfer : dryad2dataverse.transfer.Transfer
         '''
+        #pylint: disable=too-many-branches, too-many-statements, too-many-locals
         # get the pre-update dryad uid in case we need it.
         self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi = ?',
                             (transfer.dryad.dryadJson['identifier'],))
