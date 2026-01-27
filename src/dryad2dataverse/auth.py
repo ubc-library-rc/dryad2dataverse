@@ -89,6 +89,6 @@ class Token:
         '''
         Return valid authorization header
         '''
-        return {'accept' : 'application/json',
+        return {'Accept' : 'application/json',
                 'Content-Type' : 'application/json',
                 'Authorization' : f'Bearer {self.token}'}

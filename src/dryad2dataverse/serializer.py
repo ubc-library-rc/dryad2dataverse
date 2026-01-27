@@ -4,12 +4,14 @@ producing associated file information.
 '''
 import logging
 import urllib.parse
+from typing import Union
 
 import requests
 from requests.adapters import HTTPAdapter
 
 from dryad2dataverse import constants
 from dryad2dataverse import USERAGENT
+import dryad2dataverse.auth
 
 LOGGER = logging.getLogger(__name__)
 #Connection monitoring as per
@@ -42,6 +44,11 @@ class Serializer():
         kwargs : dict
             Other keyword parameters
 
+        Other parameters
+        ----------------
+        token : dryad2dataverse.auth.Token
+            If present, will use authenticated API
+
         Notes
         -----
         Unpacking a dryad2dataverse.constants.Config instance holding
@@ -56,6 +63,9 @@ class Serializer():
         self.kwargs['max_upload'] = kwargs.get('max_upload', 3221225472)
         self.kwargs['dv_contact_name'] = kwargs.get('dv_contact_name')
         self.kwargs['dv_contact_email'] = kwargs.get('dv_contact_email')
+        if self.kwargs.get('token'):
+            if not isinstance(self.kwargs['token'],dryad2dataverse.auth.Token):
+                raise ValueError('Token must be a dryad2dataverse.auth.Token instance')
         #Don't need timeout if have RETRY_STRATEGY
         self.kwargs['timeout'] = kwargs.get('timeout', 100)
         self._dryadJson = None
@@ -68,6 +78,20 @@ class Serializer():
         self.session.mount('https://',
                            HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
         LOGGER.debug('Creating Serializer instance object')
+
+    def update_headers(self, inheader:Union[None, dict]=None)->dict:
+        '''
+        Update headers with user agent and token information (if present)
+        '''
+        if not inheader:
+            inheader = {}
+        headers = {'accept':'application/json',
+                   'Content-Type':'application/json'} 
+        headers.update(USER_AGENT)
+        if self.kwargs.get('token'):
+            headers.update(self.kwargs['token'].auth_header)
+        headers.update(inheader)
+        return headers
 
     def fetch_record(self, url=None) :
         '''
@@ -84,9 +108,7 @@ class Serializer():
         if not url:
             url = self.kwargs['dry_url']
         try:
-            headers = {'accept':'application/json',
-                       'Content-Type':'application/json'}
-            headers.update(USER_AGENT)
+            headers = self.update_headers()
             doiClean = urllib.parse.quote(self.doi, safe='')
             resp = self.session.get(f'{url}{self.kwargs["api_path"]}/datasets/{doiClean}',
                                     headers=headers, timeout=self.kwargs['timeout'])
@@ -169,9 +191,7 @@ class Serializer():
         if not self._fileJson:
             try:
                 self._fileJson = []
-                headers = {'accept':'application/json',
-                           'Content-Type':'application/json'}
-                headers.update(USER_AGENT)
+                headers = self.update_headers()
                 fileList = self.session.get(f'{self.kwargs["dry_url"]}'
                                             f'{self.kwargs["api_path"]}/versions/{self.id}/files',
                                             headers=headers,
