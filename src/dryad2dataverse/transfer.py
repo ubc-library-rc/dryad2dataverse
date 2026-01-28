@@ -2,11 +2,12 @@
 This module handles data downloads and uploads from a Dryad instance to a Dataverse instance
 '''
 
-#TODO harmonize headers instead of hideous copypasta
+#pylint: disable=invalid-name #Maybe one day
 import hashlib
 import io
 import json
 import logging
+import pathlib
 import os
 import time
 import traceback
@@ -17,11 +18,10 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
-from dryad2dataverse import constants
+from dryad2dataverse import config
 from dryad2dataverse import exceptions
 from dryad2dataverse import USERAGENT
 
-USER_AGENT = {'User-agent': USERAGENT}
 LOGGER = logging.getLogger(__name__)
 URL_LOGGER = logging.getLogger('urllib3')
 
@@ -39,14 +39,37 @@ class Transfer():
     Transfers metadata and data files from a
     Dryad installation to Dataverse installation.
     '''
-    def __init__(self, dryad):
+    #pylint: disable=too-many-instance-attributes
+    def __init__(self, dryad, **kwargs):
         '''
         Creates a dryad2dataverse.transfer.Transfer instance.
 
         Parameters
         ----------
         dryad : dryad2dataverse.serializer.Serializer
+
+        **kwargs
+            Normally this would be a dryad2dataverse.constants.Config instance
+
+        Notes
+        -----
+        Minimum kwargs for function:
+        max_upload : int
+            Maximum size in bytes
+        tempfile_location : str
+            Path to temporary directory
+        dv_url : str
+            Base URL of dataverse instance
+        api_key : str
+            API key for Dataverse user
+        dv_contact_email : str
+            Contact email address for Dataverse record
+        dv_contact_name : str
+            Contact name
+        target : str
+            Target collection short name
         '''
+        self.kwargs = kwargs
         self.dryad = dryad
         self._fileJson = None
         self._files = [list(f) for f in self.dryad.files]
@@ -56,35 +79,46 @@ class Transfer():
         self.dvStudy = None
         self.jsonFlag = None #Whether or not new json uploaded
         self.session = requests.Session()
-        self.session.mount('https://', HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
+        self.session.mount('https://', HTTPAdapter(max_retries=config.RETRY_STRATEGY))
+        self.check_kwargs()
 
-    def _del__(self): #TODONE: Change name to __del__ to make a destructor
-        '''Expunges files from constants.TMP on deletion'''
+    def check_kwargs(self):
+        '''
+        Verify sufficient information
+        '''
+        required = ['max_upload',
+                    'tempfile_location',
+                    'dv_url',
+                    'api_key',
+                    'dv_contact_email',
+                    'dv_contact_name',
+                    'target']
+        keys = self.kwargs.keys()
+        for val in required:
+            if val not in keys:
+                try:
+                    raise exceptions.Dryad2DataverseError(f'Required parameter missing: {val}')
+                except exceptions.Dryad2DataverseError as err:
+                    LOGGER.exception(err)
+                    raise
+
+    def _del__(self):
+        '''Expunges files from temporary file on deletion'''
+        tmp = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         for f in self.files:
-            if os.path.exists(f'{constants.TMP}{os.sep}{f[1]}'):
-                os.remove(f'{constants.TMP}{os.sep}{f[1]}')
+            if pathlib.Path(tmp, f[1]).exists():
+                os.remove(pathlib.Path(tmp, f[1]))
 
-    def test_api_key(self, url=None, apikey=None):
+    def test_api_key(self):
         '''
         Tests for an expired API key and raises
         dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
         the API key is bad. Ignores other HTTP errors.
-        
-        Parameters
-        ----------
-        url : str
-            Base URL to Dataverse installation.
-            Defaults to dryad2dataverse.constants.DVURL
-        apikey : str
-            Default dryad2dataverse.constants.APIKEY.
         '''
         #API validity check appears to come before a PID validity check
         params = {'persistentId': 'doi:000/000/000'} # PID is irrelevant
-        if not url:
-            url = constants.DVURL
-        headers = {'X-Dataverse-key': apikey if apikey else constants.APIKEY}
-        headers.update(USER_AGENT)
-        bad_test = self.session.get(f'{url}/api/datasets/:persistentId',
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
+        bad_test = self.session.get(f'{self.kwargs["dv_url"]}/api/datasets/:persistentId',
                                 headers=headers,
                                 params=params)
         #There's an extra space in the message which Harvard
@@ -92,10 +126,8 @@ class Transfer():
         if bad_test.json().get('message').startswith('Bad api key'):
             try:
                 raise exceptions.DataverseBadApiKeyError('Bad API key')
-            except exceptions.DataverseBadApiKeyError as e:
-                LOGGER.critical('API key has expired or is otherwise invalid')
-                LOGGER.exception(e)
-                #LOGGER.exception(traceback.format_exc()) #not really necessary
+            except exceptions.DataverseBadApiKeyError as err:
+                LOGGER.exception(err)
                 raise
         try: #other errors
             bad_test.raise_for_status()
@@ -119,7 +151,7 @@ class Transfer():
         Returns datavese authentication header dict.
         ie: `{X-Dataverse-key' : 'APIKEYSTRING'}`
         '''
-        return {'X-Dataverse-key' : constants.APIKEY}
+        return {'X-Dataverse-key' : self.kwargs['api_key']}
 
     @property
     def fileJson(self):
@@ -160,7 +192,7 @@ class Transfer():
     def _dryad_file_id(url:str):
         '''
         Returns Dryad fileID from dryad file download URL as integer.
-        
+
         Parameters
         ----------
         url : str
@@ -183,18 +215,13 @@ class Transfer():
         '''
         return {'X-Dataverse-key' : apikey}
 
-    #@staticmethod
-    def set_correct_date(self, url=None, hdl=None,
-                         d_type='distributionDate',
-                         apikey=None):
+    def set_correct_date(self, hdl=None,
+                         d_type='distributionDate'):
         '''
         Sets "correct" publication date for Dataverse.
 
         Parameters
         ----------
-        url : str
-            Base URL to Dataverse installation.
-            Defaults to dryad2dataverse.constants.DVURL
         hdl : str
             Persistent indentifier for Dataverse study.
             Defaults to Transfer.dvpid (which can be None if the
@@ -202,11 +229,12 @@ class Transfer():
         d_type : str
             Date type. One of  'distributionDate', 'productionDate',
             `dateOfDeposit'. Default 'distributionDate'.
-        apikey : str
-            Default dryad2dataverse.constants.APIKEY.
-        
+
         Notes
         -----
+        self.kwargs are normally read from dryad2dataverse.config.Config
+        instances.
+
         dryad2dataverse.serializer maps Dryad 'publicationDate'
         to Dataverse 'distributionDate' (see serializer.py ~line 675).
 
@@ -216,23 +244,16 @@ class Transfer():
 
         '''
         try:
-            if not url:
-                url = constants.DVURL
             if not hdl:
                 hdl = self.dvpid
-            headers = {'X-Dataverse-key' : apikey}
-            if apikey:
-                headers = {'X-Dataverse-key' : apikey}
-            else:
-                headers = {'X-Dataverse-key' : constants.APIKEY}
-
-            headers.update(USER_AGENT)
+            headers ={'X-Dataverse-key': self.kwargs['api_key'],
+                      'User-agent': USERAGENT}
             params = {'persistentId': hdl}
-            set_date = self.session.put(f'{url}/api/datasets/:persistentId/citationdate',
+            set_date = self.session.put(f'{self.kwargs["dv_url"]}/api/'
+                                        'datasets/:persistentId/citationdate',
                                         headers=headers,
                                         data=d_type,
-                                        params=params,
-                                        timeout=45)
+                                        params=params)
             set_date.raise_for_status()
 
         except (requests.exceptions.HTTPError,
@@ -242,21 +263,14 @@ class Transfer():
             LOGGER.warning(err)
             LOGGER.warning(set_date.text)
 
-    def upload_study(self, url=None, apikey=None, timeout=45, **kwargs):
+    def upload_study(self, **kwargs):
         '''
         Uploads Dryad study metadata to target Dataverse or updates existing.
         Supplying a `targetDv` kwarg creates a new study and supplying a
         `dvpid` kwarg updates a currently existing Dataverse study.
 
-        Parameters
-        ----------
-        url : str
-            URL of Dataverse instance. Defaults to constants.DVURL.
-        apikey : str
-            API key of user. Defaults to contants.APIKEY.
-        timeout : int
-            timeout on POST request.
-        kwargs : dict
+        **kwargs : dict
+            Normally this is one of the two parameters below
 
         Other parameters
         ----------------
@@ -271,46 +285,37 @@ class Transfer():
         -----
         One of targetDv or dvpid is required.
         '''
-        if not url:
-            url = constants.DVURL
-        if not apikey:
-            apikey = constants.APIKEY
-        headers = {'X-Dataverse-key' : apikey}
-        headers.update(USER_AGENT)
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
         targetDv = kwargs.get('targetDv')
         dvpid = kwargs.get('dvpid')
         #dryFid = kwargs.get('dryFid') #Why did I put this here?
         if not targetDv and not dvpid:
             try:
                 raise exceptions.NoTargetError('You must supply one of targetDv \
-                                    (target dataverse) \
-                                     or dvpid (Dataverse persistent ID)')
-            except exceptions.NoTargetError as e:
-                LOGGER.error('No target dataverse or dvpid supplied')
-                LOGGER.exception(e)
+                                        (target dataverse) \
+                                         or dvpid (Dataverse persistent ID)')
+            except exceptions.NoTargetError as err:
+                LOGGER.exception(err)
                 raise
 
         if targetDv and dvpid:
-            try:
-                raise ValueError('Supply only one of targetDv or dvpid')
-            except ValueError as e:
-                LOGGER.exception(e)
-                raise
+            msg = 'Supply only one of targetDv or dvpid'
+            LOGGER.exception(msg)
+            raise exceptions.Dryad2DataverseError(msg)
+
         if not dvpid:
-            endpoint = f'{url}/api/dataverses/{targetDv}/datasets'
+            endpoint = f'{self.kwargs["dv_url"]}/api/dataverses/{targetDv}/datasets'
             upload = self.session.post(endpoint,
                                        headers=headers,
-                                       json=self.dryad.dvJson,
-                                       timeout=timeout)
+                                       json=self.dryad.dvJson)
             LOGGER.debug(upload.text)
         else:
-            endpoint = f'{url}/api/datasets/:persistentId/versions/:draft'
+            endpoint = f'{self.kwargs["dv_url"]}/api/datasets/:persistentId/versions/:draft'
             params = {'persistentId':dvpid}
             #Yes, dataverse uses *different* json for edits
             upload = self.session.put(endpoint, params=params,
                                       headers=headers,
-                                      json=self.dryad.dvJson['datasetVersion'],
-                                      timeout=timeout)
+                                      json=self.dryad.dvJson['datasetVersion'])
             #self._dvrecord = upload.json()
             LOGGER.debug(upload.text)
 
@@ -318,20 +323,16 @@ class Transfer():
             updata = upload.json()
             self.dvStudy = updata
             if updata.get('status') != 'OK':
+                msg = ('Status return is not OK.'
+                        f'{upload.status_code}: '
+                        f'{upload.reason}. '
+                        f'{upload.request.url} '
+                        f'{upload.text}')
                 try:
-                    raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                           f'{upload.status_code}: '
-                                                           f'{upload.reason}. '
-                                                           f'{upload.request.url} '
-                                                           f'{upload.text}'))
-                except exceptions.DataverseUploadError as e:
-                    LOGGER.exception(e)
+                    raise exceptions.DataverseUploadError(msg)
+                except exceptions.DataverseUploadError as err:
+                    LOGGER.exception(err)
                     LOGGER.exception(traceback.format_exc())
-                    raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                           f'{upload.status_code}: '
-                                                           f'{upload.reason}. '
-                                                           f'{upload.request.url} '
-                                                           f'{upload.text}'))
             upload.raise_for_status()
         except Exception as e: # Only accessible via non-requests exception
             LOGGER.exception(e)
@@ -385,14 +386,16 @@ class Transfer():
                     fblock = m.read(blocksize)
                     curvalue = HASHTABLE[dig_type](fblock, curvalue)
                 return curvalue
+        LOGGER.exception('Unable to determine hash type for %s: %s', infile, dig_type)
         raise exceptions.HashError(f'Unable to determine hash type for{infile}: {dig_type}')
 
 
-    def download_file(self, url=None, filename=None, tmp=None,
-                      size=None, chk=None, timeout=45, **kwargs):
+    def download_file(self, url=None, filename=None,
+                      size=None, chk=None, **kwargs):
         '''
-        Downloads a file via requests streaming and saves to constants.TMP.
-        returns checksum on success and an exception on failure.
+        Downloads a file via requests streaming and saves to the
+        the defined temporary file directory.
+        Returns checksum on success and an exception on failure.
 
         Parameters
         ----------
@@ -400,18 +403,10 @@ class Transfer():
             URL of download.
         filename : str
             Output file name.
-        timeout : int
-            Requests timeout.
-        tmp : str
-            Temporary directory for downloads.
-            Defaults to dryad2dataverse.constants.TMP.
         size : int
             Reported file size in bytes.
-            Defaults to dryad2dataverse.constants.MAX_UPLOAD.
         chk : str
             checksum of file (if available and known).
-        timeout : int
-            timeout in seconds
         kwargs : dict
 
         Other parameters
@@ -419,19 +414,16 @@ class Transfer():
         digest_type : str
             checksum type (ie, md5, sha-256, etc)
         '''
+        #pylint: disable=too-many-branches
         LOGGER.debug('Start download sequence')
-        LOGGER.debug('MAX SIZE = %s', constants.MAX_UPLOAD)
+        LOGGER.debug('MAX SIZE = %s', self.kwargs['max_upload'])
         LOGGER.debug('Filename: %s, size=%s', filename, size)
-        if not tmp:
-            tmp = constants.TMP
-        if tmp.endswith(os.sep):
-            tmp = tmp[:-1]
-
+        tmp = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         if size:
-            if size > constants.MAX_UPLOAD:
+            if size > self.kwargs['max_upload']:
                 #TOO BIG
                 LOGGER.warning('%s: File %s exceeds '
-                               'Dataverse MAX_UPLOAD size. Skipping download.',
+                               'Dataverse maximum upload size. Skipping download.',
                                self.doi, filename)
                 md5 = 'this_file_is_too_big_to_upload__' #HA HA
                 for i in self._files:
@@ -440,27 +432,27 @@ class Transfer():
                 LOGGER.debug('Stop download sequence with large file skip')
                 return md5
         try:
-            down = self.session.get(url, timeout=timeout, stream=True)
+            down = self.session.get(url, stream=True)
             down.raise_for_status()
-            with open(f'{tmp}{os.sep}{filename}', 'wb') as fi:
+            with open(pathlib.Path(tmp,filename), 'wb') as fi:
                 for chunk in down.iter_content(chunk_size=8192):
                     fi.write(chunk)
 
             #verify size
             #https://stackoverflow.com/questions/2104080/how-can-i-check-file-size-in-python'
             if size:
-                checkSize = os.stat(f'{tmp}{os.sep}{filename}').st_size
+                checkSize = os.stat(pathlib.Path(tmp,filename)).st_size
                 if checkSize != size:
                     try:
-                        raise exceptions.DownloadSizeError('Download size does not match '
-                                                           'reported size')
+                        raise exceptions.DownloadSizeError('Download size does not '
+                                                           'match reported size')
                     except exceptions.DownloadSizeError as e:
                         LOGGER.exception(e)
                         raise
             #now check the md5
             md5 = None
             if chk and kwargs.get('digest_type') in HASHTABLE:
-                md5 = Transfer._check_md5(f'{tmp}{os.sep}{filename}',
+                md5 = Transfer._check_md5(pathlib.Path(tmp,filename),
                                       kwargs['digest_type'])
                 if md5 != chk:
                     try:
@@ -479,7 +471,10 @@ class Transfer():
                 requests.exceptions.ConnectionError) as err:
             LOGGER.critical('Unable to download %s', url)
             LOGGER.exception(err)
-            raise exceptions.DataverseDownloadError
+            raise
+        except Exception as err:
+            LOGGER.exception(err)
+            raise
 
     def download_files(self, files=None):
         '''
@@ -513,7 +508,7 @@ class Transfer():
             LOGGER.exception('Unable to download file with info %s\n%s', f, e)
             raise
 
-    def file_lock_check(self, study, dv_url, apikey=None, count=0):
+    def file_lock_check(self, study, count=0):
         '''
         Checks for a study lock
 
@@ -526,28 +521,17 @@ class Transfer():
         ----------
         study : str
             Persistent indentifer of study.
-        dv_url : str
-            URL to base Dataverse installation.
-        apikey : str
-            API key for user.
-            If not present authorization defaults to self.auth.
         count : int
             Number of times the function has been called. Logs
             lock messages only on 0.
         '''
-        if dv_url.endswith('/'):
-            dv_url = dv_url[:-1]
-        if apikey:
-            headers = {'X-Dataverse-key': apikey}
-        else:
-            headers = self.auth
-
-        headers.update(USER_AGENT)
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
         params = {'persistentId': study}
         try:
-            lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+            lock_status = self.session.get(f'{self.kwargs["dv_url"]}'
+                                           '/api/datasets/:persistentId/locks',
                                            headers=headers,
-                                           params=params, timeout=300)
+                                           params=params)
             lock_status.raise_for_status()
             if lock_status.json().get('data'):
                 if count == 0:
@@ -563,7 +547,7 @@ class Transfer():
             #return True #Should I raise here?
             raise
 
-    def force_notab_unlock(self, study, dv_url, apikey=None):
+    def force_notab_unlock(self, study):
         '''
         Checks for a study lock and forcibly unlocks and uningests
         to prevent tabular file processing. Required if mime and filename
@@ -575,31 +559,27 @@ class Transfer():
         ----------
         study : str
             Persistent indentifer of study.
-        dv_url : str
-            URL to base Dataverse installation.
-        apikey : str
-            API key for user.
-            If not present authorization defaults to self.auth.
         '''
-        if dv_url.endswith('/'):
-            dv_url = dv_url[:-1]
-        if apikey:
-            headers = {'X-Dataverse-key': apikey}
-        else:
-            headers = self.auth
-
-        headers.update(USER_AGENT)
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
         params = {'persistentId': study}
-        lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+        lock_status = self.session.get(f'{self.kwargs["dv_url"]}/api/datasets/:persistentId/locks',
                                        headers=headers,
-                                       params=params, timeout=300)
-        lock_status.raise_for_status()
+                                       params=params)
+        try:
+            lock_status.raise_for_status()
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as err:
+            LOGGER.exception(err)
+            raise
+        except Exception as err:
+            LOGGER.exception(err)
+            raise
         if lock_status.json()['data']:
             LOGGER.warning('Study %s has been locked', study)
             LOGGER.warning('Lock info:\n%s', lock_status.json())
-            force_unlock = self.session.delete(f'{dv_url}/api/datasets/:persistentId/locks',
-                                               params=params, headers=headers,
-                                               timeout=300)
+            force_unlock = self.session.delete(f'{self.kwargs["dv_url"]}/api/'
+                                               'datasets/:persistentId/locks',
+                                               params=params, headers=headers)
             force_unlock.raise_for_status()
             LOGGER.warning('Lock removed for %s', study)
             LOGGER.warning('Lock status:\n %s', force_unlock.json())
@@ -625,15 +605,19 @@ class Transfer():
                     hashtype=None,
                     #md5=None, studyId=None, dest=None,
                     digest=None, studyId=None, dest=None,
-                    fprefix=None, force_unlock=False, timeout=300):
+                    fprefix=None, force_unlock=False):
         '''
         Uploads file to Dataverse study. Returns a tuple of the
         dryadFid (or None) and Dataverse JSON from the POST request.
         Failures produce JSON with different status messages
-        rather than raising an exception.
+        rather than raising an exception, unless it's some
+        horrendous failure whereupon you will get an actual
+        exception.
 
         Parameters
         ----------
+        dryadURL : str
+            Dryad download URL
         filename : str
             Filename (not including path).
         mimetype : str
@@ -643,15 +627,10 @@ class Transfer():
         studyId : str
             Persistent Dataverse study identifier.
             Defaults to Transfer.dvpid.
-        dest : str
-            Destination dataverse installation url.
-            Defaults to constants.DVURL.
         hashtype: str
             original Dryad hash type
         fprefix : str
             Path to file, not including a trailing slash.
-        timeout : int
-            Timeout in seconds for POST request. Default 300.
         dryadUrl : str
             Dryad download URL if you want to include a Dryad file id.
         force_unlock : bool
@@ -662,33 +641,32 @@ class Transfer():
             from non-superusers (undocumented as of 31 March 2021).
             **Forcible unlock requires a superuser API key.**
         '''
-        #return locals()
-        #TODONE remove above
+        #pylint: disable = consider-using-with, too-many-arguments, too-many-positional-arguments
+        #pylint:disable=too-many-locals, too-many-branches, too-many-statements
+        #Fix the arguments one day
         if not studyId:
             studyId = self.dvpid
-        if not dest:
-            dest = constants.DVURL
-        if not fprefix:
-            fprefix = constants.TMP
+        dest = self.kwargs['dv_url']
+        fprefix = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         if dryadUrl:
             fid = dryadUrl.strip('/download')
             fid = int(fid[fid.rfind('/')+1:])
         else:
             fid = 0 #dummy fid for non-Dryad use
         params = {'persistentId' : studyId}
-        upfile = fprefix + os.sep + filename[:]
+        upfile = pathlib.Path(fprefix, filename[:])
         badExt = filename[filename.rfind('.'):].lower()
         #Descriptions are technically possible, although how to add
         #them is buried in Dryad's API documentation
         dv4meta = {'label' : filename[:], 'description' : descr}
         #if mimetype == 'application/zip' or filename.lower().endswith('.zip'):
-        if mimetype == 'application/zip' or badExt in constants.NOTAB:
+        if mimetype == 'application/zip' or badExt in self.kwargs.get('notab',[]):
             mimetype = 'application/octet-stream' # stop unzipping automatically
             filename += '.NOPROCESS' # Also screw with their naming convention
             #debug log about file names to see what is up with XSLX
             #see doi:10.5061/dryad.z8w9ghxb6
             LOGGER.debug('File renamed to %s for upload', filename)
-        if size >= constants.MAX_UPLOAD:
+        if size >= self.kwargs['max_upload']:
             fail = (fid, {'status' : 'Failure: MAX_UPLOAD size exceeded'})
             self.fileUpRecord.append(fail)
             LOGGER.warning('%s: File %s of '
@@ -702,14 +680,21 @@ class Transfer():
         ctype = {'Content-type' : multi.content_type}
         tmphead = self.auth.copy()
         tmphead.update(ctype)
-        tmphead.update(USER_AGENT)
+        tmphead.update({'User-agent':USERAGENT})
         url = dest + '/api/datasets/:persistentId/add'
-        try:
-            upload = self.session.post(url, params=params,
+        upload = self.session.post(url, params=params,
                                        headers=tmphead,
-                                       data=multi, timeout=timeout)
-            #print(upload.text)
+                                       data=multi)
+        try:
             upload.raise_for_status()
+
+        except (requests.exceptions.HTTPError,
+                    requests.exceptions.ConnectionError):
+            LOGGER.critical('Error %s: %s, upload.status_code, upload.reason')
+            return (fid, {'status' : f'Failure: Reason - {upload.status_code}: {upload.reason}'})
+
+
+        try:
             self.fileUpRecord.append((fid, upload.json()))
             upmd5 = upload.json()['data']['files'][0]['dataFile']['checksum']['value']
             #Dataverse hash type
@@ -727,11 +712,11 @@ class Transfer():
             #if md5 and (upmd5 != md5):
             if upmd5 != comparator:
                 try:
-                    raise exceptions.HashError(f'{_type} mismatch:\nlocal: {comparator}\nuploaded: {upmd5}')
+                    raise exceptions.HashError(f'{_type} mismatch:\nlocal: '
+                                               f'{comparator}\nuploaded: {upmd5}')
                 except exceptions.HashError as e:
                     LOGGER.exception(e)
-                    raise
-
+                    return (fid, {'status': e})
             #Make damn sure that the study isn't locked because of
             #tab file processing
             ##SPSS files still process despite spoofing MIME and extension
@@ -741,12 +726,12 @@ class Transfer():
             #fid not required for unlock
             #self.force_notab_unlock(studyId, dest, fid)
             if force_unlock:
-                self.force_notab_unlock(studyId, dest)
+                self.force_notab_unlock(studyId)
             else:
                 count = 0
                 wait = True
                 while wait:
-                    wait = self.file_lock_check(studyId, dest, count=count)
+                    wait = self.file_lock_check(studyId, count)
                     if wait:
                         time.sleep(15) # Don't hit it too often
                     count += 1
@@ -754,17 +739,15 @@ class Transfer():
 
             return (fid, upload.json())
 
-        except Exception as e:
+        except requests.exceptions.JSONDecodeError as e:
+            LOGGER.warning('JSON error with upload')
             LOGGER.exception(e)
-            try:
-                reason = upload.json()['message']
-                LOGGER.warning(upload.json())
-                return (fid, {'status' : f'Failure: {reason}'})
-            except Exception as e:
-                LOGGER.warning('Further exceptions!')
-                LOGGER.exception(e)
-                LOGGER.warning(upload.text)
-                return (fid, {'status' : f'Failure: Reason {upload.reason}'})
+            return (fid, {'status' : f'Failure: Reason {upload.reason}'})
+
+        #It can crash later
+        except Exception as f_plus: #pylint: disable=broad-except
+            LOGGER.exception(f_plus)
+            return (fid, {'status' : f'Failure: Reason: {f_plus}'})
 
     def upload_files(self, files=None, pid=None, fprefix=None, force_unlock=False):
         '''
@@ -779,9 +762,6 @@ class Transfer():
         pid : str
             Defaults to self.dvpid, which is generated by calling
             dryad2dataverse.transfer.Transfer.upload_study().
-        fprefix : str
-            File location prefix.
-            Defaults to dryad2dataverse.constants.TMP
         force_unlock : bool
             Attempt forcible unlock instead of waiting for tabular
             file processing.
@@ -792,8 +772,7 @@ class Transfer():
         '''
         if not files:
             files = self.files
-        if not fprefix:
-            fprefix = constants.TMP
+        fprefix = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         out = []
         for f in files:
             #out.append(self.upload_file(f[0], f[1], f[2], f[3],
@@ -808,7 +787,7 @@ class Transfer():
     def upload_json(self, studyId=None, dest=None):
         '''
         Uploads Dryad json as a separate file for archival purposes.
-        
+
         Parameters
         ----------
         studyId : str
@@ -816,14 +795,10 @@ class Transfer():
             Default dryad2dataverse.transfer.Transfer.dvpid,
             which is only generated on
             dryad2dataverse.transfer.Transfer.upload_study()
-        dest : str
-            Base URL for transfer.
-            Default dryad2datavese.constants.DVURL
         '''
         if not studyId:
             studyId = self.dvpid
-        if not dest:
-            dest = constants.DVURL
+        dest = self.kwargs['dv_url']
         if not self.jsonFlag:
             url = dest + '/api/datasets/:persistentId/add'
             pack = io.StringIO(json.dumps(self.dryad.dryadJson))
@@ -851,7 +826,6 @@ class Transfer():
             except (requests.exceptions.HTTPError,
                     requests.exceptions.ConnectionError) as err:
                 LOGGER.error('Unable to upload Dryad JSON to %s', studyId)
-                LOGGER.error('ERROR message: %s', meta.text)
                 LOGGER.exception(err)
                 #And further checking as to what is happening
                 self.fileUpRecord.append((0, {'status':'Failure: Unable to upload Dryad JSON'}))
@@ -860,8 +834,9 @@ class Transfer():
             except Exception as err:
                 LOGGER.error('Unable to upload Dryad JSON')
                 LOGGER.exception(err)
+                raise
 
-    def delete_dv_file(self, dvfid, dvurl=None, key=None)->bool:
+    def delete_dv_file(self, dvfid)->bool:
         #WTAF curl -u $API_TOKEN: -X DELETE
         #https://$HOSTNAME/dvn/api/data-deposit/v1.1/swordv2/edit-media/file/123
 
@@ -874,28 +849,19 @@ class Transfer():
 
         Parameters
         ----------
-        dvurl : str
-            Base URL of dataverse instance.
-            Defaults to dryad2dataverse.constants.DVURL.
         dvfid : str
             Dataverse file ID number.
-        key : str
-            API key
         '''
-        if not dvurl:
-            dvurl = constants.DVURL
-        if not key:
-            key = constants.APIKEY
-
-        delme = self.session.delete(f'{dvurl}/dvn/api/data-deposit/v1.1/swordv2/edit-media'
+        delme = self.session.delete(f'{self.kwargs["dv_url"]}/'
+                                    'dvn/api/data-deposit/v1.1/swordv2/edit-media'
                                     f'/file/{dvfid}',
-                                    auth=(key, ''))
+                                    auth=(self.kwargs['api_key'], ''))
         if delme.status_code == 204:
             self.fileDelRecord.append(dvfid)
             return 1
         return 0
 
-    def delete_dv_files(self, dvfids=None, dvurl=None, key=None):
+    def delete_dv_files(self, dvfids=None):
         '''
         Deletes all files in list of Dataverse file ids from
         a Dataverse installation.
@@ -905,16 +871,8 @@ class Transfer():
         dvfids : list
             List of Dataverse file ids.
             Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.
-        dvurl : str
-            Base URL of Dataverse. Defaults to dryad2dataverse.constants.DVURL.
-        key : str
-            API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY.
         '''
         #if not dvfids:
         #   dvfids = self.fileDelRecord
-        if not dvurl:
-            dvurl = constants.DVURL
-        if not key:
-            key = constants.APIKEY
         for fid in dvfids:
-            self.delete_dv_file(fid, dvurl, key)
+            self.delete_dv_file(fid)
