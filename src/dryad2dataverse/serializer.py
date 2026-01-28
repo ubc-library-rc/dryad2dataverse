@@ -8,7 +8,7 @@ import urllib.parse
 import requests
 from requests.adapters import HTTPAdapter
 
-from dryad2dataverse import constants
+from dryad2dataverse import config
 import dryad2dataverse.auth
 
 LOGGER = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ class Serializer():
 
         Notes
         -----
-        Unpacking a dryad2dataverse.constants.Config instance holding
+        Unpacking a dryad2dataverse.config.Config instance holding
         global setup should give all of the
         required kwargs.  ie, Serializer(doi, **config_instance)
 
@@ -73,7 +73,7 @@ class Serializer():
         self.dvpid = None
         self.session = requests.Session()
         self.session.mount('https://',
-                           HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
+                           HTTPAdapter(max_retries=config.RETRY_STRATEGY))
         LOGGER.debug('Creating Serializer instance object')
 
     def fetch_record(self, url=None) :
@@ -91,7 +91,7 @@ class Serializer():
         if not url:
             url = self.kwargs['dry_url']
         try:
-            headers = constants.Config.update_headers(indict=self.kwargs)
+            headers = config.Config.update_headers(indict=self.kwargs)
             doiClean = urllib.parse.quote(self.doi, safe='')
             resp = self.session.get(f'{url}{self.kwargs["api_path"]}/datasets/{doiClean}',
                                     headers=headers, timeout=self.kwargs['timeout'])
@@ -174,7 +174,7 @@ class Serializer():
         if not self._fileJson:
             try:
                 self._fileJson = []
-                headers = constants.Config.update_headers(indict=self.kwargs)
+                headers = config.Config.update_headers(indict=self.kwargs)
                 fileList = self.session.get(f'{self.kwargs["dry_url"]}'
                                             f'{self.kwargs["api_path"]}/versions/{self.id}/files',
                                             headers=headers,
@@ -247,7 +247,7 @@ class Serializer():
         '''
         Returns a list of Dryad files whose size value
         exceeds maxsize. Maximum size defaults to
-        dryad2dataverse.constants.MAX_UPLOAD
+        dryad2dataverse.config.MAX_UPLOAD
         '''
         maxsize = self.kwargs['max_upload']
         toobig = []

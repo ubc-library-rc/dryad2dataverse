@@ -105,7 +105,7 @@ class Config(dict):
         Parameters
         ----------
         indict : dict
-            Optional dictionary (usually a dryad2dataverse.constants.Config
+            Optional dictionary (usually a dryad2dataverse.config.Config
             instance) which contains a dryad2dataverse.auth.Token instance
         inheader : dict
             Existing header if present

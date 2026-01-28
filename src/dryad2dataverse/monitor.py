@@ -64,7 +64,7 @@ class Monitor():
 
         Notes
         -----
-        Normally you would just pass a dryad2dataverse.constants.Config object,
+        Normally you would just pass a dryad2dataverse.config.Config object,
         ie. Monitor(**config)
 
         These keyword parameters are required at a minimum, and are included as part of a
