@@ -11,12 +11,13 @@ import importlib.resources
 import sys
 
 from typing import Union
-
 #from requests.packages.urllib3.util.retry import Retry
 #Above causes Pylint error. WHY?
 #Because it's a fake path and just a pointer. See requests source
 from urllib3.util import Retry
 import yaml
+
+from dryad2dataverse import USERAGENT
 
 LOGGER = logging.getLogger(__name__)
 #Requests session retry strategy in case of bad connections
@@ -93,6 +94,33 @@ class Config(dict):
             self.load_config()
         else:
             raise FileNotFoundError(f'Can\'t find {self.configfile}')
+
+    @classmethod
+    def update_headers(cls,
+                       indict:Union[None,dict]=None,
+                       inheader:Union[None, dict]=None)->dict:
+        '''
+        Update headers with user agent and token information (if present)
+
+        Parameters
+        ----------
+        indict : dict
+            Optional dictionary (usually a dryad2dataverse.constants.Config
+            instance) which contains a dryad2dataverse.auth.Token instance
+        inheader : dict
+            Existing header if present
+        '''
+        if not indict:
+            indict = {}
+        if not inheader:
+            inheader = {}
+        headers = {'accept':'application/json',
+                   'Content-Type':'application/json'} 
+        headers.update({'User-agent' : USERAGENT})
+        if indict.get('token'):
+            headers.update(indict['token'].auth_header)
+        headers.update(inheader)
+        return headers
 
     def make_config_template(self):
         '''

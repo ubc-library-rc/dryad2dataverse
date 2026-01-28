@@ -4,20 +4,17 @@ producing associated file information.
 '''
 import logging
 import urllib.parse
-from typing import Union
 
 import requests
 from requests.adapters import HTTPAdapter
 
 from dryad2dataverse import constants
-from dryad2dataverse import USERAGENT
 import dryad2dataverse.auth
 
 LOGGER = logging.getLogger(__name__)
 #Connection monitoring as per
 #https://stackoverflow.com/questions/16337511/log-all-requests-from-the-python-requests-module
 URL_LOGGER = logging.getLogger('urllib3')
-USER_AGENT = {'User-agent': USERAGENT}
 
 #pylint: disable=invalid-name, line-too-long
 #Note: Metadata downloads do not (as of 2026-01) require authentication
@@ -79,20 +76,6 @@ class Serializer():
                            HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
         LOGGER.debug('Creating Serializer instance object')
 
-    def update_headers(self, inheader:Union[None, dict]=None)->dict:
-        '''
-        Update headers with user agent and token information (if present)
-        '''
-        if not inheader:
-            inheader = {}
-        headers = {'accept':'application/json',
-                   'Content-Type':'application/json'} 
-        headers.update(USER_AGENT)
-        if self.kwargs.get('token'):
-            headers.update(self.kwargs['token'].auth_header)
-        headers.update(inheader)
-        return headers
-
     def fetch_record(self, url=None) :
         '''
         Fetches Dryad study record JSON from Dryad V2 API at
@@ -108,7 +91,7 @@ class Serializer():
         if not url:
             url = self.kwargs['dry_url']
         try:
-            headers = self.update_headers()
+            headers = constants.Config.update_headers(indict=self.kwargs)
             doiClean = urllib.parse.quote(self.doi, safe='')
             resp = self.session.get(f'{url}{self.kwargs["api_path"]}/datasets/{doiClean}',
                                     headers=headers, timeout=self.kwargs['timeout'])
@@ -191,7 +174,7 @@ class Serializer():
         if not self._fileJson:
             try:
                 self._fileJson = []
-                headers = self.update_headers()
+                headers = constants.Config.update_headers(indict=self.kwargs)
                 fileList = self.session.get(f'{self.kwargs["dry_url"]}'
                                             f'{self.kwargs["api_path"]}/versions/{self.id}/files',
                                             headers=headers,
