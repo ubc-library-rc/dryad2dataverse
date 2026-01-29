@@ -28,7 +28,7 @@ class Serializer():
     <a href="http://creativecommons.org/publicdomain/zero/1.0" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " target="_blank">CC0 1.0</a>
     </p>'''
 
-    def __init__(self, doi, **kwargs):
+    def __init__(self, doi:str, **kwargs):
         '''
         Creates Dryad study metadata instance.
 
@@ -50,7 +50,7 @@ class Serializer():
         -----
         Unpacking a dryad2dataverse.config.Config instance holding
         global setup should give all of the
-        required kwargs.  ie, Serializer(doi, **config_instance)
+        required kwargs. ie, Serializer(doi, **config_instance)
 
         '''
         self.doi = doi
@@ -91,7 +91,7 @@ class Serializer():
         if not url:
             url = self.kwargs['dry_url']
         try:
-            headers = config.Config.update_headers(indict=self.kwargs)
+            headers = config.Config.update_headers(**self.kwargs)
             doiClean = urllib.parse.quote(self.doi, safe='')
             resp = self.session.get(f'{url}{self.kwargs["api_path"]}/datasets/{doiClean}',
                                     headers=headers, timeout=self.kwargs['timeout'])
@@ -174,7 +174,7 @@ class Serializer():
         if not self._fileJson:
             try:
                 self._fileJson = []
-                headers = config.Config.update_headers(indict=self.kwargs)
+                headers = config.Config.update_headers(**self.kwargs)
                 fileList = self.session.get(f'{self.kwargs["dry_url"]}'
                                             f'{self.kwargs["api_path"]}/versions/{self.id}/files',
                                             headers=headers,

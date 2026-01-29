@@ -77,6 +77,7 @@ ssl_port: 465
 recipients: 
 - null
 #location of dryadd log
+#include full file name: eg: /var/log/dryadd.log
 log: null
 
 #level at which to write a log message. Select from:
@@ -95,6 +96,11 @@ number_of_backups: 3
 #------
 #Troubleshooting options
 #------
+#Warn if too many new updates. Occasionally, Dryad will change their
+#"persistent" IDs and then everything looks new, which causes everything
+#to be loaded again. It's recommended that this be "true" to stop an accidental
+#complete reingest
+warn_too_many: true
 #Number of new Dryad surveys which will trigger a warning and stop execution.
 #This is to prevent accidentally ingesting thousands of surveys if you 
 #misconfigure something

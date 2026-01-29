@@ -46,7 +46,7 @@ class Monitor():
                     cls.kwargs['dbase'] = args[0]
                 except ValueError as e:
                     raise KeyError from e
-            cls.conn = sqlite3.connect(pathlib.Path(cls.kwargs['dbase']).expanduser())
+            cls.conn = sqlite3.connect(pathlib.Path(cls.kwargs['dbase']).expanduser().absolute())
             cls.cursor = cls.conn.cursor()
             LOGGER.info('Open database %s', cls.kwargs['dbase'])
         return cls.inst
@@ -79,7 +79,7 @@ class Monitor():
         #but they need to be passed in __init__
         if not self.init:
 
-            conn = sqlite3.connect(pathlib.Path(self.kwargs['dbase']).expanduser())
+            conn = sqlite3.connect(pathlib.Path(self.kwargs['dbase']).expanduser().absolute())
             cursor = conn.cursor()
             create = ['CREATE TABLE IF NOT EXISTS dryadStudy \
                        (uid INTEGER PRIMARY KEY AUTOINCREMENT, \
@@ -108,7 +108,6 @@ class Monitor():
             conn.commit()
             conn.close()
         self.init = 1
-
 
     def __del__(self):
         '''

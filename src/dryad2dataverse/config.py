@@ -97,28 +97,29 @@ class Config(dict):
 
     @classmethod
     def update_headers(cls,
-                       indict:Union[None,dict]=None,
-                       inheader:Union[None, dict]=None)->dict:
+                       inheader:Union[None, dict]=None,
+                       **kwargs)->dict:
         '''
         Update headers with user agent and token information (if present)
 
         Parameters
         ----------
-        indict : dict
-            Optional dictionary (usually a dryad2dataverse.config.Config
-            instance) which contains a dryad2dataverse.auth.Token instance
         inheader : dict
             Existing header if present
+
+        **kwargs
+            Keyword arguments, one of which should be 'token' containing
+            a dryad2dataverse.auth.Token instance
         '''
-        if not indict:
-            indict = {}
+        if not kwargs:
+            kwargs = {}
         if not inheader:
             inheader = {}
-        headers = {'accept':'application/json',
+        headers = {'Accept':'application/json',
                    'Content-Type':'application/json'} 
         headers.update({'User-agent' : USERAGENT})
-        if indict.get('token'):
-            headers.update(indict['token'].auth_header)
+        if kwargs.get('token'):
+            headers.update(kwargs['token'].auth_header)
         headers.update(inheader)
         return headers
 

@@ -22,27 +22,108 @@ import textwrap
 import time
 
 import requests
+from requests.adapters import HTTPAdapter
+
 import dryad2dataverse
+import dryad2dataverse.auth
+import dryad2dataverse.config
 import dryad2dataverse.monitor
 import dryad2dataverse.serializer
 import dryad2dataverse.transfer
 from dryad2dataverse.handlers import SSLSMTPHandler
 
-VERSION = (0, 7, 1)
-__version__ = '.'.join([str(x) for x in VERSION])
+DEFAULT_LOCATIONS = {'ios': '~/.config/dryad2dataverse',
+             'linux' : '~/.config/dryad2dataverse',
+             'darwin': '~/Library/Application Support/dryad2dataverse',
+             'win32' : 'AppData/Roaming/dryad2dataverse',
+             'cygwin' : '~/.config/dryad2dataverse'}
 
-USER_AGENT = {'User-agent': dryad2dataverse.USERAGENT}
+def argp():
+    '''
+    Argument parser
+    '''
+    description = ('Dryad to Dataverse importer/monitor. '
+                   'All arguments enclosed by square brackets are OPTIONAL for '
+                   'and are used for overriding defaults and/or providing sensitive'
+                   'information.'
+                   )
 
+    epilog = textwrap.dedent(
+             '''
+                **Dryad configuration file**
 
-DRY = 'https://datadryad.org/api/v2'
+                All dryadd options can be included in the file, but you can
+                also specify the Dryad secret and Dataverse API key with other
+                options.
 
-def new_content(serial):
+                If this file is not specified,
+                then the configuration file at the default location will
+                be used.
+
+                **Dryad secret**
+
+                The dryadd program requires both an application and a secret to use.
+                App IDs and secrets are provided by Dryad and can only
+                be obtained directly from them at http://datadryad.org.
+                The app id and secret are used to create a bearer token
+                for API authentication.
+
+                Use this option if you have not stored the secret
+                in the configuration file or wish to override it.
+
+                **Dataverse API key**
+
+                The Dataverse API is required in order to upload both
+                metadata and data. While administrator-level keys
+                are recommended, any key which grants upload privileges
+                should be sufficient (note: not covered by warranty).
+
+                Use this option if you have not stored the key in the
+                configuration file or wish to override it.
+             ''').strip()
+    parser = argparse.ArgumentParser(description=description,
+                                     formatter_class=argparse.RawTextHelpFormatter,
+                                     epilog=epilog)
+    parser.add_argument('-c', '--config-file',
+                        help=textwrap.dedent(
+                            f'''
+                                Dryad configuration file.
+                                Default:
+                                {DEFAULT_LOCATIONS[sys.platform]}/dryad2dataverse_config.yml
+                                ''').strip(),
+                        required=False,
+                        default=f'{DEFAULT_LOCATIONS[sys.platform]}/dryad2dataverse_config.yml',
+                        dest='config')
+    parser.add_argument('-s', '--secret',
+                        help='Secret for Dryad API.',
+                        required=False,
+                        dest='secret')
+    parser.add_argument('-k', '--api-key',
+                        help='Dataverse API key',
+                        required=False,
+                        dest='api_key')
+    parser.add_argument('-v', '--verbosity',
+                        help='Verbose output',
+                        required=False,
+                        action='store_true')
+    parser.add_argument('--version', action='version',
+                        version='dryad2dataverse ' + dryad2dataverse.__version__,
+                        help='Show version number and exit')
+
+    return parser
+
+def new_content(serial, **kwargs):
     '''
     Creates content for new study upload message (potentially redundant
     with Dataverse emailer).
-    serial : dryad2dataverse.serializer.Serializer instance
+
+    Parameters
+    ----------
+    serial : dryad2dataverse.serializer.Serializer
+    **kwargs
+        Keyword arguments. Just pass dryad2dataverse.config.Config
     '''
-    dv_link = (dryad2dataverse.serializer.constants.DVURL +
+    dv_link = (kwargs['dv_url'] +
                '/dataset.xhtml?persistentId=' +
                serial.dvpid +
                '&version=DRAFT')
@@ -56,13 +137,18 @@ def new_content(serial):
             \n{serial.oversize}'
     return (subject, content)
 
-def changed_content(serial, monitor):
+def changed_content(serial, monitor, **kwargs):
     '''
     Creates content for file update message.
-    serial : dryad2dataverse.serializer.Serializer instance
-    monitor : dryad2dataverse.monitor.Monitor instance
+
+    Parameters
+    ----------
+    serial : dryad2dataverse.serializer.Serializer 
+    monitor : dryad2dataverse.monitor.Monitor
+    **kwargs
+        Keyword arguments. Just pass dryad2dataverse.config.Config
     '''
-    dv_link = (dryad2dataverse.serializer.constants.DVURL +
+    dv_link = (kwargs['dv_url'] +
                '/dataset.xhtml?persistentId=' +
                serial.dvpid +
                '&version=DRAFT')
@@ -145,14 +231,14 @@ def notify(msgtxt, width=100, **kwargs):
 
     msg = Em()
     msg['Subject'] = msgtxt[0]
-    msg['From'] = kwargs['email']
+    msg['From'] = kwargs['sending_email']
     msg['To'] = kwargs['recipients']
     content = __clean_msg(msgtxt[1], max(width, 1000))
     msg.set_content(content)
 
-    server = smtplib.SMTP_SSL(kwargs['mailserv'], kwargs.get('port', 465))
+    server = smtplib.SMTP_SSL(kwargs['smtp_server'], kwargs.get('ssl_port', 465))
 
-    server.login(kwargs['user'], kwargs['pwd'])
+    server.login(kwargs['sending_email_username'], kwargs['email_send_password'])
     #To must be split. See
     #https://stackoverflow.com/questions/8856117/
     #how-to-send-email-to-multiple-recipients-using-python-smtplib
@@ -195,14 +281,10 @@ def __bad_dates(rectuple: tuple, mod_date: str) -> tuple:
         return tuple(records)
     return rectuple
 
-def get_records(ror: 'str', mod_date=None, verbosity=True, timeout=100):
+def get_records(mod_date=None, verbosity=True, **kwargs):
     '''
     returns a tuple of ((doi, metadata), ...). Dryad searches return complete
     study metadata from the search, surprisingly.
-
-    ror : str
-        ROR string including http. To find your ROR, see
-        https://ror.org/
 
     mod_date : str
         UTC datetime string in the format suitable for the Dryad API.
@@ -213,32 +295,32 @@ def get_records(ror: 'str', mod_date=None, verbosity=True, timeout=100):
     verbosity : bool
        Output some data to stdout
 
-    timeout : int
-        request timeout in seconds
+    **kwargs
+        Keyword arguments. Just unpack dryad2dataverse.config.Config
     '''
-    headers = {'accept':'application/json',
-               'Content-Type':'application/json'}
-    headers.update(USER_AGENT)
+
+    session = requests.Session()
+    session.mount('https://', HTTPAdapter(max_retries=dryad2dataverse.config.RETRY_STRATEGY))
+    headers = dryad2dataverse.config.Config.update_headers(**kwargs)
     per_page = 1
-    params = {'affiliation' : ror,
+    params = {'affiliation' : kwargs['ror'],
               'per_page' : per_page}
     if mod_date:
         params['modifiedSince'] = mod_date
-    stud = requests.get(f'{DRY}/search', headers=headers,
-                        params=params, timeout=timeout)
+    stud = session.get(f'{kwargs["dry_url"]}{kwargs["api_path"]}/search', headers=headers,
+                        params=params)
     records = []
     total = stud.json()['total']
     if verbosity:
-        print(f'Total Records: {total}')
+        print(f'Total Records: {total}', file=sys.stdout)
     params['per_page'] = 100
     for data in range(total//100+1):
         if verbosity:
-            print(f'Records page: {data+1}')
+            print(f'Records page: {data+1}', file=sys.stdout)
         params['page'] = data+1
-        stud = requests.get(f'{DRY}/search',
+        stud = session.get(f'{kwargs["dry_url"]}{kwargs["api_path"]}/search',
                             headers=headers,
-                            params=params,
-                            timeout=timeout)
+                            params=params)
         time.sleep(10) # don't overload their system with API calls
         stud.raise_for_status()
         records += stud.json()['_embedded']['stash:datasets']
@@ -249,186 +331,6 @@ def get_records(ror: 'str', mod_date=None, verbosity=True, timeout=100):
     return __bad_dates(tuple((x['identifier'], x)
                               for x in records),
                               mod_date)
-
-def argp():
-    '''
-    Argument parser
-    '''
-    description = ('Dryad to Dataverse importer/monitor. '
-                   'All arguments NOT enclosed by square brackets are required for '
-                   'the script to run but some may already have defaults, specified '
-                   'by "Default". '
-                   'The "optional arguments" below refers to the use of the option switch, '
-                   '(like -u), meaning "not a positional argument."'
-                   )
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-u', '--dv-url',
-                        help='Destination Dataverse root url. '
-                        'Default: https://borealisdata.ca',
-                        required=False,
-                        default='https://borealisdata.ca',
-                        dest='url')
-    parser.add_argument('-k', '--key',
-                        help='REQUIRED: API key for dataverse user',
-                        required=True,
-                        dest='key')
-    parser.add_argument('-t', '--target',
-                        help='REQUIRED: Target dataverse short name',
-                        required=True,
-                        dest='target')
-    parser.add_argument('-e', '--email',
-                        help='REQUIRED: Email address '
-                        'which sends update notifications. ie: '
-                        '"user@website.invalid".',
-                        required=True,
-                        dest='email')
-    parser.add_argument('-s', '--user',
-                        help=('REQUIRED: User name for SMTP server. Check '
-                              'your server for details. '),
-                        required=True,
-                        dest='user')
-    parser.add_argument('-r', '--recipient',
-                        help='REQUIRED: Recipient(s) of email notification. '
-                        'Separate addresses with spaces',
-                        required=True,
-                        nargs='+',
-                        dest='recipients')
-    parser.add_argument('-p', '--pwd',
-                        help='REQUIRED: Password for sending email account. '
-                        'Enclose in single quotes to avoid OS errors with special '
-                        'characters.',
-                        required=True,
-                        dest='pwd')
-    parser.add_argument('--server',
-                        help='Mail server for sending account. '
-                        'Default: smtp.mail.yahoo.com',
-                        required=False,
-                        default='smtp.mail.yahoo.com',
-                        dest='mailserv')
-    parser.add_argument('--port',
-                        help='Mail server port. Default: 465. '
-                        'Mail is sent using SSL.',
-                        required=False,
-                        type=int,
-                        #default=587,
-                        default=465,
-                        dest='port')
-    parser.add_argument('-c', '--contact',
-                        help='REQUIRED: Contact email address for Dataverse records. '
-                        'Must pass Dataverse email validation rules (so "test@test.invalid" '
-                        'is not acceptable).',
-                        required=True,
-                        dest='contact')
-    parser.add_argument('-n', '--contact-name',
-                        help='REQUIRED: Contact name for Dataverse records',
-                        required=True,
-                        dest='cname')
-    parser.add_argument('-v', '--verbosity',
-                        help='Verbose output',
-                        required=False,
-                        action='store_true')
-    parser.add_argument('-i', '--ror',
-                        help='REQUIRED: Institutional ROR URL. '
-                        'Eg: "https://ror.org/03rmrcq20". This identifies the '
-                        'institution in Dryad repositories.',
-                        required=True,
-                        dest='ror')
-    parser.add_argument('--tmpfile',
-                        help='Temporary file location. Default: /tmp',
-                        required=False,
-                        dest='tmp')
-    parser.add_argument('--db',
-                        help='Tracking database location and name. '
-                        'Default: $HOME/dryad_dataverse_monitor.sqlite3',
-                        required=False,
-                        dest='dbase')
-    parser.add_argument('--log',
-                        help='Complete path to log. '
-                        'Default: /var/log/dryadd.log',
-                        required=False,
-                        dest='log',
-                        default='/var/log/dryadd.log')
-    parser.add_argument('--loglevel',
-                        help='Log level of server rotating log. Choose one of '
-                        'debug, info, warning, error or critical. '
-                        'Note: case sensitive. '
-                        'Default: logging.warning.',
-                        required=False,
-                        dest='loglevel',
-                        default='warning',
-                        choices=['debug', 'info', 'warning','error','critical'])
-    parser.add_argument('--email-loglevel',
-                        help='Log level of email log. Choose one of '
-                        'debug, info, warning, error or critical. '
-                        'Note: case sensitive. '
-                        'Default: warning',
-                        required=False,
-                        dest='email_loglevel',
-                        default='warning',
-                        choices=['debug', 'info', 'warning','error','critical'])
-    parser.add_argument('-l', '--no_force_unlock',
-                        help='No forcible file unlock. Required '
-                        'if /lock endpint is restricted',
-                        required=False,
-                        action='store_false',
-                        dest='force_unlock')
-    parser.add_argument('-x', '--exclude',
-                        help='Exclude these DOIs. Separate by spaces',
-                        required=False,
-                        default=[],
-                        nargs='+',
-                        dest='exclude')
-    parser.add_argument('-b', '--num-backups',
-                        help=('Number of database backups to keep. '
-                              'Default 3'),
-                        required=False,
-                        type=int,
-                        default=3)
-    parser.add_argument('-w', '--warn-too-many',
-                        help=('Warn and halt execution if abnormally large '
-                              'number of updates present.'),
-                        action='store_true',)
-    parser.add_argument('--warn-threshold',
-                        help=('Do not transfer studies if number of updates '
-                              'is greater than or equal to this number. '
-                              'Default: 15'),
-                        type=int,
-                        dest='warn',
-                        default=15)
-    parser.add_argument('--testmode-on',
-                        help=('Turn on test mode. '
-                              'Number of transfers will be limited '
-                              'to the value in --testmode-limit '
-                              'or 5 if you don\'t set --testmode-limit '),
-                        action='store_true',
-                        dest='testmode')
-    parser.add_argument('--testmode-limit',
-                        help=('Test mode - only transfer first [n] '
-                              'of the total number of (new) records. Old ones will '
-                              'still be updated, though. '
-                              'Default: 5'),
-                        type=int,
-                        default=5,
-                        dest='testlimit')
-    parser.add_argument('--version', action='version',
-                        version='dryad2dataverse ' + dryad2dataverse.__version__,
-                        help='Show version number and exit')
-
-    return parser
-
-def set_constants(args):
-    '''
-    Set the appropriate dryad2dataverse "constants"
-    '''
-    dryad2dataverse.constants.DV_CONTACT_EMAIL = args.contact
-    dryad2dataverse.constants.DV_CONTACT_ = args.contact
-    dryad2dataverse.constants.APIKEY = args.key
-    if args.url:
-        dryad2dataverse.constants.DVURL = args.url
-    if args.dbase:
-        dryad2dataverse.constants.DBASE = args.dbase
-    if args.tmp:
-        dryad2dataverse.constants.TMP = args.tmp
 
 def email_log(mailhost, fromaddr, toaddrs, credentials, port=465, secure=(),
               level=logging.WARNING, timeout=100):
@@ -452,7 +354,7 @@ def email_log(mailhost, fromaddr, toaddrs, credentials, port=465, secure=(),
     level : int
         logging level. Default logging.WARNING
     '''
-    #pylint: disable=too-many-arguments
+    #pylint: disable=too-many-arguments, too-many-positional-arguments
     #Because consistency is for suckers and yahoo requires full hostname
     #subject = 'Dryad to Dataverse transfer error'
     subject = 'Dryad to Dataverse logger message'
@@ -487,7 +389,9 @@ def rotating_log(path, level):
     #python-logging-disable-logging-from-imported-modules
     for name in ['dryad2dataverse.serializer',
                'dryad2dataverse.transfer',
-               'dryad2dataverse.monitor']:
+               'dryad2dataverse.monitor',
+               'dryad2dataverse.auth',
+                'dryad2dataverse.config']:
         logging.getLogger(name).setLevel(level)
     rotator = logging.handlers.RotatingFileHandler(filename=path,
                                                    maxBytes=10*1024**2,
@@ -526,11 +430,12 @@ def checkwarn(val:int, **kwargs) -> None:
     '''
     if not kwargs.get('warn_too_many'):
         return
-    if val >= kwargs.get('warn',0):
+    if val >= kwargs.get('warning_threshold',0):
         mess = ('Large number of updates detected. '
-                f'{val} new studies exceeds threshold of {kwargs.get("warn", 0)}. '
+                f'{val} new studies exceeds threshold of {kwargs.get("warning_threshold", 0)}. '
                 'Program execution halted.')
-        subject = 'Dryad to Dataverse large update warning'
+        print(mess, file=sys.stderr)
+        subject = 'Dryad2Dataverse large update warning'
         for logme in kwargs.get('loggers'):
             logme.warning(mess)
         notify(msgtxt=(subject, mess),
@@ -546,7 +451,7 @@ def verbo(verbosity:bool, **kwargs)->None:
     '''
     if verbosity:
         for key, value in kwargs.items():
-            print(f'{key}: {value}')
+            print(f'{key}: {value}', file=sys.stdout)
 
 def anonymizer(args: argparse.Namespace) -> dict:
     '''
@@ -554,10 +459,7 @@ def anonymizer(args: argparse.Namespace) -> dict:
     with cleaner values.
     '''
     clean_me = args.__dict__.copy()#Don't work on the real thing!
-    cleanser = {x : 'REDACTED' for x in ['email', 'mailserve',
-                                         'key', 'mailserve',
-                                         'pwd', 'recipients', 
-                                         'user']}
+    cleanser = {x : 'REDACTED' for x in ['secret', 'api_key']}
     clean_me.update(cleanser)
     return clean_me
 
@@ -574,76 +476,74 @@ def bulklog(message, *logfuncs):
 
 def main():
     '''
-    Main Dryad transfer daemon
-
-    log : str
-        path to logfile
-    level : int
-        log level, usually one of logging.LOGLEVEL (ie, logging.warning)
+    Primary function
     '''
-    #pylint: disable=too-many-branches
-    #pylint: disable=too-many-statements
-    #pylint: disable=too-many-locals
-    parser = argp()
-    args = parser.parse_args()
+    #pylint: disable=too-many-branches, too-many-locals, too-many-statements
+    args = argp().parse_args()
+    configfile = pathlib.Path(args.config)
+    config = dryad2dataverse.config.Config(configfile.parent, configfile.name)
+    for val in ['api_key', 'secret']:
+        if getattr(args,val):
+            config[val] = getattr(args,val)
+    #TODONE remove this for prod
+    config['token'] = dryad2dataverse.auth.Token(**config)
 
-    #Ensure log can be written
-    logpath = pathlib.Path(args.log)
-    if not logpath.parent.exists():
-        os.makedirs(logpath.parent)
+    logpath = pathlib.Path(config['log']).expanduser().absolute()
+    logpath.parent.mkdir(parents=True, exist_ok=True)
 
-    set_constants(args)
-
-    logger = rotating_log(args.log,
-                          level=logging.getLevelName(args.loglevel.upper()))
-
-    elog = email_log(args.mailserv, args.email, args.recipients,
-                     (args.user, args.pwd), port=args.port,
-                     level = logging.getLevelName(args.email_loglevel.upper()))
-
-
+    logger = rotating_log(logpath,
+                          level=logging.getLevelName(config['loglevel'].upper()))
+    elog = email_log(config['smtp_server'],
+                     config['sending_email'],
+                     config['recipients'],
+                     (config['sending_email_username'], config['email_send_password']),
+                     port=config['ssl_port'],
+                     level = logging.getLevelName(config['email_loglevel'].upper()))
     logger.info('Beginning update process')
     for logme in [elog, logger]:
-        logme.debug('Command line arguments: %s' , pprint.pprint(anonymizer(args)))
+        logme.debug('Command line arguments: %s' , pprint.pformat(anonymizer(args)))
 
-    monitor = dryad2dataverse.monitor.Monitor(args.dbase)
+    monitor = dryad2dataverse.monitor.Monitor(**config)
     #copy the database to make a backup, because paranoia is your friend
-    if os.path.exists(dryad2dataverse.constants.DBASE):
-        bu_db = pathlib.Path(dryad2dataverse.constants.DBASE)
+    db_full = pathlib.Path(config['dbase']).expanduser().absolute()
+    if db_full.exists():
         try:
-            shutil.copyfile( bu_db,
-                            pathlib.Path(bu_db.parent,
-                                         bu_db.stem + '_' +
-                                         datetime.datetime.now().strftime('%Y-%m-%d-%H%M') +
-                                         bu_db.suffix)
+            shutil.copyfile(db_full,
+                            pathlib.Path(db_full.parent,
+                                         db_full.stem + '_' +
+                                         datetime.datetime.now().strftime('%Y-%m-%d-%H:%M') +
+                                         db_full.suffix)
                             )
         except FileNotFoundError:
-            print(dryad2dataverse.constants.DBASE)
-            print(bu_db)
+            for _ in [logger, elog]:
+                _.exception('Database not found: %s', config['dbase'])
+            print(f'Database not found: {config["dbase"]}', file=sys.stderr)
             sys.exit()
     #list comprehension includes untimestamped dbase name, hence 2+
-    fnames = glob.glob(os.path.abspath(dryad2dataverse.constants.DBASE)
-                       +'*')
-    fnames.remove(os.path.abspath(dryad2dataverse.constants.DBASE))
+    fnames = glob.glob((str(pathlib.Path(db_full.parent,
+                           db_full.stem + '*' + db_full.suffix))))
+    fnames.remove(str(db_full))
     fnames.sort(reverse=True)
-    fnames = fnames[args.num_backups:]
+    fnames = fnames[config['number_of_backups']:]
     for fil in fnames:
         os.remove(fil)
+        logger.info('Deleted database backup: %s', fil)
     logger.info('Last update time: %s', monitor.lastmod)
     #get all updates since the last update check
-    updates = get_records(args.ror, monitor.lastmod,
-                          verbosity=args.verbosity)
+    updates = get_records(monitor.lastmod,
+                          verbosity=args.verbosity,
+                          **config)
     logger.info('Total new files: %s', len(updates))
     elog.info('Total new files: %s', len(updates))
-
-    checkwarn(val=len(updates) if not args.testmode else
-              min(args.testlimit, len(updates)),
+    checkwarn(val=len(updates) if not config['test_mode'] else
+              min(config['test_mode_limit'], len(updates)),
               loggers=[logger],
-              **vars(args))
-    if args.testmode:
-        logger.warning('Test mode is ON - number of updates limited to %s', args.testlimit)
-        elog.warning('Test mode is ON - number of updates limited to %s', args.testlimit)
+              **config)
 
+    if config['test_mode']:
+        for _ in [logger, elog]:
+            _.warning('Test mode is ON - number of updates limited to %s',
+                       config['test_mode_limit'])
     #update all the new files
     verbo(args.verbosity, **{'Total to process': len(updates)})
 
@@ -651,8 +551,8 @@ def main():
         count = 0
         testcount = 0
         for doi in updates:
-            if args.testmode and (testcount >= args.testlimit):
-                logger.info('Test limit of %s reached', args.testlimit)
+            if config['test_mode'] and (testcount >= config['test_mode_limit']):
+                logger.info('Test limit of %s reached', config['test_mode_limit'])
                 break
             count += 1
             logger.info('Start processing %s of %s', count, len(updates))
@@ -660,11 +560,12 @@ def main():
                         doi[0], doi[0])
             if not updates:
                 break #no new files in this case
-            if doi[0] in args.exclude:
+            #use get in this case because people *will* have nothing to exclude
+            if doi[0] in config.get('exclude_list',[]):
                 logger.warning('Skipping excluded doi: %s', doi[0])
                 continue
             #Create study object
-            study = dryad2dataverse.serializer.Serializer(doi[0])
+            study = dryad2dataverse.serializer.Serializer(doi[0], **config)
             #verbose output
             verbo(args.verbosity,
                   **{'Processing': count,
@@ -684,13 +585,13 @@ def main():
             update_type = monitor.status(study)['status']
             verbo(args.verbosity, **{'Status': update_type})
             #create a transfer object to copy the files over
-            transfer = dryad2dataverse.transfer.Transfer(study)
+            transfer = dryad2dataverse.transfer.Transfer(study, **config)
             transfer.test_api_key()
             #Now start the action
             if update_type == 'new':
                 logger.info('New study: %s, %s', doi[0], doi[1]['title'])
                 logger.info('Uploading study metadata')
-                transfer.upload_study(targetDv=args.target)
+                transfer.upload_study(targetDv=config['target'])
                 #New files are in now in monitor.diff_files()['add']
                 #with 2 Feb 2022 API change
                 #so we can ignore them here
@@ -698,7 +599,7 @@ def main():
                 transfer.upload_json()
                 transfer.set_correct_date()
                 notify(new_content(study),
-                       **vars(args))
+                       **config)
                 testcount+=1
 
             elif update_type == 'updated':
@@ -706,12 +607,11 @@ def main():
                 logger.info('Updating metadata')
                 transfer.upload_study(dvpid=study.dvpid)
                 #remove old JSON files
-                rem = monitor.get_json_dvfids(study)
-                transfer.delete_dv_files(rem)
+                transfer.delete_dv_files(monitor.get_json_dvfids(study))
                 transfer.upload_json()
                 transfer.set_correct_date()
-                notify(changed_content(study, monitor),
-                       **vars(args))
+                notify(changed_content(study, monitor, **config),
+                       **config)
 
                 #new, identical, updated, lastmodsame
             elif update_type in ('unchanged', 'lastmodsame'):
@@ -731,7 +631,7 @@ def main():
                 transfer.download_files(diff['add'])
                 #now send them to Dataverse
                 transfer.upload_files(diff['add'], pid=study.dvpid,
-                                      force_unlock=args.force_unlock)
+                                      force_unlock=config['force_unlock'])
             #Update the tracking database for that record
             monitor.update(transfer)
 
@@ -744,13 +644,14 @@ def main():
         elog.info('Completed update process')
         finished = ('Dryad to Dataverse transfers completed',
                     ('Dryad to Dataverse transfer daemon has completed.\n'
-                     f'Log available at: {args.log}'))
-        notify(finished, **vars(args))
+                     f'Log available at: {config["log"]}'))
+        notify(finished, **config)
 
     except dryad2dataverse.exceptions.DataverseBadApiKeyError as api_err:
         logger.exception(api_err)
         elog.exception(api_err)
-        print(f'Error: {api_err}. Exiting. For details see log at {args.log}.')
+        print(f'Error: {api_err}. Exiting. For details see log at {args.log}.',
+              file=sys.stderr)
         sys.exit()#graceful exit is graceful
 
     except Exception as err: # pylint: disable=broad-except
@@ -760,12 +661,9 @@ def main():
         logger.exception('%s\nCritical failure with DOI: %s : %s\n%s', err,
                          doi[0], doi[1]['title'], doi[1].get('sharingLink'),
                          stack_info=True, exc_info=True)
-        print(f'Error: {err}. Exiting. For details see log at {args.log}.')
+        print(f'Error: {err}. Exiting. For details see log at {args.log}.',
+              file=sys.stderr)
         sys.exit()
 
 if __name__ == '__main__':
     main()
-    _parser = argp()
-    _args = _parser.parse_args()
-    print('This is what you would have done had you actually run this')
-    print(_args)

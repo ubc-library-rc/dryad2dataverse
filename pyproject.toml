@@ -20,7 +20,7 @@ dependencies = [
     "pydoc-markdown (>=4.8.2,<5.0.0)",
     "setuptools (>=80.8.0,<81.0.0)",
     "tomli-w (>=1.2.0,<2.0.0)",
-    "pyyaml (>=6.0.3,<7.0.0)"
+    "pyyaml (>=6.0.3,<7.0.0)",
 ]
 
 keywords =['Harvard Dataverse',
