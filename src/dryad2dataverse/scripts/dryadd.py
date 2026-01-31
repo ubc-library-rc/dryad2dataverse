@@ -531,7 +531,7 @@ def main():
             shutil.copyfile(db_full,
                             pathlib.Path(db_full.parent,
                                          db_full.stem + '_' +
-                                         datetime.datetime.now().strftime('%Y-%m-%d-%H:%M') +
+                                         datetime.datetime.now().strftime('%Y-%m-%d-%H%M') +
                                          db_full.suffix)
                             )
         except FileNotFoundError:
