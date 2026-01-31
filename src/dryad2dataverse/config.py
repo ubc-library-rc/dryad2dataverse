@@ -148,9 +148,9 @@ class Config(dict):
         try:
             with open(self.configfile, 'r', encoding='utf-8') as f:
                 self.update(yaml.safe_load(f))
-        except yaml.ParserError as e:
+        except yaml.YAMLError as e:
             LOGGER.exception('Unable to load config file, %s', e)
-            print('Unable to load configuration file', file=sys.stderr)
+            sys.exit()
 
     def overwrite(self):
         '''

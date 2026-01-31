@@ -432,7 +432,8 @@ class Transfer():
                 LOGGER.debug('Stop download sequence with large file skip')
                 return md5
         try:
-            down = self.session.get(url, stream=True)
+            down = self.session.get(url, stream=True,
+                                    headers=config.Config.update_headers(**self.kwargs))
             down.raise_for_status()
             with open(pathlib.Path(tmp,filename), 'wb') as fi:
                 for chunk in down.iter_content(chunk_size=8192):

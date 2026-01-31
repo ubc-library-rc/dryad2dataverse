@@ -22,6 +22,7 @@ import textwrap
 import time
 
 import requests
+import yaml
 from requests.adapters import HTTPAdapter
 
 import dryad2dataverse
@@ -474,6 +475,24 @@ def bulklog(message, *logfuncs):
     for log in logfuncs:
         log('%s', message)
 
+def test_config(cfile:pathlib.Path):
+    '''
+    Ensure that the config file can be loaded, and if not
+    raise a helpful error because it can't be logged yet
+
+    Parameters
+    ----------
+    cfile : pathlib.Path
+        Config yaml file
+    '''
+    try:
+        with open(cfile.expanduser().absolute(), encoding='utf-8') as y:
+            yaml.safe_load(y)
+    except yaml.YAMLError as e:
+        print('Configuration file error', file=sys.stdout)
+        print(e, file=sys.stderr)
+        sys.exit()
+
 def main():
     '''
     Primary function
@@ -481,6 +500,7 @@ def main():
     #pylint: disable=too-many-branches, too-many-locals, too-many-statements
     args = argp().parse_args()
     configfile = pathlib.Path(args.config)
+    test_config(configfile)
     config = dryad2dataverse.config.Config(configfile.parent, configfile.name)
     for val in ['api_key', 'secret']:
         if getattr(args,val):
@@ -598,7 +618,7 @@ def main():
                 logger.info('Uploading Dryad JSON metadata')
                 transfer.upload_json()
                 transfer.set_correct_date()
-                notify(new_content(study),
+                notify(new_content(study, **config),
                        **config)
                 testcount+=1
 
@@ -661,7 +681,7 @@ def main():
         logger.exception('%s\nCritical failure with DOI: %s : %s\n%s', err,
                          doi[0], doi[1]['title'], doi[1].get('sharingLink'),
                          stack_info=True, exc_info=True)
-        print(f'Error: {err}. Exiting. For details see log at {args.log}.',
+        print(f'Error: {err}. Exiting. For details see log at {config["log"]}.',
               file=sys.stderr)
         sys.exit()
 

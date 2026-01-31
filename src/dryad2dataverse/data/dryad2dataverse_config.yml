@@ -18,14 +18,14 @@ secret: null
 #Dataverse configuration
 #------
 #Base url of Dataverse instance (eg: https://borealisdata.ca)
-dvurl: null 
+dv_url: null 
 #Dataverse API KEY
 apikey: null
 #Maximum upload size in bytes (contact Dataverse administrator for value if unknown)
 max_upload: 3221225472
 #Contact email address for Dataverse record, eg: research.data@test.invalid
 dv_contact_email: null
-#Contact name associated with the address (like, say, "[University] Research Data Services
+#Contact name associated with the address (like, say, "[University] Research Data Services")
 dv_contact_name: null
 #Dataverse target collection shortname
 target: Null
