@@ -492,6 +492,12 @@ def test_config(cfile:pathlib.Path):
         print('Configuration file error', file=sys.stdout)
         print(e, file=sys.stderr)
         sys.exit()
+    #this shouldn't happen ever, but just in case
+    except FileNotFoundError as e:
+        print(e, file=sys.stderr)
+        sys.exit()
+
+
 
 def main():
     '''
@@ -499,13 +505,23 @@ def main():
     '''
     #pylint: disable=too-many-branches, too-many-locals, too-many-statements
     args = argp().parse_args()
-    configfile = pathlib.Path(args.config)
+    configfile = pathlib.Path(args.config).expanduser().absolute()
+    if not configfile.exists():
+        print(('Config file not found. Creating it at '
+              f'{str(configfile)} and exiting.') , file=sys.stderr)
+        config = dryad2dataverse.config.Config(configfile.parent, configfile.name)
+        sys.exit()
+    else:
+        config = dryad2dataverse.config.Config(configfile.parent, configfile.name)
     test_config(configfile)
-    config = dryad2dataverse.config.Config(configfile.parent, configfile.name)
     for val in ['api_key', 'secret']:
         if getattr(args,val):
             config[val] = getattr(args,val)
-    #TODONE remove this for prod
+    try:
+        config.validate()
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        sys.exit()
     config['token'] = dryad2dataverse.auth.Token(**config)
 
     logpath = pathlib.Path(config['log']).expanduser().absolute()
