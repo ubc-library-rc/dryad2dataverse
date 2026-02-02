@@ -20,7 +20,7 @@ secret: null
 #Base url of Dataverse instance (eg: https://borealisdata.ca)
 dv_url: null 
 #Dataverse API KEY
-apikey: null
+api_key: null
 #Maximum upload size in bytes (contact Dataverse administrator for value if unknown)
 max_upload: 3221225472
 #Contact email address for Dataverse record, eg: research.data@test.invalid
@@ -78,8 +78,9 @@ recipients:
 - null
 #location of dryadd log
 #include full file name: eg: /var/log/dryadd.log
-log: null
-
+#The default below will exist but is a terrible place
+#for a log so you should change it.
+log: ~/dryadd.log
 #level at which to write a log message. Select from:
 # debug, info, warning, error or critical
 loglevel: warning
