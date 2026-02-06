@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>API Reference - Dryad2dataverse</title>
+    <title>API reference - Dryad2dataverse</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -14,7 +14,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "API Reference";
+        var mkdocs_page_name = "API reference";
         var mkdocs_page_input_path = "api_reference.md";
         var mkdocs_page_url = null;
       </script>
@@ -50,25 +50,65 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../script/">The dryadd console application</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../other_utils/">Other utilities</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../compiling/">Compiling or packaging the application</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../reference/">General Reference</a>
+                <li class="toctree-l1"><a class="reference internal" href="../dryadd/">The dryadd application</a>
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="#">API Reference</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">API reference</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic usage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#converting-json">Converting JSON</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#transferring-data">Transferring data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#change-monitoring">Change monitoring</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup">That&rsquo;s great! I&rsquo;m going to use this for my very important data for which I have no backup.</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#python-package-api">Python package API</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverse">dryad2dataverse</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverse.config">config</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dryad2dataverse.config.Config">Config</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.config.Config.__init__">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.config.Config.load_config">load_config</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.config.Config.make_config_template">make_config_template</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.config.Config.overwrite">overwrite</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.config.Config.update_headers">update_headers</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.config.Config.validate">validate</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverse.auth">auth</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dryad2dataverse.auth.Token">Token</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.auth.Token.auth_header">auth_header</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.auth.Token.token">token</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.auth.Token.__init__">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.auth.Token.check_token_valid">check_token_valid</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.auth.Token.get_bearer_token">get_bearer_token</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverse.serializer">serializer</a>
         <ul>
@@ -113,6 +153,8 @@
     <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.transfer.Transfer.oversize">oversize</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.transfer.Transfer.__init__">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.transfer.Transfer.check_kwargs">check_kwargs</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dryad2dataverse.transfer.Transfer.delete_dv_file">delete_dv_file</a>
     </li>
@@ -204,17 +246,15 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#dryad2dataverse.constants">constants</a>
-    </li>
     </ul>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking Database Structure</a>
+                <li class="toctree-l1"><a class="reference internal" href="../track/">Tracking database structure</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                <li class="toctree-l1"><a class="reference internal" href="../other_utils/">Other Dataverse related utilities</a>
                 </li>
               </ul>
               <ul>
@@ -239,7 +279,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">API Reference</li>
+      <li class="breadcrumb-item active">API reference</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -248,7 +288,66 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
+                <h1 id="api-reference">API reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
+<p>This is a general guide as to how to use the dryad2dataverse package in your own Python software.</p>
+<h2 id="basic-usage">Basic usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
+<h4 id="converting-json">Converting JSON<a class="headerlink" href="#converting-json" title="Permanent link">&para;</a></h4>
+<pre><code class="language-python">&gt;&gt;&gt; #Convert Dryad JSON to Dataverse JSON and save to a file
+&gt;&gt;&gt; import dryad2dataverse.serializer
+&gt;&gt;&gt; i_heart_dryad = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
+&gt;&gt;&gt; with open('dataverse_json.json', 'w') as f:
+    f.write(f'{i_heart_dryad.dvJson}')
+&gt;&gt;&gt; #Or just view it this way in a Python session
+&gt;&gt;&gt; i_heart_dryad.dvJson
+</code></pre>
+<h4 id="transferring-data">Transferring data<a class="headerlink" href="#transferring-data" title="Permanent link">&para;</a></h4>
+<p>Note: a number of variables must be set [correctly] for this to work, such as your target dataverse. This example continues with the Serializer instance above.</p>
+<pre><code class="language-python">&gt;&gt;&gt; import dryad2dataverse.config
+&gt;&gt;&gt; import dryad2dataverse.auth
+&gt;&gt;&gt; import dryad2dataverse.transfer
+&gt;&gt;&gt; config = dryad2dataverse.config.Config()
+&gt;&gt;&gt; # Now go and edit the config file which is saved at your system's default location
+&gt;&gt;&gt; # Alternately, you can fill out the config object like a dict
+&gt;&gt;&gt; config = dryad2dataverse.config.Config() #you are reloading it
+&gt;&gt;&gt; config['token'] = dryad2dataverse.auth.Token(**config)
+&gt;&gt;&gt; dv = dryad2dataverse.transfer.Transfer(i_heart_dryad, **config)
+&gt;&gt;&gt; # Files must first be downloaded; there is no direct transfer
+&gt;&gt;&gt; dv.download_files()
+&gt;&gt;&gt; # 'dryad' is the short name of the target dataverse
+&gt;&gt;&gt; # Yours may be different
+&gt;&gt;&gt; # First, create the study metadata
+&gt;&gt;&gt; dv.upload_study(targetDv='dryad', **config)
+&gt;&gt;&gt; # Then upload the files
+&gt;&gt;&gt; dv.upload_files(**config)
+</code></pre>
+<h4 id="change-monitoring">Change monitoring<a class="headerlink" href="#change-monitoring" title="Permanent link">&para;</a></h4>
+<p>Because monitoring the status of something over time requires persistence, the dryad2dataverse.monitor.Monitor object uses an <a href="https://sqlite.org">SQLite3</a> database, which has the enormous advantage of being a single file that is portable between systems. This allows monitoring without laborious database configuration on a host system, and updates can be run on any system that has sufficient storage space to act as an intermediary between Dryad and Dataverse. This is quite a simple database, as the <a href="../dbase_structure/">documentation on its structure</a> shows.</p>
+<p>If you need to change systems just swap the database to the new system.</p>
+<p>In theory you could run it from a Raspberry Pi Zero that you have in a desk drawer, although that may not be the wisest idea. Maybe use your cell phone.</p>
+<p>Monitoring changes requires both the <code>Serializer</code> and <code>Transfer</code> objects from above.</p>
+<pre><code class="language-python">&gt;&gt;&gt; # Create the Monitor instance
+&gt;&gt;&gt; monitor = dryad2dataverse.monitor.Monitor(**config) #config as above
+&gt;&gt;&gt; # Check status of your serializer object
+&gt;&gt;&gt; monitor.status(i_heart_dryad)
+{'status': 'new', 'dvpid': None}
+&gt;&gt;&gt; # imagine, now that i_still_heart_dryad is a study
+&gt;&gt;&gt; # that was uploaded previously
+&gt;&gt;&gt; monitor.status(i_still_heart_dryad)
+{'status': 'unchanged', 'dvpid': 'doi:99.99999/FK2/FAKER'}
+&gt;&gt;&gt; #Check the difference in files
+&gt;&gt;&gt; monitor.diff_files(i_still_heart_dryad)
+{}
+&gt;&gt;&gt; # After the transfer dv above:
+&gt;&gt;&gt; monitor.update(transfer)
+&gt;&gt;&gt; # And then, to make your life easier, update the last time you checked Dryad
+&gt;&gt;&gt; monitor.set_timestamp()
+</code></pre>
+<h3 id="thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup">That&rsquo;s great! I&rsquo;m going to use this for my very important data for which I have no backup.<a class="headerlink" href="#thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup" title="Permanent link">&para;</a></h3>
+<p>The <strong>dryad2dataverse</strong> library is free and open source, released under the MIT license. It&rsquo;s also not written by anyone with a degree in computer science, so as the MIT license says: </p>
+<pre class="codehilite"><code>Software is provided &quot;as is&quot;, without warranty of any kind
+</code></pre>
+
+<h2 id="python-package-api">Python package API<a class="headerlink" href="#python-package-api" title="Permanent link">&para;</a></h2>
 
 
 <div class="doc doc-object doc-module">
@@ -269,8 +368,9 @@
 <p>Modules included:</p>
 <ul>
 <li>
-<p><strong>dryad2dataverse.constants</strong> : &ldquo;Constants&rdquo; for all modules. URLs, API keys,
-etc are all here.</p>
+<p><strong>dryad2dataverse.config</strong> : Configuration for all modules. URLs, API keys,
+etc are all here.
+Base configurations are read out of a yaml file in ./data</p>
 </li>
 <li>
 <p><strong>dryad2dataverse.serializer</strong> : Download and serialize Dryad
@@ -308,6 +408,976 @@ downloading and file duplication.</p>
 
 
 
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="dryad2dataverse.config" class="doc doc-heading">
+            <code>dryad2dataverse.config</code>
+
+
+<a href="#dryad2dataverse.config" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>This module contains the information that configures all the parameters
+required to transfer data from Dryad to Dataverse.</p>
+<p>&ldquo;Constants&rdquo; may be a bit strong, but the only constant is the
+presence of change.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="dryad2dataverse.config.Config" class="doc doc-heading">
+            <code>Config</code>
+
+
+<a href="#dryad2dataverse.config.Config" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="dict">dict</span></code></p>
+
+
+
+        <p>Holds all the information about dryad2dataverse parameters</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/dryad2dataverse/config.py</code></summary>
+                <pre class="codehilite"><code class="language-python">class Config(dict):
+    '''
+    Holds all the information about dryad2dataverse parameters
+    '''
+    def __init__(self, cpath: Union[pathlib.Path, str]=None,
+                 fname:str=None,
+                 force:bool=False):
+        '''
+        Initalize
+
+        Parameters
+        ----------
+        force : bool
+            Force writing a new config file
+        '''
+        self.cpath = cpath
+        self.fname = fname
+        self.force = force
+        self.default_locations = {'ios': '~/.config/dryad2dataverse',
+                     'linux' : '~/.config/dryad2dataverse',
+                     'darwin': '~/Library/Application Support/dryad2dataverse',
+                     'win32' : '~/AppData/Roaming/dryad2dataverse',
+                     'cygwin' : '~/.config/dryad2dataverse'}
+
+        #Use read() instead of yaml.safe_load.read_text() so that
+        #comments are preserved
+        with open(importlib.resources.files(
+                    'dryad2dataverse.data').joinpath(
+                    'dryad2dataverse_config.yml'), mode='r',
+                    encoding='utf-8') as w:
+            self.template  = w.read()
+
+        if not self.cpath:
+            self.cpath = self.default_locations[sys.platform]
+        if not self.fname:
+            self.fname = 'dryad2dataverse_config.yml'
+        self.configfile = pathlib.Path(self.cpath, self.fname).expanduser()
+
+        if self.make_config_template():
+            self.load_config()
+        else:
+            raise FileNotFoundError(f'Can\'t find {self.configfile}')
+
+    @classmethod
+    def update_headers(cls,
+                       inheader:Union[None, dict]=None,
+                       **kwargs)-&gt;dict:
+        '''
+        Update headers with user agent and token information (if present)
+
+        Parameters
+        ----------
+        inheader : dict
+            Existing header if present
+
+        **kwargs
+            Keyword arguments, one of which should be 'token' containing
+            a dryad2dataverse.auth.Token instance
+        '''
+        if not kwargs:
+            kwargs = {}
+        if not inheader:
+            inheader = {}
+        headers = {'Accept':'application/json',
+                   'Content-Type':'application/json'} 
+        headers.update({'User-agent' : USERAGENT})
+        if kwargs.get('token'):
+            headers.update(kwargs['token'].auth_header)
+        headers.update(inheader)
+        return headers
+
+    def make_config_template(self):
+        '''
+        Make a default config if one does not exist
+        Returns
+        -------
+        True if created
+        False if not
+        '''
+        if self.configfile.exists() and not self.force:
+            return 1
+        if not self.configfile.parent.exists():
+            self.configfile.parent.mkdir(parents=True)
+        with open(self.configfile, 'w', encoding='utf-8') as f:
+            f.write(self.template)
+        if self.configfile.exists():
+            return 1
+        return 0
+
+    def load_config(self):
+        '''
+        Loads the config to a dict
+        '''
+        try:
+            with open(self.configfile, 'r', encoding='utf-8') as f:
+                self.update(yaml.safe_load(f))
+        except yaml.YAMLError as e:
+            LOGGER.exception('Unable to load config file, %s', e)
+            sys.exit()
+
+    def overwrite(self):
+        '''
+        Overwrite the config file with current contents.
+
+        Note that this will remove the comments from the YAML file.
+        '''
+        with open(self.configfile, 'w', encoding='utf-8') as w:
+            yaml.safe_dump(self, w)
+
+    def validate(self):
+        '''
+        Ensure all keys have values
+        '''
+        can_be_false = ['force_unlock', 'test_mode']
+        badkey = [k for k, v in self.items() if not v]
+        for rm in can_be_false:
+            badkey.remove(rm)#It can be false
+        listkeys = {k:v for k,v in self.items() if isinstance(v, list)}
+        for k, v in listkeys.items():
+            for sub_v in v:
+                if not sub_v:
+                    badkey.append(k)
+                    break
+        if badkey:
+            raise ValueError('Null values in configuration. '
+                             f'See:\n{"\n".join([str(_) for _ in badkey])}')</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.config.Config.__init__" class="doc doc-heading">
+            <code class=" language-python">__init__(cpath=None, fname=None, force=False)</code>
+
+<a href="#dryad2dataverse.config.Config.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initalize</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>force</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Force writing a new config file</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/config.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def __init__(self, cpath: Union[pathlib.Path, str]=None,
+             fname:str=None,
+             force:bool=False):
+    '''
+    Initalize
+
+    Parameters
+    ----------
+    force : bool
+        Force writing a new config file
+    '''
+    self.cpath = cpath
+    self.fname = fname
+    self.force = force
+    self.default_locations = {'ios': '~/.config/dryad2dataverse',
+                 'linux' : '~/.config/dryad2dataverse',
+                 'darwin': '~/Library/Application Support/dryad2dataverse',
+                 'win32' : '~/AppData/Roaming/dryad2dataverse',
+                 'cygwin' : '~/.config/dryad2dataverse'}
+
+    #Use read() instead of yaml.safe_load.read_text() so that
+    #comments are preserved
+    with open(importlib.resources.files(
+                'dryad2dataverse.data').joinpath(
+                'dryad2dataverse_config.yml'), mode='r',
+                encoding='utf-8') as w:
+        self.template  = w.read()
+
+    if not self.cpath:
+        self.cpath = self.default_locations[sys.platform]
+    if not self.fname:
+        self.fname = 'dryad2dataverse_config.yml'
+    self.configfile = pathlib.Path(self.cpath, self.fname).expanduser()
+
+    if self.make_config_template():
+        self.load_config()
+    else:
+        raise FileNotFoundError(f'Can\'t find {self.configfile}')</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.config.Config.load_config" class="doc doc-heading">
+            <code class=" language-python">load_config()</code>
+
+<a href="#dryad2dataverse.config.Config.load_config" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Loads the config to a dict</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/config.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def load_config(self):
+    '''
+    Loads the config to a dict
+    '''
+    try:
+        with open(self.configfile, 'r', encoding='utf-8') as f:
+            self.update(yaml.safe_load(f))
+    except yaml.YAMLError as e:
+        LOGGER.exception('Unable to load config file, %s', e)
+        sys.exit()</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.config.Config.make_config_template" class="doc doc-heading">
+            <code class=" language-python">make_config_template()</code>
+
+<a href="#dryad2dataverse.config.Config.make_config_template" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Make a default config if one does not exist</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>True if created</code>
+              –
+              <div class="doc-md-description">
+                
+              </div>
+            </li>
+            <li>
+                  <code>False if not</code>
+              –
+              <div class="doc-md-description">
+                
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/config.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def make_config_template(self):
+    '''
+    Make a default config if one does not exist
+    Returns
+    -------
+    True if created
+    False if not
+    '''
+    if self.configfile.exists() and not self.force:
+        return 1
+    if not self.configfile.parent.exists():
+        self.configfile.parent.mkdir(parents=True)
+    with open(self.configfile, 'w', encoding='utf-8') as f:
+        f.write(self.template)
+    if self.configfile.exists():
+        return 1
+    return 0</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.config.Config.overwrite" class="doc doc-heading">
+            <code class=" language-python">overwrite()</code>
+
+<a href="#dryad2dataverse.config.Config.overwrite" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Overwrite the config file with current contents.</p>
+<p>Note that this will remove the comments from the YAML file.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/config.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def overwrite(self):
+    '''
+    Overwrite the config file with current contents.
+
+    Note that this will remove the comments from the YAML file.
+    '''
+    with open(self.configfile, 'w', encoding='utf-8') as w:
+        yaml.safe_dump(self, w)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.config.Config.update_headers" class="doc doc-heading">
+            <code class=" language-python">update_headers(inheader=None, **kwargs)</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#dryad2dataverse.config.Config.update_headers" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Update headers with user agent and token information (if present)</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>inheader</code></b>
+                  (<code><span title="dict">dict</span></code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Existing header if present</p>
+              </div>
+            </li>
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Keyword arguments, one of which should be &lsquo;token&rsquo; containing
+a dryad2dataverse.auth.Token instance</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/config.py</code></summary>
+              <pre class="codehilite"><code class="language-python">@classmethod
+def update_headers(cls,
+                   inheader:Union[None, dict]=None,
+                   **kwargs)-&gt;dict:
+    '''
+    Update headers with user agent and token information (if present)
+
+    Parameters
+    ----------
+    inheader : dict
+        Existing header if present
+
+    **kwargs
+        Keyword arguments, one of which should be 'token' containing
+        a dryad2dataverse.auth.Token instance
+    '''
+    if not kwargs:
+        kwargs = {}
+    if not inheader:
+        inheader = {}
+    headers = {'Accept':'application/json',
+               'Content-Type':'application/json'} 
+    headers.update({'User-agent' : USERAGENT})
+    if kwargs.get('token'):
+        headers.update(kwargs['token'].auth_header)
+    headers.update(inheader)
+    return headers</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.config.Config.validate" class="doc doc-heading">
+            <code class=" language-python">validate()</code>
+
+<a href="#dryad2dataverse.config.Config.validate" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Ensure all keys have values</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/config.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def validate(self):
+    '''
+    Ensure all keys have values
+    '''
+    can_be_false = ['force_unlock', 'test_mode']
+    badkey = [k for k, v in self.items() if not v]
+    for rm in can_be_false:
+        badkey.remove(rm)#It can be false
+    listkeys = {k:v for k,v in self.items() if isinstance(v, list)}
+    for k, v in listkeys.items():
+        for sub_v in v:
+            if not sub_v:
+                badkey.append(k)
+                break
+    if badkey:
+        raise ValueError('Null values in configuration. '
+                         f'See:\n{"\n".join([str(_) for _ in badkey])}')</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="dryad2dataverse.auth" class="doc doc-heading">
+            <code>dryad2dataverse.auth</code>
+
+
+<a href="#dryad2dataverse.auth" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Handles authentication and bearer tokens using
+Dryad&rsquo;s application ID and secret</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="dryad2dataverse.auth.Token" class="doc doc-heading">
+            <code>Token</code>
+
+
+<a href="#dryad2dataverse.auth.Token" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Self updating bearer token generator</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/dryad2dataverse/auth.py</code></summary>
+                <pre class="codehilite"><code class="language-python">class Token:
+    '''
+    Self updating bearer token generator
+    '''
+    def __init__(self, **kwargs):
+        '''
+        Obtain bearer token
+
+        Parameters
+        ----------
+        **kwargs
+            Must include required keyword arguments as below
+        dry_url : str
+            Dryad base url (eg: https://datadryad.org)
+        app_id : str
+            Dryad application ID
+        secret : str
+            Application secret
+
+        Other parameters
+        ----------------
+        timeout : int
+            timeout in seconds
+
+        '''
+        self.kwargs = kwargs
+        self.path = '/oauth/token'
+        self.data = {'client_id': kwargs['app_id'],
+                     'client_secret' : kwargs['secret'],
+                     'grant_type': 'client_credentials'}
+        self.headers = {'User-agent': USERAGENT,
+                        'charset' : 'UTF-8'}
+        self.timeout = kwargs.get('timeout', 100)
+        self.expiry_time = None
+        self.__token_info = None
+
+    def get_bearer_token(self):
+        '''
+        Obtain a brand new bearer token
+        '''
+        try:
+            tokenr = requests.post(f"{self.kwargs['dry_url']}{self.path}",
+                                   headers=self.headers,
+                                   data=self.data,
+                                   timeout=self.timeout)
+            tokenr.raise_for_status()
+            self.__token_info = tokenr.json()
+
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.RequestException) as err:
+            LOGGER.exception('HTTP Error:, %s', err)
+            raise err
+
+    def check_token_valid(self)-&gt;bool:
+        '''
+        Checks to see if token is still valid
+        '''
+        expiry_time = (datetime.datetime.fromtimestamp(self.__token_info['created_at']) +
+                       datetime.timedelta(seconds=self.__token_info['expires_in']))
+        self.expiry_time = expiry_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+        if datetime.datetime.now() &gt; expiry_time:
+            return False
+        return True
+
+    @property
+    def token(self)-&gt;str:
+        '''
+        Return only a valid token
+        '''
+        if not self.__token_info:
+            self.get_bearer_token()
+        if not self.check_token_valid():
+            self.get_bearer_token()
+        return self.__token_info['access_token']
+
+    @property
+    def auth_header(self)-&gt;dict:
+        '''
+        Return valid authorization header
+        '''
+        return {'Accept' : 'application/json',
+                'Content-Type' : 'application/json',
+                'Authorization' : f'Bearer {self.token}'}</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="dryad2dataverse.auth.Token.auth_header" class="doc doc-heading">
+            <code class=" language-python">auth_header</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#dryad2dataverse.auth.Token.auth_header" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return valid authorization header</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="dryad2dataverse.auth.Token.token" class="doc doc-heading">
+            <code class=" language-python">token</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#dryad2dataverse.auth.Token.token" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return only a valid token</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.auth.Token.__init__" class="doc doc-heading">
+            <code class=" language-python">__init__(**kwargs)</code>
+
+<a href="#dryad2dataverse.auth.Token.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Obtain bearer token</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Must include required keyword arguments as below</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dry_url</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dryad base url (eg: https://datadryad.org)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>app_id</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dryad application ID</p>
+              </div>
+            </li>
+            <li>
+              <b><code>secret</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Application secret</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name"></th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>timeout</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>timeout in seconds</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/auth.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def __init__(self, **kwargs):
+    '''
+    Obtain bearer token
+
+    Parameters
+    ----------
+    **kwargs
+        Must include required keyword arguments as below
+    dry_url : str
+        Dryad base url (eg: https://datadryad.org)
+    app_id : str
+        Dryad application ID
+    secret : str
+        Application secret
+
+    Other parameters
+    ----------------
+    timeout : int
+        timeout in seconds
+
+    '''
+    self.kwargs = kwargs
+    self.path = '/oauth/token'
+    self.data = {'client_id': kwargs['app_id'],
+                 'client_secret' : kwargs['secret'],
+                 'grant_type': 'client_credentials'}
+    self.headers = {'User-agent': USERAGENT,
+                    'charset' : 'UTF-8'}
+    self.timeout = kwargs.get('timeout', 100)
+    self.expiry_time = None
+    self.__token_info = None</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.auth.Token.check_token_valid" class="doc doc-heading">
+            <code class=" language-python">check_token_valid()</code>
+
+<a href="#dryad2dataverse.auth.Token.check_token_valid" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Checks to see if token is still valid</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/auth.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def check_token_valid(self)-&gt;bool:
+    '''
+    Checks to see if token is still valid
+    '''
+    expiry_time = (datetime.datetime.fromtimestamp(self.__token_info['created_at']) +
+                   datetime.timedelta(seconds=self.__token_info['expires_in']))
+    self.expiry_time = expiry_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+    if datetime.datetime.now() &gt; expiry_time:
+        return False
+    return True</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.auth.Token.get_bearer_token" class="doc doc-heading">
+            <code class=" language-python">get_bearer_token()</code>
+
+<a href="#dryad2dataverse.auth.Token.get_bearer_token" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Obtain a brand new bearer token</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/auth.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def get_bearer_token(self):
+    '''
+    Obtain a brand new bearer token
+    '''
+    try:
+        tokenr = requests.post(f"{self.kwargs['dry_url']}{self.path}",
+                               headers=self.headers,
+                               data=self.data,
+                               timeout=self.timeout)
+        tokenr.raise_for_status()
+        self.__token_info = tokenr.json()
+
+    except (requests.exceptions.HTTPError,
+            requests.exceptions.RequestException) as err:
+        LOGGER.exception('HTTP Error:, %s', err)
+        raise err</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
 
 
 
@@ -386,7 +1456,7 @@ producing associated file information.</p>
     &lt;a href="http://creativecommons.org/publicdomain/zero/1.0" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " target="_blank"&gt;CC0 1.0&lt;/a&gt;
     &lt;/p&gt;'''
 
-    def __init__(self, doi):
+    def __init__(self, doi:str, **kwargs):
         '''
         Creates Dryad study metadata instance.
 
@@ -395,8 +1465,34 @@ producing associated file information.</p>
         doi : str
             DOI of Dryad study. Required for downloading.
             eg: 'doi:10.5061/dryad.2rbnzs7jp'
+
+        kwargs : dict
+            Other keyword parameters
+
+        Other parameters
+        ----------------
+        token : dryad2dataverse.auth.Token
+            If present, will use authenticated API
+
+        Notes
+        -----
+        Unpacking a dryad2dataverse.config.Config instance holding
+        global setup should give all of the
+        required kwargs. ie, Serializer(doi, **config_instance)
+
         '''
         self.doi = doi
+        self.kwargs = kwargs
+        self.kwargs['dry_url'] = kwargs.get('dry_url', 'https://datadryad.org')
+        self.kwargs['api_path'] = kwargs.get('api_path', '/api/v2')
+        self.kwargs['max_upload'] = kwargs.get('max_upload', 3221225472)
+        self.kwargs['dv_contact_name'] = kwargs.get('dv_contact_name')
+        self.kwargs['dv_contact_email'] = kwargs.get('dv_contact_email')
+        if self.kwargs.get('token'):
+            if not isinstance(self.kwargs['token'],dryad2dataverse.auth.Token):
+                raise ValueError('Token must be a dryad2dataverse.auth.Token instance')
+        #Don't need timeout if have RETRY_STRATEGY
+        self.kwargs['timeout'] = kwargs.get('timeout', 100)
         self._dryadJson = None
         self._fileJson = None
         self._dvJson = None
@@ -405,10 +1501,10 @@ producing associated file information.</p>
         self.dvpid = None
         self.session = requests.Session()
         self.session.mount('https://',
-                           HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
+                           HTTPAdapter(max_retries=config.RETRY_STRATEGY))
         LOGGER.debug('Creating Serializer instance object')
 
-    def fetch_record(self, url=None, timeout=45):
+    def fetch_record(self, url=None) :
         '''
         Fetches Dryad study record JSON from Dryad V2 API at
         https://datadryad.org/api/v2/datasets/.
@@ -419,18 +1515,14 @@ producing associated file information.</p>
         ----------
         url : str
             Dryad instance base URL (eg: 'https://datadryad.org').
-        timeout : int
-            Timeout in seconds. Default 45.
         '''
         if not url:
-            url = constants.DRYURL
+            url = self.kwargs['dry_url']
         try:
-            headers = {'accept':'application/json',
-                       'Content-Type':'application/json'}
-            headers.update(USER_AGENT)
+            headers = config.Config.update_headers(**self.kwargs)
             doiClean = urllib.parse.quote(self.doi, safe='')
-            resp = self.session.get(f'{url}/api/v2/datasets/{doiClean}',
-                                    headers=headers, timeout=timeout)
+            resp = self.session.get(f'{url}{self.kwargs["api_path"]}/datasets/{doiClean}',
+                                    headers=headers, timeout=self.kwargs['timeout'])
             resp.raise_for_status()
             self._dryadJson = resp.json()
         except (requests.exceptions.HTTPError,
@@ -500,37 +1592,31 @@ producing associated file information.</p>
         return self._dvJson
 
     @property
-    def fileJson(self, timeout=45):
+    def fileJson(self):
         '''
         Returns a list of file JSONs from call to Dryad API /files/{id},
         where the ID is parsed from the Dryad JSON. Dryad file listings
         are paginated, so the return consists of a list of dicts, one
         per page.
-
-        Parameters
-        ----------
-        timeout : int
-            Request timeout in seconds.
         '''
         if not self._fileJson:
             try:
                 self._fileJson = []
-                headers = {'accept':'application/json',
-                           'Content-Type':'application/json'}
-                headers.update(USER_AGENT)
-                fileList = self.session.get(f'{constants.DRYURL}/api/v2/versions/{self.id}/files',
+                headers = config.Config.update_headers(**self.kwargs)
+                fileList = self.session.get(f'{self.kwargs["dry_url"]}'
+                                            f'{self.kwargs["api_path"]}/versions/{self.id}/files',
                                             headers=headers,
-                                            timeout=timeout)
+                                            timeout=self.kwargs['timeout'])
                 fileList.raise_for_status()
                 #total = fileList.json()['total'] #Not needed
                 lastPage = fileList.json()['_links']['last']['href']
                 pages = int(lastPage[lastPage.rfind('=')+1:])
                 self._fileJson.append(fileList.json())
                 for i in range(2, pages+1):
-                    fileCont = self.session.get(f'{constants.DRYURL}/api/v2'
+                    fileCont = self.session.get(f'{self.kwargs["dry_url"]}{self.kwargs["api_path"]}'
                                                 f'/versions/{self.id}/files?page={i}',
                                                 headers=headers,
-                                                timeout=timeout)
+                                                timeout=self.kwargs['timeout'])
                     fileCont.raise_for_status()
                     self._fileJson.append(fileCont.json())
             except Exception as e:
@@ -561,7 +1647,7 @@ producing associated file information.</p>
 
                     #downLink = f['_links']['stash:file-download']['href']
                     downLink = f['_links']['stash:download']['href']
-                    downLink = f'{constants.DRYURL}{downLink}'
+                    downLink = f'{self.kwargs["dry_url"]}{downLink}'
                     name = f['path']
                     mimeType = f['mimeType']
                     size = f['size']
@@ -585,20 +1671,13 @@ producing associated file information.</p>
         return out
 
     @property
-    def oversize(self, maxsize=None):
+    def oversize(self):
         '''
         Returns a list of Dryad files whose size value
         exceeds maxsize. Maximum size defaults to
-        dryad2dataverse.constants.MAX_UPLOAD
-
-        Parameters
-        ----------
-        maxsize : int
-            Size in bytes in which to flag as oversize.
-            Defaults to constants.MAX_UPLOAD.
+        dryad2dataverse.config.MAX_UPLOAD
         '''
-        if not maxsize:
-            maxsize = constants.MAX_UPLOAD
+        maxsize = self.kwargs['max_upload']
         toobig = []
         for f in self.files:
             if f[3] &gt;= maxsize:
@@ -768,34 +1847,24 @@ producing associated file information.</p>
                    'storageSize',
                    'visibility',
                    'skipEmails']
+        lookup = {'versionNumber': '&lt;b&gt;Dryad version number:&lt;/b&gt;',
+                  'versionStatus': '&lt;b&gt;Version status:&lt;/b&gt;',
+                  'manuscriptNumber': '&lt;b&gt;Manuscript number:&lt;/b&gt;',
+                  'curationStatus': '&lt;b&gt;Dryad curation status:&lt;/b&gt;',
+                  'preserveCurationStatus': '&lt;b&gt;Dryad preserve curation status:&lt;/b&gt;',
+                  'invoiceId': '&lt;b&gt;Invoice ID:&lt;/b&gt;',
+                  'sharingLink': '&lt;b&gt;Sharing link:&lt;/b&gt;',
+                  'loosenValidation': '&lt;b&gt;Loosen validation:&lt;/b&gt;',
+                  'skipDataciteUpdate': '&lt;b&gt;Skip Datacite update:&lt;/b&gt;',
+                  'storageSize': '&lt;b&gt;Storage size:&lt;/b&gt;',
+                  'visibility': '&lt;b&gt;Visibility:&lt;/b&gt;',
+                  'skipEmails': '&lt;b&gt;Skip emails:&lt;/b&gt;'}
         for note in notable:
             text = dryJson.get(note)
             if text:
                 text = str(text).strip()
-                if note == 'versionNumber':
-                    text = f'&lt;b&gt;Dryad version number:&lt;/b&gt; {text}'
-                if note == 'versionStatus':
-                    text = f'&lt;b&gt;Version status:&lt;/b&gt; {text}'
-                if note == 'manuscriptNumber':
-                    text = f'&lt;b&gt;Manuscript number:&lt;/b&gt; {text}'
-                if note == 'curationStatus':
-                    text = f'&lt;b&gt;Dryad curation status:&lt;/b&gt; {text}'
-                if note == 'preserveCurationStatus':
-                    text = f'&lt;b&gt;Dryad preserve curation status:&lt;/b&gt; {text}'
-                if note == 'invoiceId':
-                    text = f'&lt;b&gt;Invoice ID:&lt;/b&gt; {text}'
-                if note == 'sharingLink':
-                    text = f'&lt;b&gt;Sharing link:&lt;/b&gt; {text}'
-                if note == 'loosenValidation':
-                    text = f'&lt;b&gt;Loosen validation:&lt;/b&gt; {text}'
-                if note == 'skipDataciteUpdate':
-                    text = f'&lt;b&gt;Skip Datacite update:&lt;/b&gt; {text}'
-                if note == 'storageSize':
-                    text = f'&lt;b&gt;Storage size:&lt;/b&gt; {text}'
-                if note == 'visibility':
-                    text = f'&lt;b&gt;Visibility:&lt;/b&gt; {text}'
-                if note == 'skipEmails':
-                    text = f'&lt;b&gt;Skip emails:&lt;/b&gt; {text}'
+                if note in lookup:
+                    text = f'{lookup.get(note)} {text}'
 
                 notes += f'&lt;p&gt;{text}&lt;/p&gt;\n'
         concat = {'typeName':'notesText',
@@ -831,7 +1900,8 @@ producing associated file information.</p>
             out.append(Serializer._convert_generic(inJson=coord[1],
                                                    dvField=coord[0],
                                                    #dryField='north'))
-                                                   dryField=[k for k in coord[1].keys()][0]))
+                                                   #dryField=[k for k in coord[1].keys()][0]))
+                                                   dryField=list(coord[1].keys())[0]))
         return out
 
     @staticmethod
@@ -899,7 +1969,9 @@ producing associated file information.</p>
 
     def _assemble_json(self, dryJson=None, dvContact=None,
                        dvEmail=None, defContact=True):
+        #pylint: disable = too-many-statements, too-many-locals, too-many-branches
         '''
+
         Assembles Dataverse json from Dryad JSON components.
         Dataverse JSON is a nightmare, so this function is too.
 
@@ -918,9 +1990,9 @@ producing associated file information.</p>
         	Flag to include default contact information with record.
         '''
         if not dvContact:
-            dvContact = constants.DV_CONTACT_NAME
+            dvContact = self.kwargs['dv_contact_name']
         if not dvEmail:
-            dvEmail = constants.DV_CONTACT_EMAIL
+            dvEmail = self.kwargs['dv_contact_email']
         if not dryJson:
             dryJson = self.dryadJson
         LOGGER.debug(dryJson)
@@ -1272,30 +2344,6 @@ where the ID is parsed from the Dryad JSON. Dryad file listings
 are paginated, so the return consists of a list of dicts, one
 per page.</p>
 
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>timeout</code></b>
-                  (<code><span title="int">int</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>Request timeout in seconds.</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
     </div>
 
 </div>
@@ -1370,33 +2418,8 @@ trailing portion of:</p>
 
         <p>Returns a list of Dryad files whose size value
 exceeds maxsize. Maximum size defaults to
-dryad2dataverse.constants.MAX_UPLOAD</p>
+dryad2dataverse.config.MAX_UPLOAD</p>
 
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>maxsize</code></b>
-                  (<code><span title="int">int</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>Size in bytes in which to flag as oversize.
-Defaults to constants.MAX_UPLOAD.</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
     </div>
 
 </div>
@@ -1408,7 +2431,7 @@ Defaults to constants.MAX_UPLOAD.</p>
 
 
 <h4 id="dryad2dataverse.serializer.Serializer.__init__" class="doc doc-heading">
-            <code class=" language-python">__init__(doi)</code>
+            <code class=" language-python">__init__(doi, **kwargs)</code>
 
 <a href="#dryad2dataverse.serializer.Serializer.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1437,15 +2460,56 @@ Defaults to constants.MAX_UPLOAD.</p>
 eg: &lsquo;doi:10.5061/dryad.2rbnzs7jp&rsquo;</p>
               </div>
             </li>
+            <li>
+              <b><code>kwargs</code></b>
+                  (<code><span title="dict">dict</span></code>, default:
+                      <code>{}</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Other keyword parameters</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
 
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name"></th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>token</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="Token (dryad2dataverse.auth.Token)" href="#dryad2dataverse.auth.Token">Token</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>If present, will use authenticated API</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Unpacking a dryad2dataverse.config.Config instance holding
+global setup should give all of the
+required kwargs. ie, Serializer(doi, **config_instance)</p>
+</details>
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/serializer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __init__(self, doi):
+              <pre class="codehilite"><code class="language-python">def __init__(self, doi:str, **kwargs):
     '''
     Creates Dryad study metadata instance.
 
@@ -1454,8 +2518,34 @@ eg: &lsquo;doi:10.5061/dryad.2rbnzs7jp&rsquo;</p>
     doi : str
         DOI of Dryad study. Required for downloading.
         eg: 'doi:10.5061/dryad.2rbnzs7jp'
+
+    kwargs : dict
+        Other keyword parameters
+
+    Other parameters
+    ----------------
+    token : dryad2dataverse.auth.Token
+        If present, will use authenticated API
+
+    Notes
+    -----
+    Unpacking a dryad2dataverse.config.Config instance holding
+    global setup should give all of the
+    required kwargs. ie, Serializer(doi, **config_instance)
+
     '''
     self.doi = doi
+    self.kwargs = kwargs
+    self.kwargs['dry_url'] = kwargs.get('dry_url', 'https://datadryad.org')
+    self.kwargs['api_path'] = kwargs.get('api_path', '/api/v2')
+    self.kwargs['max_upload'] = kwargs.get('max_upload', 3221225472)
+    self.kwargs['dv_contact_name'] = kwargs.get('dv_contact_name')
+    self.kwargs['dv_contact_email'] = kwargs.get('dv_contact_email')
+    if self.kwargs.get('token'):
+        if not isinstance(self.kwargs['token'],dryad2dataverse.auth.Token):
+            raise ValueError('Token must be a dryad2dataverse.auth.Token instance')
+    #Don't need timeout if have RETRY_STRATEGY
+    self.kwargs['timeout'] = kwargs.get('timeout', 100)
     self._dryadJson = None
     self._fileJson = None
     self._dvJson = None
@@ -1464,7 +2554,7 @@ eg: &lsquo;doi:10.5061/dryad.2rbnzs7jp&rsquo;</p>
     self.dvpid = None
     self.session = requests.Session()
     self.session.mount('https://',
-                       HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
+                       HTTPAdapter(max_retries=config.RETRY_STRATEGY))
     LOGGER.debug('Creating Serializer instance object')</code></pre>
             </details>
     </div>
@@ -1475,7 +2565,7 @@ eg: &lsquo;doi:10.5061/dryad.2rbnzs7jp&rsquo;</p>
 
 
 <h4 id="dryad2dataverse.serializer.Serializer.fetch_record" class="doc doc-heading">
-            <code class=" language-python">fetch_record(url=None, timeout=45)</code>
+            <code class=" language-python">fetch_record(url=None)</code>
 
 <a href="#dryad2dataverse.serializer.Serializer.fetch_record" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1508,16 +2598,6 @@ will call this function automatically.</p>
                 <p>Dryad instance base URL (eg: &lsquo;https://datadryad.org&rsquo;).</p>
               </div>
             </li>
-            <li>
-              <b><code>timeout</code></b>
-                  (<code><span title="int">int</span></code>, default:
-                      <code>45</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Timeout in seconds. Default 45.</p>
-              </div>
-            </li>
         </ul>
       </td>
     </tr>
@@ -1526,7 +2606,7 @@ will call this function automatically.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/serializer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def fetch_record(self, url=None, timeout=45):
+              <pre class="codehilite"><code class="language-python">def fetch_record(self, url=None) :
     '''
     Fetches Dryad study record JSON from Dryad V2 API at
     https://datadryad.org/api/v2/datasets/.
@@ -1537,18 +2617,14 @@ will call this function automatically.</p>
     ----------
     url : str
         Dryad instance base URL (eg: 'https://datadryad.org').
-    timeout : int
-        Timeout in seconds. Default 45.
     '''
     if not url:
-        url = constants.DRYURL
+        url = self.kwargs['dry_url']
     try:
-        headers = {'accept':'application/json',
-                   'Content-Type':'application/json'}
-        headers.update(USER_AGENT)
+        headers = config.Config.update_headers(**self.kwargs)
         doiClean = urllib.parse.quote(self.doi, safe='')
-        resp = self.session.get(f'{url}/api/v2/datasets/{doiClean}',
-                                headers=headers, timeout=timeout)
+        resp = self.session.get(f'{url}{self.kwargs["api_path"]}/datasets/{doiClean}',
+                                headers=headers, timeout=self.kwargs['timeout'])
         resp.raise_for_status()
         self._dryadJson = resp.json()
     except (requests.exceptions.HTTPError,
@@ -1643,14 +2719,37 @@ Dryad installation to Dataverse installation.</p>
     Transfers metadata and data files from a
     Dryad installation to Dataverse installation.
     '''
-    def __init__(self, dryad):
+    #pylint: disable=too-many-instance-attributes
+    def __init__(self, dryad, **kwargs):
         '''
         Creates a dryad2dataverse.transfer.Transfer instance.
 
         Parameters
         ----------
         dryad : dryad2dataverse.serializer.Serializer
+
+        **kwargs
+            Normally this would be a dryad2dataverse.constants.Config instance
+
+        Notes
+        -----
+        Minimum kwargs for function:
+        max_upload : int
+            Maximum size in bytes
+        tempfile_location : str
+            Path to temporary directory
+        dv_url : str
+            Base URL of dataverse instance
+        api_key : str
+            API key for Dataverse user
+        dv_contact_email : str
+            Contact email address for Dataverse record
+        dv_contact_name : str
+            Contact name
+        target : str
+            Target collection short name
         '''
+        self.kwargs = kwargs
         self.dryad = dryad
         self._fileJson = None
         self._files = [list(f) for f in self.dryad.files]
@@ -1660,35 +2759,46 @@ Dryad installation to Dataverse installation.</p>
         self.dvStudy = None
         self.jsonFlag = None #Whether or not new json uploaded
         self.session = requests.Session()
-        self.session.mount('https://', HTTPAdapter(max_retries=constants.RETRY_STRATEGY))
+        self.session.mount('https://', HTTPAdapter(max_retries=config.RETRY_STRATEGY))
+        self.check_kwargs()
 
-    def _del__(self): #TODONE: Change name to __del__ to make a destructor
-        '''Expunges files from constants.TMP on deletion'''
+    def check_kwargs(self):
+        '''
+        Verify sufficient information
+        '''
+        required = ['max_upload',
+                    'tempfile_location',
+                    'dv_url',
+                    'api_key',
+                    'dv_contact_email',
+                    'dv_contact_name',
+                    'target']
+        keys = self.kwargs.keys()
+        for val in required:
+            if val not in keys:
+                try:
+                    raise exceptions.Dryad2DataverseError(f'Required parameter missing: {val}')
+                except exceptions.Dryad2DataverseError as err:
+                    LOGGER.exception(err)
+                    raise
+
+    def _del__(self):
+        '''Expunges files from temporary file on deletion'''
+        tmp = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         for f in self.files:
-            if os.path.exists(f'{constants.TMP}{os.sep}{f[1]}'):
-                os.remove(f'{constants.TMP}{os.sep}{f[1]}')
+            if pathlib.Path(tmp, f[1]).exists():
+                os.remove(pathlib.Path(tmp, f[1]))
 
-    def test_api_key(self, url=None, apikey=None):
+    def test_api_key(self):
         '''
         Tests for an expired API key and raises
         dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
         the API key is bad. Ignores other HTTP errors.
-
-        Parameters
-        ----------
-        url : str
-            Base URL to Dataverse installation.
-            Defaults to dryad2dataverse.constants.DVURL
-        apikey : str
-            Default dryad2dataverse.constants.APIKEY.
         '''
         #API validity check appears to come before a PID validity check
         params = {'persistentId': 'doi:000/000/000'} # PID is irrelevant
-        if not url:
-            url = constants.DVURL
-        headers = {'X-Dataverse-key': apikey if apikey else constants.APIKEY}
-        headers.update(USER_AGENT)
-        bad_test = self.session.get(f'{url}/api/datasets/:persistentId',
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
+        bad_test = self.session.get(f'{self.kwargs["dv_url"]}/api/datasets/:persistentId',
                                 headers=headers,
                                 params=params)
         #There's an extra space in the message which Harvard
@@ -1696,10 +2806,8 @@ Dryad installation to Dataverse installation.</p>
         if bad_test.json().get('message').startswith('Bad api key'):
             try:
                 raise exceptions.DataverseBadApiKeyError('Bad API key')
-            except exceptions.DataverseBadApiKeyError as e:
-                LOGGER.critical('API key has expired or is otherwise invalid')
-                LOGGER.exception(e)
-                #LOGGER.exception(traceback.format_exc()) #not really necessary
+            except exceptions.DataverseBadApiKeyError as err:
+                LOGGER.exception(err)
                 raise
         try: #other errors
             bad_test.raise_for_status()
@@ -1723,7 +2831,7 @@ Dryad installation to Dataverse installation.</p>
         Returns datavese authentication header dict.
         ie: `{X-Dataverse-key' : 'APIKEYSTRING'}`
         '''
-        return {'X-Dataverse-key' : constants.APIKEY}
+        return {'X-Dataverse-key' : self.kwargs['api_key']}
 
     @property
     def fileJson(self):
@@ -1787,18 +2895,13 @@ Dryad installation to Dataverse installation.</p>
         '''
         return {'X-Dataverse-key' : apikey}
 
-    #@staticmethod
-    def set_correct_date(self, url=None, hdl=None,
-                         d_type='distributionDate',
-                         apikey=None):
+    def set_correct_date(self, hdl=None,
+                         d_type='distributionDate'):
         '''
         Sets "correct" publication date for Dataverse.
 
         Parameters
         ----------
-        url : str
-            Base URL to Dataverse installation.
-            Defaults to dryad2dataverse.constants.DVURL
         hdl : str
             Persistent indentifier for Dataverse study.
             Defaults to Transfer.dvpid (which can be None if the
@@ -1806,11 +2909,12 @@ Dryad installation to Dataverse installation.</p>
         d_type : str
             Date type. One of  'distributionDate', 'productionDate',
             `dateOfDeposit'. Default 'distributionDate'.
-        apikey : str
-            Default dryad2dataverse.constants.APIKEY.
 
         Notes
         -----
+        self.kwargs are normally read from dryad2dataverse.config.Config
+        instances.
+
         dryad2dataverse.serializer maps Dryad 'publicationDate'
         to Dataverse 'distributionDate' (see serializer.py ~line 675).
 
@@ -1820,23 +2924,16 @@ Dryad installation to Dataverse installation.</p>
 
         '''
         try:
-            if not url:
-                url = constants.DVURL
             if not hdl:
                 hdl = self.dvpid
-            headers = {'X-Dataverse-key' : apikey}
-            if apikey:
-                headers = {'X-Dataverse-key' : apikey}
-            else:
-                headers = {'X-Dataverse-key' : constants.APIKEY}
-
-            headers.update(USER_AGENT)
+            headers ={'X-Dataverse-key': self.kwargs['api_key'],
+                      'User-agent': USERAGENT}
             params = {'persistentId': hdl}
-            set_date = self.session.put(f'{url}/api/datasets/:persistentId/citationdate',
+            set_date = self.session.put(f'{self.kwargs["dv_url"]}/api/'
+                                        'datasets/:persistentId/citationdate',
                                         headers=headers,
                                         data=d_type,
-                                        params=params,
-                                        timeout=45)
+                                        params=params)
             set_date.raise_for_status()
 
         except (requests.exceptions.HTTPError,
@@ -1846,21 +2943,14 @@ Dryad installation to Dataverse installation.</p>
             LOGGER.warning(err)
             LOGGER.warning(set_date.text)
 
-    def upload_study(self, url=None, apikey=None, timeout=45, **kwargs):
+    def upload_study(self, **kwargs):
         '''
         Uploads Dryad study metadata to target Dataverse or updates existing.
         Supplying a `targetDv` kwarg creates a new study and supplying a
         `dvpid` kwarg updates a currently existing Dataverse study.
 
-        Parameters
-        ----------
-        url : str
-            URL of Dataverse instance. Defaults to constants.DVURL.
-        apikey : str
-            API key of user. Defaults to contants.APIKEY.
-        timeout : int
-            timeout on POST request.
-        kwargs : dict
+        **kwargs : dict
+            Normally this is one of the two parameters below
 
         Other parameters
         ----------------
@@ -1875,46 +2965,37 @@ Dryad installation to Dataverse installation.</p>
         -----
         One of targetDv or dvpid is required.
         '''
-        if not url:
-            url = constants.DVURL
-        if not apikey:
-            apikey = constants.APIKEY
-        headers = {'X-Dataverse-key' : apikey}
-        headers.update(USER_AGENT)
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
         targetDv = kwargs.get('targetDv')
         dvpid = kwargs.get('dvpid')
         #dryFid = kwargs.get('dryFid') #Why did I put this here?
         if not targetDv and not dvpid:
             try:
                 raise exceptions.NoTargetError('You must supply one of targetDv \
-                                    (target dataverse) \
-                                     or dvpid (Dataverse persistent ID)')
-            except exceptions.NoTargetError as e:
-                LOGGER.error('No target dataverse or dvpid supplied')
-                LOGGER.exception(e)
+                                        (target dataverse) \
+                                         or dvpid (Dataverse persistent ID)')
+            except exceptions.NoTargetError as err:
+                LOGGER.exception(err)
                 raise
 
         if targetDv and dvpid:
-            try:
-                raise ValueError('Supply only one of targetDv or dvpid')
-            except ValueError as e:
-                LOGGER.exception(e)
-                raise
+            msg = 'Supply only one of targetDv or dvpid'
+            LOGGER.exception(msg)
+            raise exceptions.Dryad2DataverseError(msg)
+
         if not dvpid:
-            endpoint = f'{url}/api/dataverses/{targetDv}/datasets'
+            endpoint = f'{self.kwargs["dv_url"]}/api/dataverses/{targetDv}/datasets'
             upload = self.session.post(endpoint,
                                        headers=headers,
-                                       json=self.dryad.dvJson,
-                                       timeout=timeout)
+                                       json=self.dryad.dvJson)
             LOGGER.debug(upload.text)
         else:
-            endpoint = f'{url}/api/datasets/:persistentId/versions/:draft'
+            endpoint = f'{self.kwargs["dv_url"]}/api/datasets/:persistentId/versions/:draft'
             params = {'persistentId':dvpid}
             #Yes, dataverse uses *different* json for edits
             upload = self.session.put(endpoint, params=params,
                                       headers=headers,
-                                      json=self.dryad.dvJson['datasetVersion'],
-                                      timeout=timeout)
+                                      json=self.dryad.dvJson['datasetVersion'])
             #self._dvrecord = upload.json()
             LOGGER.debug(upload.text)
 
@@ -1922,20 +3003,16 @@ Dryad installation to Dataverse installation.</p>
             updata = upload.json()
             self.dvStudy = updata
             if updata.get('status') != 'OK':
+                msg = ('Status return is not OK.'
+                        f'{upload.status_code}: '
+                        f'{upload.reason}. '
+                        f'{upload.request.url} '
+                        f'{upload.text}')
                 try:
-                    raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                           f'{upload.status_code}: '
-                                                           f'{upload.reason}. '
-                                                           f'{upload.request.url} '
-                                                           f'{upload.text}'))
-                except exceptions.DataverseUploadError as e:
-                    LOGGER.exception(e)
+                    raise exceptions.DataverseUploadError(msg)
+                except exceptions.DataverseUploadError as err:
+                    LOGGER.exception(err)
                     LOGGER.exception(traceback.format_exc())
-                    raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                           f'{upload.status_code}: '
-                                                           f'{upload.reason}. '
-                                                           f'{upload.request.url} '
-                                                           f'{upload.text}'))
             upload.raise_for_status()
         except Exception as e: # Only accessible via non-requests exception
             LOGGER.exception(e)
@@ -1989,14 +3066,16 @@ Dryad installation to Dataverse installation.</p>
                     fblock = m.read(blocksize)
                     curvalue = HASHTABLE[dig_type](fblock, curvalue)
                 return curvalue
+        LOGGER.exception('Unable to determine hash type for %s: %s', infile, dig_type)
         raise exceptions.HashError(f'Unable to determine hash type for{infile}: {dig_type}')
 
 
-    def download_file(self, url=None, filename=None, tmp=None,
-                      size=None, chk=None, timeout=45, **kwargs):
+    def download_file(self, url=None, filename=None,
+                      size=None, chk=None, **kwargs):
         '''
-        Downloads a file via requests streaming and saves to constants.TMP.
-        returns checksum on success and an exception on failure.
+        Downloads a file via requests streaming and saves to the
+        the defined temporary file directory.
+        Returns checksum on success and an exception on failure.
 
         Parameters
         ----------
@@ -2004,18 +3083,10 @@ Dryad installation to Dataverse installation.</p>
             URL of download.
         filename : str
             Output file name.
-        timeout : int
-            Requests timeout.
-        tmp : str
-            Temporary directory for downloads.
-            Defaults to dryad2dataverse.constants.TMP.
         size : int
             Reported file size in bytes.
-            Defaults to dryad2dataverse.constants.MAX_UPLOAD.
         chk : str
             checksum of file (if available and known).
-        timeout : int
-            timeout in seconds
         kwargs : dict
 
         Other parameters
@@ -2023,19 +3094,16 @@ Dryad installation to Dataverse installation.</p>
         digest_type : str
             checksum type (ie, md5, sha-256, etc)
         '''
+        #pylint: disable=too-many-branches
         LOGGER.debug('Start download sequence')
-        LOGGER.debug('MAX SIZE = %s', constants.MAX_UPLOAD)
+        LOGGER.debug('MAX SIZE = %s', self.kwargs['max_upload'])
         LOGGER.debug('Filename: %s, size=%s', filename, size)
-        if not tmp:
-            tmp = constants.TMP
-        if tmp.endswith(os.sep):
-            tmp = tmp[:-1]
-
+        tmp = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         if size:
-            if size &gt; constants.MAX_UPLOAD:
+            if size &gt; self.kwargs['max_upload']:
                 #TOO BIG
                 LOGGER.warning('%s: File %s exceeds '
-                               'Dataverse MAX_UPLOAD size. Skipping download.',
+                               'Dataverse maximum upload size. Skipping download.',
                                self.doi, filename)
                 md5 = 'this_file_is_too_big_to_upload__' #HA HA
                 for i in self._files:
@@ -2044,27 +3112,28 @@ Dryad installation to Dataverse installation.</p>
                 LOGGER.debug('Stop download sequence with large file skip')
                 return md5
         try:
-            down = self.session.get(url, timeout=timeout, stream=True)
+            down = self.session.get(url, stream=True,
+                                    headers=config.Config.update_headers(**self.kwargs))
             down.raise_for_status()
-            with open(f'{tmp}{os.sep}{filename}', 'wb') as fi:
+            with open(pathlib.Path(tmp,filename), 'wb') as fi:
                 for chunk in down.iter_content(chunk_size=8192):
                     fi.write(chunk)
 
             #verify size
             #https://stackoverflow.com/questions/2104080/how-can-i-check-file-size-in-python'
             if size:
-                checkSize = os.stat(f'{tmp}{os.sep}{filename}').st_size
+                checkSize = os.stat(pathlib.Path(tmp,filename)).st_size
                 if checkSize != size:
                     try:
-                        raise exceptions.DownloadSizeError('Download size does not match '
-                                                           'reported size')
+                        raise exceptions.DownloadSizeError('Download size does not '
+                                                           'match reported size')
                     except exceptions.DownloadSizeError as e:
                         LOGGER.exception(e)
                         raise
             #now check the md5
             md5 = None
             if chk and kwargs.get('digest_type') in HASHTABLE:
-                md5 = Transfer._check_md5(f'{tmp}{os.sep}{filename}',
+                md5 = Transfer._check_md5(pathlib.Path(tmp,filename),
                                       kwargs['digest_type'])
                 if md5 != chk:
                     try:
@@ -2083,7 +3152,10 @@ Dryad installation to Dataverse installation.</p>
                 requests.exceptions.ConnectionError) as err:
             LOGGER.critical('Unable to download %s', url)
             LOGGER.exception(err)
-            raise exceptions.DataverseDownloadError
+            raise
+        except Exception as err:
+            LOGGER.exception(err)
+            raise
 
     def download_files(self, files=None):
         '''
@@ -2117,7 +3189,7 @@ Dryad installation to Dataverse installation.</p>
             LOGGER.exception('Unable to download file with info %s\n%s', f, e)
             raise
 
-    def file_lock_check(self, study, dv_url, apikey=None, count=0):
+    def file_lock_check(self, study, count=0):
         '''
         Checks for a study lock
 
@@ -2130,28 +3202,17 @@ Dryad installation to Dataverse installation.</p>
         ----------
         study : str
             Persistent indentifer of study.
-        dv_url : str
-            URL to base Dataverse installation.
-        apikey : str
-            API key for user.
-            If not present authorization defaults to self.auth.
         count : int
             Number of times the function has been called. Logs
             lock messages only on 0.
         '''
-        if dv_url.endswith('/'):
-            dv_url = dv_url[:-1]
-        if apikey:
-            headers = {'X-Dataverse-key': apikey}
-        else:
-            headers = self.auth
-
-        headers.update(USER_AGENT)
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
         params = {'persistentId': study}
         try:
-            lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+            lock_status = self.session.get(f'{self.kwargs["dv_url"]}'
+                                           '/api/datasets/:persistentId/locks',
                                            headers=headers,
-                                           params=params, timeout=300)
+                                           params=params)
             lock_status.raise_for_status()
             if lock_status.json().get('data'):
                 if count == 0:
@@ -2167,7 +3228,7 @@ Dryad installation to Dataverse installation.</p>
             #return True #Should I raise here?
             raise
 
-    def force_notab_unlock(self, study, dv_url, apikey=None):
+    def force_notab_unlock(self, study):
         '''
         Checks for a study lock and forcibly unlocks and uningests
         to prevent tabular file processing. Required if mime and filename
@@ -2179,31 +3240,27 @@ Dryad installation to Dataverse installation.</p>
         ----------
         study : str
             Persistent indentifer of study.
-        dv_url : str
-            URL to base Dataverse installation.
-        apikey : str
-            API key for user.
-            If not present authorization defaults to self.auth.
         '''
-        if dv_url.endswith('/'):
-            dv_url = dv_url[:-1]
-        if apikey:
-            headers = {'X-Dataverse-key': apikey}
-        else:
-            headers = self.auth
-
-        headers.update(USER_AGENT)
+        headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
         params = {'persistentId': study}
-        lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+        lock_status = self.session.get(f'{self.kwargs["dv_url"]}/api/datasets/:persistentId/locks',
                                        headers=headers,
-                                       params=params, timeout=300)
-        lock_status.raise_for_status()
+                                       params=params)
+        try:
+            lock_status.raise_for_status()
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as err:
+            LOGGER.exception(err)
+            raise
+        except Exception as err:
+            LOGGER.exception(err)
+            raise
         if lock_status.json()['data']:
             LOGGER.warning('Study %s has been locked', study)
             LOGGER.warning('Lock info:\n%s', lock_status.json())
-            force_unlock = self.session.delete(f'{dv_url}/api/datasets/:persistentId/locks',
-                                               params=params, headers=headers,
-                                               timeout=300)
+            force_unlock = self.session.delete(f'{self.kwargs["dv_url"]}/api/'
+                                               'datasets/:persistentId/locks',
+                                               params=params, headers=headers)
             force_unlock.raise_for_status()
             LOGGER.warning('Lock removed for %s', study)
             LOGGER.warning('Lock status:\n %s', force_unlock.json())
@@ -2229,15 +3286,19 @@ Dryad installation to Dataverse installation.</p>
                     hashtype=None,
                     #md5=None, studyId=None, dest=None,
                     digest=None, studyId=None, dest=None,
-                    fprefix=None, force_unlock=False, timeout=300):
+                    fprefix=None, force_unlock=False):
         '''
         Uploads file to Dataverse study. Returns a tuple of the
         dryadFid (or None) and Dataverse JSON from the POST request.
         Failures produce JSON with different status messages
-        rather than raising an exception.
+        rather than raising an exception, unless it's some
+        horrendous failure whereupon you will get an actual
+        exception.
 
         Parameters
         ----------
+        dryadURL : str
+            Dryad download URL
         filename : str
             Filename (not including path).
         mimetype : str
@@ -2247,15 +3308,10 @@ Dryad installation to Dataverse installation.</p>
         studyId : str
             Persistent Dataverse study identifier.
             Defaults to Transfer.dvpid.
-        dest : str
-            Destination dataverse installation url.
-            Defaults to constants.DVURL.
         hashtype: str
             original Dryad hash type
         fprefix : str
             Path to file, not including a trailing slash.
-        timeout : int
-            Timeout in seconds for POST request. Default 300.
         dryadUrl : str
             Dryad download URL if you want to include a Dryad file id.
         force_unlock : bool
@@ -2266,33 +3322,32 @@ Dryad installation to Dataverse installation.</p>
             from non-superusers (undocumented as of 31 March 2021).
             **Forcible unlock requires a superuser API key.**
         '''
-        #return locals()
-        #TODONE remove above
+        #pylint: disable = consider-using-with, too-many-arguments, too-many-positional-arguments
+        #pylint:disable=too-many-locals, too-many-branches, too-many-statements
+        #Fix the arguments one day
         if not studyId:
             studyId = self.dvpid
-        if not dest:
-            dest = constants.DVURL
-        if not fprefix:
-            fprefix = constants.TMP
+        dest = self.kwargs['dv_url']
+        fprefix = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         if dryadUrl:
             fid = dryadUrl.strip('/download')
             fid = int(fid[fid.rfind('/')+1:])
         else:
             fid = 0 #dummy fid for non-Dryad use
         params = {'persistentId' : studyId}
-        upfile = fprefix + os.sep + filename[:]
+        upfile = pathlib.Path(fprefix, filename[:])
         badExt = filename[filename.rfind('.'):].lower()
         #Descriptions are technically possible, although how to add
         #them is buried in Dryad's API documentation
         dv4meta = {'label' : filename[:], 'description' : descr}
         #if mimetype == 'application/zip' or filename.lower().endswith('.zip'):
-        if mimetype == 'application/zip' or badExt in constants.NOTAB:
+        if mimetype == 'application/zip' or badExt in self.kwargs.get('notab',[]):
             mimetype = 'application/octet-stream' # stop unzipping automatically
             filename += '.NOPROCESS' # Also screw with their naming convention
             #debug log about file names to see what is up with XSLX
             #see doi:10.5061/dryad.z8w9ghxb6
             LOGGER.debug('File renamed to %s for upload', filename)
-        if size &gt;= constants.MAX_UPLOAD:
+        if size &gt;= self.kwargs['max_upload']:
             fail = (fid, {'status' : 'Failure: MAX_UPLOAD size exceeded'})
             self.fileUpRecord.append(fail)
             LOGGER.warning('%s: File %s of '
@@ -2306,14 +3361,21 @@ Dryad installation to Dataverse installation.</p>
         ctype = {'Content-type' : multi.content_type}
         tmphead = self.auth.copy()
         tmphead.update(ctype)
-        tmphead.update(USER_AGENT)
+        tmphead.update({'User-agent':USERAGENT})
         url = dest + '/api/datasets/:persistentId/add'
-        try:
-            upload = self.session.post(url, params=params,
+        upload = self.session.post(url, params=params,
                                        headers=tmphead,
-                                       data=multi, timeout=timeout)
-            #print(upload.text)
+                                       data=multi)
+        try:
             upload.raise_for_status()
+
+        except (requests.exceptions.HTTPError,
+                    requests.exceptions.ConnectionError):
+            LOGGER.critical('Error %s: %s, upload.status_code, upload.reason')
+            return (fid, {'status' : f'Failure: Reason - {upload.status_code}: {upload.reason}'})
+
+
+        try:
             self.fileUpRecord.append((fid, upload.json()))
             upmd5 = upload.json()['data']['files'][0]['dataFile']['checksum']['value']
             #Dataverse hash type
@@ -2331,11 +3393,11 @@ Dryad installation to Dataverse installation.</p>
             #if md5 and (upmd5 != md5):
             if upmd5 != comparator:
                 try:
-                    raise exceptions.HashError(f'{_type} mismatch:\nlocal: {comparator}\nuploaded: {upmd5}')
+                    raise exceptions.HashError(f'{_type} mismatch:\nlocal: '
+                                               f'{comparator}\nuploaded: {upmd5}')
                 except exceptions.HashError as e:
                     LOGGER.exception(e)
-                    raise
-
+                    return (fid, {'status': e})
             #Make damn sure that the study isn't locked because of
             #tab file processing
             ##SPSS files still process despite spoofing MIME and extension
@@ -2345,12 +3407,12 @@ Dryad installation to Dataverse installation.</p>
             #fid not required for unlock
             #self.force_notab_unlock(studyId, dest, fid)
             if force_unlock:
-                self.force_notab_unlock(studyId, dest)
+                self.force_notab_unlock(studyId)
             else:
                 count = 0
                 wait = True
                 while wait:
-                    wait = self.file_lock_check(studyId, dest, count=count)
+                    wait = self.file_lock_check(studyId, count)
                     if wait:
                         time.sleep(15) # Don't hit it too often
                     count += 1
@@ -2358,17 +3420,15 @@ Dryad installation to Dataverse installation.</p>
 
             return (fid, upload.json())
 
-        except Exception as e:
+        except requests.exceptions.JSONDecodeError as e:
+            LOGGER.warning('JSON error with upload')
             LOGGER.exception(e)
-            try:
-                reason = upload.json()['message']
-                LOGGER.warning(upload.json())
-                return (fid, {'status' : f'Failure: {reason}'})
-            except Exception as e:
-                LOGGER.warning('Further exceptions!')
-                LOGGER.exception(e)
-                LOGGER.warning(upload.text)
-                return (fid, {'status' : f'Failure: Reason {upload.reason}'})
+            return (fid, {'status' : f'Failure: Reason {upload.reason}'})
+
+        #It can crash later
+        except Exception as f_plus: #pylint: disable=broad-except
+            LOGGER.exception(f_plus)
+            return (fid, {'status' : f'Failure: Reason: {f_plus}'})
 
     def upload_files(self, files=None, pid=None, fprefix=None, force_unlock=False):
         '''
@@ -2383,9 +3443,6 @@ Dryad installation to Dataverse installation.</p>
         pid : str
             Defaults to self.dvpid, which is generated by calling
             dryad2dataverse.transfer.Transfer.upload_study().
-        fprefix : str
-            File location prefix.
-            Defaults to dryad2dataverse.constants.TMP
         force_unlock : bool
             Attempt forcible unlock instead of waiting for tabular
             file processing.
@@ -2396,8 +3453,7 @@ Dryad installation to Dataverse installation.</p>
         '''
         if not files:
             files = self.files
-        if not fprefix:
-            fprefix = constants.TMP
+        fprefix = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
         out = []
         for f in files:
             #out.append(self.upload_file(f[0], f[1], f[2], f[3],
@@ -2420,14 +3476,10 @@ Dryad installation to Dataverse installation.</p>
             Default dryad2dataverse.transfer.Transfer.dvpid,
             which is only generated on
             dryad2dataverse.transfer.Transfer.upload_study()
-        dest : str
-            Base URL for transfer.
-            Default dryad2datavese.constants.DVURL
         '''
         if not studyId:
             studyId = self.dvpid
-        if not dest:
-            dest = constants.DVURL
+        dest = self.kwargs['dv_url']
         if not self.jsonFlag:
             url = dest + '/api/datasets/:persistentId/add'
             pack = io.StringIO(json.dumps(self.dryad.dryadJson))
@@ -2455,7 +3507,6 @@ Dryad installation to Dataverse installation.</p>
             except (requests.exceptions.HTTPError,
                     requests.exceptions.ConnectionError) as err:
                 LOGGER.error('Unable to upload Dryad JSON to %s', studyId)
-                LOGGER.error('ERROR message: %s', meta.text)
                 LOGGER.exception(err)
                 #And further checking as to what is happening
                 self.fileUpRecord.append((0, {'status':'Failure: Unable to upload Dryad JSON'}))
@@ -2464,8 +3515,9 @@ Dryad installation to Dataverse installation.</p>
             except Exception as err:
                 LOGGER.error('Unable to upload Dryad JSON')
                 LOGGER.exception(err)
+                raise
 
-    def delete_dv_file(self, dvfid, dvurl=None, key=None)-&gt;bool:
+    def delete_dv_file(self, dvfid)-&gt;bool:
         #WTAF curl -u $API_TOKEN: -X DELETE
         #https://$HOSTNAME/dvn/api/data-deposit/v1.1/swordv2/edit-media/file/123
 
@@ -2478,28 +3530,19 @@ Dryad installation to Dataverse installation.</p>
 
         Parameters
         ----------
-        dvurl : str
-            Base URL of dataverse instance.
-            Defaults to dryad2dataverse.constants.DVURL.
         dvfid : str
             Dataverse file ID number.
-        key : str
-            API key
         '''
-        if not dvurl:
-            dvurl = constants.DVURL
-        if not key:
-            key = constants.APIKEY
-
-        delme = self.session.delete(f'{dvurl}/dvn/api/data-deposit/v1.1/swordv2/edit-media'
+        delme = self.session.delete(f'{self.kwargs["dv_url"]}/'
+                                    'dvn/api/data-deposit/v1.1/swordv2/edit-media'
                                     f'/file/{dvfid}',
-                                    auth=(key, ''))
+                                    auth=(self.kwargs['api_key'], ''))
         if delme.status_code == 204:
             self.fileDelRecord.append(dvfid)
             return 1
         return 0
 
-    def delete_dv_files(self, dvfids=None, dvurl=None, key=None):
+    def delete_dv_files(self, dvfids=None):
         '''
         Deletes all files in list of Dataverse file ids from
         a Dataverse installation.
@@ -2509,19 +3552,11 @@ Dryad installation to Dataverse installation.</p>
         dvfids : list
             List of Dataverse file ids.
             Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.
-        dvurl : str
-            Base URL of Dataverse. Defaults to dryad2dataverse.constants.DVURL.
-        key : str
-            API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY.
         '''
         #if not dvfids:
         #   dvfids = self.fileDelRecord
-        if not dvurl:
-            dvurl = constants.DVURL
-        if not key:
-            key = constants.APIKEY
         for fid in dvfids:
-            self.delete_dv_file(fid, dvurl, key)</code></pre>
+            self.delete_dv_file(fid)</code></pre>
               </details>
 
 
@@ -2679,7 +3714,7 @@ dryad2dataverse.constants.MAX_UPLOAD.</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.__init__" class="doc doc-heading">
-            <code class=" language-python">__init__(dryad)</code>
+            <code class=" language-python">__init__(dryad, **kwargs)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -2707,22 +3742,70 @@ dryad2dataverse.constants.MAX_UPLOAD.</p>
                 
               </div>
             </li>
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Normally this would be a dryad2dataverse.constants.Config instance</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
 
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Minimum kwargs for function:
+max_upload : int
+    Maximum size in bytes
+tempfile_location : str
+    Path to temporary directory
+dv_url : str
+    Base URL of dataverse instance
+api_key : str
+    API key for Dataverse user
+dv_contact_email : str
+    Contact email address for Dataverse record
+dv_contact_name : str
+    Contact name
+target : str
+    Target collection short name</p>
+</details>
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __init__(self, dryad):
+              <pre class="codehilite"><code class="language-python">def __init__(self, dryad, **kwargs):
     '''
     Creates a dryad2dataverse.transfer.Transfer instance.
 
     Parameters
     ----------
     dryad : dryad2dataverse.serializer.Serializer
+
+    **kwargs
+        Normally this would be a dryad2dataverse.constants.Config instance
+
+    Notes
+    -----
+    Minimum kwargs for function:
+    max_upload : int
+        Maximum size in bytes
+    tempfile_location : str
+        Path to temporary directory
+    dv_url : str
+        Base URL of dataverse instance
+    api_key : str
+        API key for Dataverse user
+    dv_contact_email : str
+        Contact email address for Dataverse record
+    dv_contact_name : str
+        Contact name
+    target : str
+        Target collection short name
     '''
+    self.kwargs = kwargs
     self.dryad = dryad
     self._fileJson = None
     self._files = [list(f) for f in self.dryad.files]
@@ -2732,7 +3815,48 @@ dryad2dataverse.constants.MAX_UPLOAD.</p>
     self.dvStudy = None
     self.jsonFlag = None #Whether or not new json uploaded
     self.session = requests.Session()
-    self.session.mount('https://', HTTPAdapter(max_retries=constants.RETRY_STRATEGY))</code></pre>
+    self.session.mount('https://', HTTPAdapter(max_retries=config.RETRY_STRATEGY))
+    self.check_kwargs()</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.transfer.Transfer.check_kwargs" class="doc doc-heading">
+            <code class=" language-python">check_kwargs()</code>
+
+<a href="#dryad2dataverse.transfer.Transfer.check_kwargs" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Verify sufficient information</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def check_kwargs(self):
+    '''
+    Verify sufficient information
+    '''
+    required = ['max_upload',
+                'tempfile_location',
+                'dv_url',
+                'api_key',
+                'dv_contact_email',
+                'dv_contact_name',
+                'target']
+    keys = self.kwargs.keys()
+    for val in required:
+        if val not in keys:
+            try:
+                raise exceptions.Dryad2DataverseError(f'Required parameter missing: {val}')
+            except exceptions.Dryad2DataverseError as err:
+                LOGGER.exception(err)
+                raise</code></pre>
             </details>
     </div>
 
@@ -2742,7 +3866,7 @@ dryad2dataverse.constants.MAX_UPLOAD.</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.delete_dv_file" class="doc doc-heading">
-            <code class=" language-python">delete_dv_file(dvfid, dvurl=None, key=None)</code>
+            <code class=" language-python">delete_dv_file(dvfid)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.delete_dv_file" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -2766,32 +3890,11 @@ dryad2dataverse.monitor.Monitor or by other methods.</p>
       <td class="field-body">
         <ul class="first simple">
             <li>
-              <b><code>dvurl</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Base URL of dataverse instance.
-Defaults to dryad2dataverse.constants.DVURL.</p>
-              </div>
-            </li>
-            <li>
               <b><code>dvfid</code></b>
                   (<code><span title="str">str</span></code>)
               –
               <div class="doc-md-description">
                 <p>Dataverse file ID number.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>key</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>API key</p>
               </div>
             </li>
         </ul>
@@ -2802,7 +3905,7 @@ Defaults to dryad2dataverse.constants.DVURL.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def delete_dv_file(self, dvfid, dvurl=None, key=None)-&gt;bool:
+              <pre class="codehilite"><code class="language-python">def delete_dv_file(self, dvfid)-&gt;bool:
     #WTAF curl -u $API_TOKEN: -X DELETE
     #https://$HOSTNAME/dvn/api/data-deposit/v1.1/swordv2/edit-media/file/123
 
@@ -2815,22 +3918,13 @@ Defaults to dryad2dataverse.constants.DVURL.</p>
 
     Parameters
     ----------
-    dvurl : str
-        Base URL of dataverse instance.
-        Defaults to dryad2dataverse.constants.DVURL.
     dvfid : str
         Dataverse file ID number.
-    key : str
-        API key
     '''
-    if not dvurl:
-        dvurl = constants.DVURL
-    if not key:
-        key = constants.APIKEY
-
-    delme = self.session.delete(f'{dvurl}/dvn/api/data-deposit/v1.1/swordv2/edit-media'
+    delme = self.session.delete(f'{self.kwargs["dv_url"]}/'
+                                'dvn/api/data-deposit/v1.1/swordv2/edit-media'
                                 f'/file/{dvfid}',
-                                auth=(key, ''))
+                                auth=(self.kwargs['api_key'], ''))
     if delme.status_code == 204:
         self.fileDelRecord.append(dvfid)
         return 1
@@ -2844,7 +3938,7 @@ Defaults to dryad2dataverse.constants.DVURL.</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.delete_dv_files" class="doc doc-heading">
-            <code class=" language-python">delete_dv_files(dvfids=None, dvurl=None, key=None)</code>
+            <code class=" language-python">delete_dv_files(dvfids=None)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.delete_dv_files" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -2876,26 +3970,6 @@ a Dataverse installation.</p>
 Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.</p>
               </div>
             </li>
-            <li>
-              <b><code>dvurl</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Base URL of Dataverse. Defaults to dryad2dataverse.constants.DVURL.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>key</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY.</p>
-              </div>
-            </li>
         </ul>
       </td>
     </tr>
@@ -2904,7 +3978,7 @@ Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def delete_dv_files(self, dvfids=None, dvurl=None, key=None):
+              <pre class="codehilite"><code class="language-python">def delete_dv_files(self, dvfids=None):
     '''
     Deletes all files in list of Dataverse file ids from
     a Dataverse installation.
@@ -2914,19 +3988,11 @@ Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.</p>
     dvfids : list
         List of Dataverse file ids.
         Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.
-    dvurl : str
-        Base URL of Dataverse. Defaults to dryad2dataverse.constants.DVURL.
-    key : str
-        API key for Dataverse. Defaults to dryad2dataverse.constants.APIKEY.
     '''
     #if not dvfids:
     #   dvfids = self.fileDelRecord
-    if not dvurl:
-        dvurl = constants.DVURL
-    if not key:
-        key = constants.APIKEY
     for fid in dvfids:
-        self.delete_dv_file(fid, dvurl, key)</code></pre>
+        self.delete_dv_file(fid)</code></pre>
             </details>
     </div>
 
@@ -2936,15 +4002,16 @@ Defaults to dryad2dataverse.transfer.Transfer.fileDelRecord.</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.download_file" class="doc doc-heading">
-            <code class=" language-python">download_file(url=None, filename=None, tmp=None, size=None, chk=None, timeout=45, **kwargs)</code>
+            <code class=" language-python">download_file(url=None, filename=None, size=None, chk=None, **kwargs)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.download_file" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Downloads a file via requests streaming and saves to constants.TMP.
-returns checksum on success and an exception on failure.</p>
+        <p>Downloads a file via requests streaming and saves to the
+the defined temporary file directory.
+Returns checksum on success and an exception on failure.</p>
 
 
 <table class="field-list">
@@ -2978,35 +4045,13 @@ returns checksum on success and an exception on failure.</p>
               </div>
             </li>
             <li>
-              <b><code>timeout</code></b>
-                  (<code><span title="int">int</span></code>, default:
-                      <code>45</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Requests timeout.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>tmp</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Temporary directory for downloads.
-Defaults to dryad2dataverse.constants.TMP.</p>
-              </div>
-            </li>
-            <li>
               <b><code>size</code></b>
                   (<code><span title="int">int</span></code>, default:
                       <code>None</code>
 )
               –
               <div class="doc-md-description">
-                <p>Reported file size in bytes.
-Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
+                <p>Reported file size in bytes.</p>
               </div>
             </li>
             <li>
@@ -3017,16 +4062,6 @@ Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
               –
               <div class="doc-md-description">
                 <p>checksum of file (if available and known).</p>
-              </div>
-            </li>
-            <li>
-              <b><code>timeout</code></b>
-                  (<code><span title="int">int</span></code>, default:
-                      <code>45</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>timeout in seconds</p>
               </div>
             </li>
             <li>
@@ -3071,11 +4106,12 @@ Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def download_file(self, url=None, filename=None, tmp=None,
-                  size=None, chk=None, timeout=45, **kwargs):
+              <pre class="codehilite"><code class="language-python">def download_file(self, url=None, filename=None,
+                  size=None, chk=None, **kwargs):
     '''
-    Downloads a file via requests streaming and saves to constants.TMP.
-    returns checksum on success and an exception on failure.
+    Downloads a file via requests streaming and saves to the
+    the defined temporary file directory.
+    Returns checksum on success and an exception on failure.
 
     Parameters
     ----------
@@ -3083,18 +4119,10 @@ Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
         URL of download.
     filename : str
         Output file name.
-    timeout : int
-        Requests timeout.
-    tmp : str
-        Temporary directory for downloads.
-        Defaults to dryad2dataverse.constants.TMP.
     size : int
         Reported file size in bytes.
-        Defaults to dryad2dataverse.constants.MAX_UPLOAD.
     chk : str
         checksum of file (if available and known).
-    timeout : int
-        timeout in seconds
     kwargs : dict
 
     Other parameters
@@ -3102,19 +4130,16 @@ Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
     digest_type : str
         checksum type (ie, md5, sha-256, etc)
     '''
+    #pylint: disable=too-many-branches
     LOGGER.debug('Start download sequence')
-    LOGGER.debug('MAX SIZE = %s', constants.MAX_UPLOAD)
+    LOGGER.debug('MAX SIZE = %s', self.kwargs['max_upload'])
     LOGGER.debug('Filename: %s, size=%s', filename, size)
-    if not tmp:
-        tmp = constants.TMP
-    if tmp.endswith(os.sep):
-        tmp = tmp[:-1]
-
+    tmp = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
     if size:
-        if size &gt; constants.MAX_UPLOAD:
+        if size &gt; self.kwargs['max_upload']:
             #TOO BIG
             LOGGER.warning('%s: File %s exceeds '
-                           'Dataverse MAX_UPLOAD size. Skipping download.',
+                           'Dataverse maximum upload size. Skipping download.',
                            self.doi, filename)
             md5 = 'this_file_is_too_big_to_upload__' #HA HA
             for i in self._files:
@@ -3123,27 +4148,28 @@ Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
             LOGGER.debug('Stop download sequence with large file skip')
             return md5
     try:
-        down = self.session.get(url, timeout=timeout, stream=True)
+        down = self.session.get(url, stream=True,
+                                headers=config.Config.update_headers(**self.kwargs))
         down.raise_for_status()
-        with open(f'{tmp}{os.sep}{filename}', 'wb') as fi:
+        with open(pathlib.Path(tmp,filename), 'wb') as fi:
             for chunk in down.iter_content(chunk_size=8192):
                 fi.write(chunk)
 
         #verify size
         #https://stackoverflow.com/questions/2104080/how-can-i-check-file-size-in-python'
         if size:
-            checkSize = os.stat(f'{tmp}{os.sep}{filename}').st_size
+            checkSize = os.stat(pathlib.Path(tmp,filename)).st_size
             if checkSize != size:
                 try:
-                    raise exceptions.DownloadSizeError('Download size does not match '
-                                                       'reported size')
+                    raise exceptions.DownloadSizeError('Download size does not '
+                                                       'match reported size')
                 except exceptions.DownloadSizeError as e:
                     LOGGER.exception(e)
                     raise
         #now check the md5
         md5 = None
         if chk and kwargs.get('digest_type') in HASHTABLE:
-            md5 = Transfer._check_md5(f'{tmp}{os.sep}{filename}',
+            md5 = Transfer._check_md5(pathlib.Path(tmp,filename),
                                   kwargs['digest_type'])
             if md5 != chk:
                 try:
@@ -3162,7 +4188,10 @@ Defaults to dryad2dataverse.constants.MAX_UPLOAD.</p>
             requests.exceptions.ConnectionError) as err:
         LOGGER.critical('Unable to download %s', url)
         LOGGER.exception(err)
-        raise exceptions.DataverseDownloadError</code></pre>
+        raise
+    except Exception as err:
+        LOGGER.exception(err)
+        raise</code></pre>
             </details>
     </div>
 
@@ -3259,7 +4288,7 @@ files with a Dryad study.</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.file_lock_check" class="doc doc-heading">
-            <code class=" language-python">file_lock_check(study, dv_url, apikey=None, count=0)</code>
+            <code class=" language-python">file_lock_check(study, count=0)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.file_lock_check" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -3292,25 +4321,6 @@ Dataverse study before performing a data file upload.</p>
               </div>
             </li>
             <li>
-              <b><code>dv_url</code></b>
-                  (<code><span title="str">str</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>URL to base Dataverse installation.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>apikey</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>API key for user.
-If not present authorization defaults to self.auth.</p>
-              </div>
-            </li>
-            <li>
               <b><code>count</code></b>
                   (<code><span title="int">int</span></code>, default:
                       <code>0</code>
@@ -3329,7 +4339,7 @@ lock messages only on 0.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def file_lock_check(self, study, dv_url, apikey=None, count=0):
+              <pre class="codehilite"><code class="language-python">def file_lock_check(self, study, count=0):
     '''
     Checks for a study lock
 
@@ -3342,28 +4352,17 @@ lock messages only on 0.</p>
     ----------
     study : str
         Persistent indentifer of study.
-    dv_url : str
-        URL to base Dataverse installation.
-    apikey : str
-        API key for user.
-        If not present authorization defaults to self.auth.
     count : int
         Number of times the function has been called. Logs
         lock messages only on 0.
     '''
-    if dv_url.endswith('/'):
-        dv_url = dv_url[:-1]
-    if apikey:
-        headers = {'X-Dataverse-key': apikey}
-    else:
-        headers = self.auth
-
-    headers.update(USER_AGENT)
+    headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
     params = {'persistentId': study}
     try:
-        lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+        lock_status = self.session.get(f'{self.kwargs["dv_url"]}'
+                                       '/api/datasets/:persistentId/locks',
                                        headers=headers,
-                                       params=params, timeout=300)
+                                       params=params)
         lock_status.raise_for_status()
         if lock_status.json().get('data'):
             if count == 0:
@@ -3387,7 +4386,7 @@ lock messages only on 0.</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.force_notab_unlock" class="doc doc-heading">
-            <code class=" language-python">force_notab_unlock(study, dv_url, apikey=None)</code>
+            <code class=" language-python">force_notab_unlock(study)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.force_notab_unlock" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -3418,25 +4417,6 @@ spoofing is not sufficient.</p>
                 <p>Persistent indentifer of study.</p>
               </div>
             </li>
-            <li>
-              <b><code>dv_url</code></b>
-                  (<code><span title="str">str</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>URL to base Dataverse installation.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>apikey</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>API key for user.
-If not present authorization defaults to self.auth.</p>
-              </div>
-            </li>
         </ul>
       </td>
     </tr>
@@ -3445,7 +4425,7 @@ If not present authorization defaults to self.auth.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def force_notab_unlock(self, study, dv_url, apikey=None):
+              <pre class="codehilite"><code class="language-python">def force_notab_unlock(self, study):
     '''
     Checks for a study lock and forcibly unlocks and uningests
     to prevent tabular file processing. Required if mime and filename
@@ -3457,31 +4437,27 @@ If not present authorization defaults to self.auth.</p>
     ----------
     study : str
         Persistent indentifer of study.
-    dv_url : str
-        URL to base Dataverse installation.
-    apikey : str
-        API key for user.
-        If not present authorization defaults to self.auth.
     '''
-    if dv_url.endswith('/'):
-        dv_url = dv_url[:-1]
-    if apikey:
-        headers = {'X-Dataverse-key': apikey}
-    else:
-        headers = self.auth
-
-    headers.update(USER_AGENT)
+    headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
     params = {'persistentId': study}
-    lock_status = self.session.get(f'{dv_url}/api/datasets/:persistentId/locks',
+    lock_status = self.session.get(f'{self.kwargs["dv_url"]}/api/datasets/:persistentId/locks',
                                    headers=headers,
-                                   params=params, timeout=300)
-    lock_status.raise_for_status()
+                                   params=params)
+    try:
+        lock_status.raise_for_status()
+    except (requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError) as err:
+        LOGGER.exception(err)
+        raise
+    except Exception as err:
+        LOGGER.exception(err)
+        raise
     if lock_status.json()['data']:
         LOGGER.warning('Study %s has been locked', study)
         LOGGER.warning('Lock info:\n%s', lock_status.json())
-        force_unlock = self.session.delete(f'{dv_url}/api/datasets/:persistentId/locks',
-                                           params=params, headers=headers,
-                                           timeout=300)
+        force_unlock = self.session.delete(f'{self.kwargs["dv_url"]}/api/'
+                                           'datasets/:persistentId/locks',
+                                           params=params, headers=headers)
         force_unlock.raise_for_status()
         LOGGER.warning('Lock removed for %s', study)
         LOGGER.warning('Lock status:\n %s', force_unlock.json())</code></pre>
@@ -3494,7 +4470,7 @@ If not present authorization defaults to self.auth.</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.set_correct_date" class="doc doc-heading">
-            <code class=" language-python">set_correct_date(url=None, hdl=None, d_type='distributionDate', apikey=None)</code>
+            <code class=" language-python">set_correct_date(hdl=None, d_type='distributionDate')</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.set_correct_date" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -3514,17 +4490,6 @@ If not present authorization defaults to self.auth.</p>
       <th class="field-name">Parameters:</th>
       <td class="field-body">
         <ul class="first simple">
-            <li>
-              <b><code>url</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Base URL to Dataverse installation.
-Defaults to dryad2dataverse.constants.DVURL</p>
-              </div>
-            </li>
             <li>
               <b><code>hdl</code></b>
                   (<code><span title="str">str</span></code>, default:
@@ -3548,16 +4513,6 @@ study has not yet been uploaded).</p>
 `dateOfDeposit&rsquo;. Default &lsquo;distributionDate&rsquo;.</p>
               </div>
             </li>
-            <li>
-              <b><code>apikey</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Default dryad2dataverse.constants.APIKEY.</p>
-              </div>
-            </li>
         </ul>
       </td>
     </tr>
@@ -3566,7 +4521,9 @@ study has not yet been uploaded).</p>
 
 <details class="note" open>
   <summary>Notes</summary>
-  <p>dryad2dataverse.serializer maps Dryad &lsquo;publicationDate&rsquo;
+  <p>self.kwargs are normally read from dryad2dataverse.config.Config
+instances.</p>
+<p>dryad2dataverse.serializer maps Dryad &lsquo;publicationDate&rsquo;
 to Dataverse &lsquo;distributionDate&rsquo; (see serializer.py ~line 675).</p>
 <p>Dataverse citation date default is &ldquo;:publicationDate&rdquo;. See
 Dataverse API reference:
@@ -3575,17 +4532,13 @@ Dataverse API reference:
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def set_correct_date(self, url=None, hdl=None,
-                     d_type='distributionDate',
-                     apikey=None):
+              <pre class="codehilite"><code class="language-python">def set_correct_date(self, hdl=None,
+                     d_type='distributionDate'):
     '''
     Sets "correct" publication date for Dataverse.
 
     Parameters
     ----------
-    url : str
-        Base URL to Dataverse installation.
-        Defaults to dryad2dataverse.constants.DVURL
     hdl : str
         Persistent indentifier for Dataverse study.
         Defaults to Transfer.dvpid (which can be None if the
@@ -3593,11 +4546,12 @@ Dataverse API reference:
     d_type : str
         Date type. One of  'distributionDate', 'productionDate',
         `dateOfDeposit'. Default 'distributionDate'.
-    apikey : str
-        Default dryad2dataverse.constants.APIKEY.
 
     Notes
     -----
+    self.kwargs are normally read from dryad2dataverse.config.Config
+    instances.
+
     dryad2dataverse.serializer maps Dryad 'publicationDate'
     to Dataverse 'distributionDate' (see serializer.py ~line 675).
 
@@ -3607,23 +4561,16 @@ Dataverse API reference:
 
     '''
     try:
-        if not url:
-            url = constants.DVURL
         if not hdl:
             hdl = self.dvpid
-        headers = {'X-Dataverse-key' : apikey}
-        if apikey:
-            headers = {'X-Dataverse-key' : apikey}
-        else:
-            headers = {'X-Dataverse-key' : constants.APIKEY}
-
-        headers.update(USER_AGENT)
+        headers ={'X-Dataverse-key': self.kwargs['api_key'],
+                  'User-agent': USERAGENT}
         params = {'persistentId': hdl}
-        set_date = self.session.put(f'{url}/api/datasets/:persistentId/citationdate',
+        set_date = self.session.put(f'{self.kwargs["dv_url"]}/api/'
+                                    'datasets/:persistentId/citationdate',
                                     headers=headers,
                                     data=d_type,
-                                    params=params,
-                                    timeout=45)
+                                    params=params)
         set_date.raise_for_status()
 
     except (requests.exceptions.HTTPError,
@@ -3641,7 +4588,7 @@ Dataverse API reference:
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.test_api_key" class="doc doc-heading">
-            <code class=" language-python">test_api_key(url=None, apikey=None)</code>
+            <code class=" language-python">test_api_key()</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.test_api_key" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -3653,66 +4600,18 @@ dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
 the API key is bad. Ignores other HTTP errors.</p>
 
 
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>url</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Base URL to Dataverse installation.
-Defaults to dryad2dataverse.constants.DVURL</p>
-              </div>
-            </li>
-            <li>
-              <b><code>apikey</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Default dryad2dataverse.constants.APIKEY.</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def test_api_key(self, url=None, apikey=None):
+              <pre class="codehilite"><code class="language-python">def test_api_key(self):
     '''
     Tests for an expired API key and raises
     dryad2dataverse.exceptions.Dryad2dataverseBadApiKeyError
     the API key is bad. Ignores other HTTP errors.
-
-    Parameters
-    ----------
-    url : str
-        Base URL to Dataverse installation.
-        Defaults to dryad2dataverse.constants.DVURL
-    apikey : str
-        Default dryad2dataverse.constants.APIKEY.
     '''
     #API validity check appears to come before a PID validity check
     params = {'persistentId': 'doi:000/000/000'} # PID is irrelevant
-    if not url:
-        url = constants.DVURL
-    headers = {'X-Dataverse-key': apikey if apikey else constants.APIKEY}
-    headers.update(USER_AGENT)
-    bad_test = self.session.get(f'{url}/api/datasets/:persistentId',
+    headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
+    bad_test = self.session.get(f'{self.kwargs["dv_url"]}/api/datasets/:persistentId',
                             headers=headers,
                             params=params)
     #There's an extra space in the message which Harvard
@@ -3720,10 +4619,8 @@ Defaults to dryad2dataverse.constants.DVURL</p>
     if bad_test.json().get('message').startswith('Bad api key'):
         try:
             raise exceptions.DataverseBadApiKeyError('Bad API key')
-        except exceptions.DataverseBadApiKeyError as e:
-            LOGGER.critical('API key has expired or is otherwise invalid')
-            LOGGER.exception(e)
-            #LOGGER.exception(traceback.format_exc()) #not really necessary
+        except exceptions.DataverseBadApiKeyError as err:
+            LOGGER.exception(err)
             raise
     try: #other errors
         bad_test.raise_for_status()
@@ -3742,7 +4639,7 @@ Defaults to dryad2dataverse.constants.DVURL</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.upload_file" class="doc doc-heading">
-            <code class=" language-python">upload_file(dryadUrl=None, filename=None, mimetype=None, size=None, descr=None, hashtype=None, digest=None, studyId=None, dest=None, fprefix=None, force_unlock=False, timeout=300)</code>
+            <code class=" language-python">upload_file(dryadUrl=None, filename=None, mimetype=None, size=None, descr=None, hashtype=None, digest=None, studyId=None, dest=None, fprefix=None, force_unlock=False)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.upload_file" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -3752,7 +4649,9 @@ Defaults to dryad2dataverse.constants.DVURL</p>
         <p>Uploads file to Dataverse study. Returns a tuple of the
 dryadFid (or None) and Dataverse JSON from the POST request.
 Failures produce JSON with different status messages
-rather than raising an exception.</p>
+rather than raising an exception, unless it&rsquo;s some
+horrendous failure whereupon you will get an actual
+exception.</p>
 
 
 <table class="field-list">
@@ -3765,6 +4664,14 @@ rather than raising an exception.</p>
       <th class="field-name">Parameters:</th>
       <td class="field-body">
         <ul class="first simple">
+            <li>
+              <b><code>dryadURL</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dryad download URL</p>
+              </div>
+            </li>
             <li>
               <b><code>filename</code></b>
                   (<code><span title="str">str</span></code>, default:
@@ -3807,17 +4714,6 @@ Defaults to Transfer.dvpid.</p>
               </div>
             </li>
             <li>
-              <b><code>dest</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Destination dataverse installation url.
-Defaults to constants.DVURL.</p>
-              </div>
-            </li>
-            <li>
               <b><code>hashtype</code></b>
               –
               <div class="doc-md-description">
@@ -3832,16 +4728,6 @@ Defaults to constants.DVURL.</p>
               –
               <div class="doc-md-description">
                 <p>Path to file, not including a trailing slash.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>timeout</code></b>
-                  (<code><span title="int">int</span></code>, default:
-                      <code>300</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Timeout in seconds for POST request. Default 300.</p>
               </div>
             </li>
             <li>
@@ -3882,15 +4768,19 @@ from non-superusers (undocumented as of 31 March 2021).
                 hashtype=None,
                 #md5=None, studyId=None, dest=None,
                 digest=None, studyId=None, dest=None,
-                fprefix=None, force_unlock=False, timeout=300):
+                fprefix=None, force_unlock=False):
     '''
     Uploads file to Dataverse study. Returns a tuple of the
     dryadFid (or None) and Dataverse JSON from the POST request.
     Failures produce JSON with different status messages
-    rather than raising an exception.
+    rather than raising an exception, unless it's some
+    horrendous failure whereupon you will get an actual
+    exception.
 
     Parameters
     ----------
+    dryadURL : str
+        Dryad download URL
     filename : str
         Filename (not including path).
     mimetype : str
@@ -3900,15 +4790,10 @@ from non-superusers (undocumented as of 31 March 2021).
     studyId : str
         Persistent Dataverse study identifier.
         Defaults to Transfer.dvpid.
-    dest : str
-        Destination dataverse installation url.
-        Defaults to constants.DVURL.
     hashtype: str
         original Dryad hash type
     fprefix : str
         Path to file, not including a trailing slash.
-    timeout : int
-        Timeout in seconds for POST request. Default 300.
     dryadUrl : str
         Dryad download URL if you want to include a Dryad file id.
     force_unlock : bool
@@ -3919,33 +4804,32 @@ from non-superusers (undocumented as of 31 March 2021).
         from non-superusers (undocumented as of 31 March 2021).
         **Forcible unlock requires a superuser API key.**
     '''
-    #return locals()
-    #TODONE remove above
+    #pylint: disable = consider-using-with, too-many-arguments, too-many-positional-arguments
+    #pylint:disable=too-many-locals, too-many-branches, too-many-statements
+    #Fix the arguments one day
     if not studyId:
         studyId = self.dvpid
-    if not dest:
-        dest = constants.DVURL
-    if not fprefix:
-        fprefix = constants.TMP
+    dest = self.kwargs['dv_url']
+    fprefix = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
     if dryadUrl:
         fid = dryadUrl.strip('/download')
         fid = int(fid[fid.rfind('/')+1:])
     else:
         fid = 0 #dummy fid for non-Dryad use
     params = {'persistentId' : studyId}
-    upfile = fprefix + os.sep + filename[:]
+    upfile = pathlib.Path(fprefix, filename[:])
     badExt = filename[filename.rfind('.'):].lower()
     #Descriptions are technically possible, although how to add
     #them is buried in Dryad's API documentation
     dv4meta = {'label' : filename[:], 'description' : descr}
     #if mimetype == 'application/zip' or filename.lower().endswith('.zip'):
-    if mimetype == 'application/zip' or badExt in constants.NOTAB:
+    if mimetype == 'application/zip' or badExt in self.kwargs.get('notab',[]):
         mimetype = 'application/octet-stream' # stop unzipping automatically
         filename += '.NOPROCESS' # Also screw with their naming convention
         #debug log about file names to see what is up with XSLX
         #see doi:10.5061/dryad.z8w9ghxb6
         LOGGER.debug('File renamed to %s for upload', filename)
-    if size &gt;= constants.MAX_UPLOAD:
+    if size &gt;= self.kwargs['max_upload']:
         fail = (fid, {'status' : 'Failure: MAX_UPLOAD size exceeded'})
         self.fileUpRecord.append(fail)
         LOGGER.warning('%s: File %s of '
@@ -3959,14 +4843,21 @@ from non-superusers (undocumented as of 31 March 2021).
     ctype = {'Content-type' : multi.content_type}
     tmphead = self.auth.copy()
     tmphead.update(ctype)
-    tmphead.update(USER_AGENT)
+    tmphead.update({'User-agent':USERAGENT})
     url = dest + '/api/datasets/:persistentId/add'
-    try:
-        upload = self.session.post(url, params=params,
+    upload = self.session.post(url, params=params,
                                    headers=tmphead,
-                                   data=multi, timeout=timeout)
-        #print(upload.text)
+                                   data=multi)
+    try:
         upload.raise_for_status()
+
+    except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError):
+        LOGGER.critical('Error %s: %s, upload.status_code, upload.reason')
+        return (fid, {'status' : f'Failure: Reason - {upload.status_code}: {upload.reason}'})
+
+
+    try:
         self.fileUpRecord.append((fid, upload.json()))
         upmd5 = upload.json()['data']['files'][0]['dataFile']['checksum']['value']
         #Dataverse hash type
@@ -3984,11 +4875,11 @@ from non-superusers (undocumented as of 31 March 2021).
         #if md5 and (upmd5 != md5):
         if upmd5 != comparator:
             try:
-                raise exceptions.HashError(f'{_type} mismatch:\nlocal: {comparator}\nuploaded: {upmd5}')
+                raise exceptions.HashError(f'{_type} mismatch:\nlocal: '
+                                           f'{comparator}\nuploaded: {upmd5}')
             except exceptions.HashError as e:
                 LOGGER.exception(e)
-                raise
-
+                return (fid, {'status': e})
         #Make damn sure that the study isn't locked because of
         #tab file processing
         ##SPSS files still process despite spoofing MIME and extension
@@ -3998,12 +4889,12 @@ from non-superusers (undocumented as of 31 March 2021).
         #fid not required for unlock
         #self.force_notab_unlock(studyId, dest, fid)
         if force_unlock:
-            self.force_notab_unlock(studyId, dest)
+            self.force_notab_unlock(studyId)
         else:
             count = 0
             wait = True
             while wait:
-                wait = self.file_lock_check(studyId, dest, count=count)
+                wait = self.file_lock_check(studyId, count)
                 if wait:
                     time.sleep(15) # Don't hit it too often
                 count += 1
@@ -4011,17 +4902,15 @@ from non-superusers (undocumented as of 31 March 2021).
 
         return (fid, upload.json())
 
-    except Exception as e:
+    except requests.exceptions.JSONDecodeError as e:
+        LOGGER.warning('JSON error with upload')
         LOGGER.exception(e)
-        try:
-            reason = upload.json()['message']
-            LOGGER.warning(upload.json())
-            return (fid, {'status' : f'Failure: {reason}'})
-        except Exception as e:
-            LOGGER.warning('Further exceptions!')
-            LOGGER.exception(e)
-            LOGGER.warning(upload.text)
-            return (fid, {'status' : f'Failure: Reason {upload.reason}'})</code></pre>
+        return (fid, {'status' : f'Failure: Reason {upload.reason}'})
+
+    #It can crash later
+    except Exception as f_plus: #pylint: disable=broad-except
+        LOGGER.exception(f_plus)
+        return (fid, {'status' : f'Failure: Reason: {f_plus}'})</code></pre>
             </details>
     </div>
 
@@ -4075,17 +4964,6 @@ dryad2dataverse.transfer.Transfer.upload_study().</p>
               </div>
             </li>
             <li>
-              <b><code>fprefix</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>File location prefix.
-Defaults to dryad2dataverse.constants.TMP</p>
-              </div>
-            </li>
-            <li>
               <b><code>force_unlock</code></b>
                   (<code><span title="bool">bool</span></code>, default:
                       <code>False</code>
@@ -4121,9 +4999,6 @@ from non-superusers (undocumented as of 31 March 2021).
     pid : str
         Defaults to self.dvpid, which is generated by calling
         dryad2dataverse.transfer.Transfer.upload_study().
-    fprefix : str
-        File location prefix.
-        Defaults to dryad2dataverse.constants.TMP
     force_unlock : bool
         Attempt forcible unlock instead of waiting for tabular
         file processing.
@@ -4134,8 +5009,7 @@ from non-superusers (undocumented as of 31 March 2021).
     '''
     if not files:
         files = self.files
-    if not fprefix:
-        fprefix = constants.TMP
+    fprefix = pathlib.Path(self.kwargs['tempfile_location']).expanduser().absolute()
     out = []
     for f in files:
         #out.append(self.upload_file(f[0], f[1], f[2], f[3],
@@ -4188,17 +5062,6 @@ which is only generated on
 dryad2dataverse.transfer.Transfer.upload_study()</p>
               </div>
             </li>
-            <li>
-              <b><code>dest</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Base URL for transfer.
-Default dryad2datavese.constants.DVURL</p>
-              </div>
-            </li>
         </ul>
       </td>
     </tr>
@@ -4218,14 +5081,10 @@ Default dryad2datavese.constants.DVURL</p>
         Default dryad2dataverse.transfer.Transfer.dvpid,
         which is only generated on
         dryad2dataverse.transfer.Transfer.upload_study()
-    dest : str
-        Base URL for transfer.
-        Default dryad2datavese.constants.DVURL
     '''
     if not studyId:
         studyId = self.dvpid
-    if not dest:
-        dest = constants.DVURL
+    dest = self.kwargs['dv_url']
     if not self.jsonFlag:
         url = dest + '/api/datasets/:persistentId/add'
         pack = io.StringIO(json.dumps(self.dryad.dryadJson))
@@ -4253,7 +5112,6 @@ Default dryad2datavese.constants.DVURL</p>
         except (requests.exceptions.HTTPError,
                 requests.exceptions.ConnectionError) as err:
             LOGGER.error('Unable to upload Dryad JSON to %s', studyId)
-            LOGGER.error('ERROR message: %s', meta.text)
             LOGGER.exception(err)
             #And further checking as to what is happening
             self.fileUpRecord.append((0, {'status':'Failure: Unable to upload Dryad JSON'}))
@@ -4261,7 +5119,8 @@ Default dryad2datavese.constants.DVURL</p>
                 LOGGER.error('Dryad JSON is not a dictionary')
         except Exception as err:
             LOGGER.error('Unable to upload Dryad JSON')
-            LOGGER.exception(err)</code></pre>
+            LOGGER.exception(err)
+            raise</code></pre>
             </details>
     </div>
 
@@ -4271,7 +5130,7 @@ Default dryad2datavese.constants.DVURL</p>
 
 
 <h4 id="dryad2dataverse.transfer.Transfer.upload_study" class="doc doc-heading">
-            <code class=" language-python">upload_study(url=None, apikey=None, timeout=45, **kwargs)</code>
+            <code class=" language-python">upload_study(**kwargs)</code>
 
 <a href="#dryad2dataverse.transfer.Transfer.upload_study" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -4281,63 +5140,9 @@ Default dryad2datavese.constants.DVURL</p>
         <p>Uploads Dryad study metadata to target Dataverse or updates existing.
 Supplying a <code>targetDv</code> kwarg creates a new study and supplying a
 <code>dvpid</code> kwarg updates a currently existing Dataverse study.</p>
+<p>**kwargs : dict
+    Normally this is one of the two parameters below</p>
 
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>url</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>URL of Dataverse instance. Defaults to constants.DVURL.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>apikey</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>API key of user. Defaults to contants.APIKEY.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>timeout</code></b>
-                  (<code><span title="int">int</span></code>, default:
-                      <code>45</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>timeout on POST request.</p>
-              </div>
-            </li>
-            <li>
-              <b><code>kwargs</code></b>
-                  (<code><span title="dict">dict</span></code>, default:
-                      <code>{}</code>
-)
-              –
-              <div class="doc-md-description">
-                
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
 
 <table class="field-list">
   <colgroup>
@@ -4380,21 +5185,14 @@ This is not required for new uploads, specify as dvpid=value</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/transfer.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def upload_study(self, url=None, apikey=None, timeout=45, **kwargs):
+              <pre class="codehilite"><code class="language-python">def upload_study(self, **kwargs):
     '''
     Uploads Dryad study metadata to target Dataverse or updates existing.
     Supplying a `targetDv` kwarg creates a new study and supplying a
     `dvpid` kwarg updates a currently existing Dataverse study.
 
-    Parameters
-    ----------
-    url : str
-        URL of Dataverse instance. Defaults to constants.DVURL.
-    apikey : str
-        API key of user. Defaults to contants.APIKEY.
-    timeout : int
-        timeout on POST request.
-    kwargs : dict
+    **kwargs : dict
+        Normally this is one of the two parameters below
 
     Other parameters
     ----------------
@@ -4409,46 +5207,37 @@ This is not required for new uploads, specify as dvpid=value</p>
     -----
     One of targetDv or dvpid is required.
     '''
-    if not url:
-        url = constants.DVURL
-    if not apikey:
-        apikey = constants.APIKEY
-    headers = {'X-Dataverse-key' : apikey}
-    headers.update(USER_AGENT)
+    headers = {'X-Dataverse-key': self.kwargs['api_key'], 'User-agent': USERAGENT}
     targetDv = kwargs.get('targetDv')
     dvpid = kwargs.get('dvpid')
     #dryFid = kwargs.get('dryFid') #Why did I put this here?
     if not targetDv and not dvpid:
         try:
             raise exceptions.NoTargetError('You must supply one of targetDv \
-                                (target dataverse) \
-                                 or dvpid (Dataverse persistent ID)')
-        except exceptions.NoTargetError as e:
-            LOGGER.error('No target dataverse or dvpid supplied')
-            LOGGER.exception(e)
+                                    (target dataverse) \
+                                     or dvpid (Dataverse persistent ID)')
+        except exceptions.NoTargetError as err:
+            LOGGER.exception(err)
             raise
 
     if targetDv and dvpid:
-        try:
-            raise ValueError('Supply only one of targetDv or dvpid')
-        except ValueError as e:
-            LOGGER.exception(e)
-            raise
+        msg = 'Supply only one of targetDv or dvpid'
+        LOGGER.exception(msg)
+        raise exceptions.Dryad2DataverseError(msg)
+
     if not dvpid:
-        endpoint = f'{url}/api/dataverses/{targetDv}/datasets'
+        endpoint = f'{self.kwargs["dv_url"]}/api/dataverses/{targetDv}/datasets'
         upload = self.session.post(endpoint,
                                    headers=headers,
-                                   json=self.dryad.dvJson,
-                                   timeout=timeout)
+                                   json=self.dryad.dvJson)
         LOGGER.debug(upload.text)
     else:
-        endpoint = f'{url}/api/datasets/:persistentId/versions/:draft'
+        endpoint = f'{self.kwargs["dv_url"]}/api/datasets/:persistentId/versions/:draft'
         params = {'persistentId':dvpid}
         #Yes, dataverse uses *different* json for edits
         upload = self.session.put(endpoint, params=params,
                                   headers=headers,
-                                  json=self.dryad.dvJson['datasetVersion'],
-                                  timeout=timeout)
+                                  json=self.dryad.dvJson['datasetVersion'])
         #self._dvrecord = upload.json()
         LOGGER.debug(upload.text)
 
@@ -4456,20 +5245,16 @@ This is not required for new uploads, specify as dvpid=value</p>
         updata = upload.json()
         self.dvStudy = updata
         if updata.get('status') != 'OK':
+            msg = ('Status return is not OK.'
+                    f'{upload.status_code}: '
+                    f'{upload.reason}. '
+                    f'{upload.request.url} '
+                    f'{upload.text}')
             try:
-                raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                       f'{upload.status_code}: '
-                                                       f'{upload.reason}. '
-                                                       f'{upload.request.url} '
-                                                       f'{upload.text}'))
-            except exceptions.DataverseUploadError as e:
-                LOGGER.exception(e)
+                raise exceptions.DataverseUploadError(msg)
+            except exceptions.DataverseUploadError as err:
+                LOGGER.exception(err)
                 LOGGER.exception(traceback.format_exc())
-                raise exceptions.DataverseUploadError(('Status return is not OK.'
-                                                       f'{upload.status_code}: '
-                                                       f'{upload.reason}. '
-                                                       f'{upload.request.url} '
-                                                       f'{upload.text}'))
         upload.raise_for_status()
     except Exception as e: # Only accessible via non-requests exception
         LOGGER.exception(e)
@@ -4576,31 +5361,61 @@ but is not thread-safe.</p>
     Dryad files can be monitored and updated over time. Monitor is a singleton,
     but is not thread-safe.
     '''
-    __instance = None
-
-    def __new__(cls, dbase=None, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         '''
         Creates a new singleton instance of Monitor.
 
-        Also creates a database if existing database is not present.
+        Parameters
+        ----------
+        *args
+        **kwargs
+        '''
+        if not hasattr(cls, 'inst'):
+            cls.inst = super().__new__(cls)
+            #This ensures only the first set of kwargs (on instantiation)
+            #are used.
+            cls.init = 0
+            cls.kwargs = kwargs
+            if not cls.kwargs.get('dbase'):
+                try:
+                    cls.kwargs['dbase'] = args[0]
+                except ValueError as e:
+                    raise KeyError from e
+            cls.conn = sqlite3.connect(pathlib.Path(cls.kwargs['dbase']).expanduser().absolute())
+            cls.cursor = cls.conn.cursor()
+            LOGGER.info('Open database %s', cls.kwargs['dbase'])
+        return cls.inst
+
+    def __init__(self, *args, **kwargs):
+        '''
+        Initialize singleton instance of Monitor
 
         Parameters
         ----------
-        dbase : str
-            Path to sqlite3 database. That is:
-            /path/to/file.sqlite3
+        *args
+            Positional arguments. Only the first is used
+        **kwargs
+            Keyword arguments. Only dbase is used, and it overwrites args[0] if present
 
-        *args : list
-        **kwargs : dict
+        Notes
+        -----
+        Normally you would just pass a dryad2dataverse.config.Config object,
+        ie. Monitor(**config)
+
+        These keyword parameters are required at a minimum, and are included as part of a
+        Config instance.
+        dbase : str
+            Path to dryad2dataverse monitor database
+        dry_url : str
+            Dryad base URL
         '''
-        if cls.__instance is None:
-            cls.__instance = super(Monitor, cls).__new__(cls)
-            cls.__instance.__initialized = False
-            cls.dbase = dbase
-            if not cls.dbase:
-                cls.dbase = constants.DBASE
-            cls.conn = sqlite3.Connection(cls.dbase)
-            cls.cursor = cls.conn.cursor()
+        #pylint: disable=unused-argument
+        #arguments are parsed in __new__ to make a singleton
+        #but they need to be passed in __init__
+        if not self.init:
+
+            conn = sqlite3.connect(pathlib.Path(self.kwargs['dbase']).expanduser().absolute())
+            cursor = conn.cursor()
             create = ['CREATE TABLE IF NOT EXISTS dryadStudy \
                        (uid INTEGER PRIMARY KEY AUTOINCREMENT, \
                        doi TEXT, lastmoddate TEXT, dryadjson TEXT, \
@@ -4624,33 +5439,10 @@ but is not thread-safe.</p>
                       ]
 
             for line in create:
-                cls.cursor.execute(line)
-            cls.conn.commit()
-            LOGGER.info('Using database %s', cls.dbase)
-
-        return cls.__instance
-
-    def __init__(self, dbase=None, *args, **kwargs):
-        # remove args and kwargs when you find out how init interacts with new.
-        '''
-        Initialize the Monitor instance if not instantiated already (ie, Monitor
-        is a singleton).
-
-        Parameters
-        ----------
-        dbase : str, default=dryad2datverse.constants.DBASE
-            Complete path to desired location of tracking database
-            (eg: /tmp/test.db).
-        *args : list
-        **kwargs : dict
-        '''
-        if self.__initialized:
-            return
-        self.__initialized = True
-        if not dbase:
-            self.dbase = constants.DBASE
-        else:
-            self.dbase = dbase
+                cursor.execute(line)
+            conn.commit()
+            conn.close()
+        self.init = 1
 
     def __del__(self):
         '''
@@ -4751,13 +5543,11 @@ but is not thread-safe.</p>
                                  dryaduid = ?', (dryaduid,))
             dvpid = self.cursor.fetchall()[-1][0]
             serial.dvpid = dvpid
-        except TypeError:
-            try:
-                raise exceptions.DatabaseError
-            except exceptions.DatabaseError as e:
-                LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
-                LOGGER.exception(e)
-                raise
+        except TypeError as exc:
+            LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
+            LOGGER.exception(exc)
+            raise exceptions.DatabaseError from exc
+
         newfile = copy.deepcopy(serial.dryadJson)
         testfile = copy.deepcopy(json.loads(result[-1][3]))
         if newfile == testfile:
@@ -4854,6 +5644,8 @@ but is not thread-safe.</p>
         ----------
         serial : dryad2dataverse.serializer.Serializer
         '''
+        #pylint: disable=too-many-locals
+
         diffReport = {}
         if self.status(serial)['status'] == 'new':
             #do we want to show what needs to be added?
@@ -4883,7 +5675,7 @@ but is not thread-safe.</p>
                         downLink = f['_links']['stash:file-download']['href']
                     except KeyError:
                         downLink = f['_links']['stash:download']['href']
-                    downLink = f'{constants.DRYURL}{downLink}'
+                    downLink = f'{self.kwargs.get("dry_url", "https://datadryad.org")}{downLink}'
                     name = f['path']
                     mimeType = f['mimeType']
                     size = f['size']
@@ -5027,6 +5819,7 @@ but is not thread-safe.</p>
         ----------
         transfer : dryad2dataverse.transfer.Transfer
         '''
+        #pylint: disable=too-many-branches, too-many-statements, too-many-locals
         # get the pre-update dryad uid in case we need it.
         self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi = ?',
                             (transfer.dryad.dryadJson['identifier'],))
@@ -5243,15 +6036,14 @@ but is not thread-safe.</p>
 
 
 <h4 id="dryad2dataverse.monitor.Monitor.__init__" class="doc doc-heading">
-            <code class=" language-python">__init__(dbase=None, *args, **kwargs)</code>
+            <code class=" language-python">__init__(*args, **kwargs)</code>
 
 <a href="#dryad2dataverse.monitor.Monitor.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the Monitor instance if not instantiated already (ie, Monitor
-is a singleton).</p>
+        <p>Initialize singleton instance of Monitor</p>
 
 
 <table class="field-list">
@@ -5265,34 +6057,17 @@ is a singleton).</p>
       <td class="field-body">
         <ul class="first simple">
             <li>
-              <b><code>dbase</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>dryad2datverse.constants.DBASE</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Complete path to desired location of tracking database
-(eg: /tmp/test.db).</p>
-              </div>
-            </li>
-            <li>
               <b><code>*args</code></b>
-                  (<code><span title="list">list</span></code>, default:
-                      <code>()</code>
-)
               –
               <div class="doc-md-description">
-                
+                <p>Positional arguments. Only the first is used</p>
               </div>
             </li>
             <li>
               <b><code>**kwargs</code></b>
-                  (<code><span title="dict">dict</span></code>, default:
-                      <code>{}</code>
-)
               –
               <div class="doc-md-description">
-                
+                <p>Keyword arguments. Only dbase is used, and it overwrites args[0] if present</p>
               </div>
             </li>
         </ul>
@@ -5301,121 +6076,50 @@ is a singleton).</p>
   </tbody>
 </table>
 
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>src/dryad2dataverse/monitor.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __init__(self, dbase=None, *args, **kwargs):
-    # remove args and kwargs when you find out how init interacts with new.
-    '''
-    Initialize the Monitor instance if not instantiated already (ie, Monitor
-    is a singleton).
-
-    Parameters
-    ----------
-    dbase : str, default=dryad2datverse.constants.DBASE
-        Complete path to desired location of tracking database
-        (eg: /tmp/test.db).
-    *args : list
-    **kwargs : dict
-    '''
-    if self.__initialized:
-        return
-    self.__initialized = True
-    if not dbase:
-        self.dbase = constants.DBASE
-    else:
-        self.dbase = dbase</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dryad2dataverse.monitor.Monitor.__new__" class="doc doc-heading">
-            <code class=" language-python">__new__(dbase=None, *args, **kwargs)</code>
-
-<a href="#dryad2dataverse.monitor.Monitor.__new__" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Creates a new singleton instance of Monitor.</p>
-<p>Also creates a database if existing database is not present.</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>dbase</code></b>
-                  (<code><span title="str">str</span></code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Path to sqlite3 database. That is:
-/path/to/file.sqlite3</p>
-              </div>
-            </li>
-            <li>
-              <b><code>*args</code></b>
-                  (<code><span title="list">list</span></code>, default:
-                      <code>()</code>
-)
-              –
-              <div class="doc-md-description">
-                
-              </div>
-            </li>
-            <li>
-              <b><code>**kwargs</code></b>
-                  (<code><span title="dict">dict</span></code>, default:
-                      <code>{}</code>
-)
-              –
-              <div class="doc-md-description">
-                
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Normally you would just pass a dryad2dataverse.config.Config object,
+ie. Monitor(**config)</p>
+<p>These keyword parameters are required at a minimum, and are included as part of a
+Config instance.
+dbase : str
+    Path to dryad2dataverse monitor database
+dry_url : str
+    Dryad base URL</p>
+</details>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dryad2dataverse/monitor.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __new__(cls, dbase=None, *args, **kwargs):
+              <pre class="codehilite"><code class="language-python">def __init__(self, *args, **kwargs):
     '''
-    Creates a new singleton instance of Monitor.
-
-    Also creates a database if existing database is not present.
+    Initialize singleton instance of Monitor
 
     Parameters
     ----------
+    *args
+        Positional arguments. Only the first is used
+    **kwargs
+        Keyword arguments. Only dbase is used, and it overwrites args[0] if present
+
+    Notes
+    -----
+    Normally you would just pass a dryad2dataverse.config.Config object,
+    ie. Monitor(**config)
+
+    These keyword parameters are required at a minimum, and are included as part of a
+    Config instance.
     dbase : str
-        Path to sqlite3 database. That is:
-        /path/to/file.sqlite3
-
-    *args : list
-    **kwargs : dict
+        Path to dryad2dataverse monitor database
+    dry_url : str
+        Dryad base URL
     '''
-    if cls.__instance is None:
-        cls.__instance = super(Monitor, cls).__new__(cls)
-        cls.__instance.__initialized = False
-        cls.dbase = dbase
-        if not cls.dbase:
-            cls.dbase = constants.DBASE
-        cls.conn = sqlite3.Connection(cls.dbase)
-        cls.cursor = cls.conn.cursor()
+    #pylint: disable=unused-argument
+    #arguments are parsed in __new__ to make a singleton
+    #but they need to be passed in __init__
+    if not self.init:
+
+        conn = sqlite3.connect(pathlib.Path(self.kwargs['dbase']).expanduser().absolute())
+        cursor = conn.cursor()
         create = ['CREATE TABLE IF NOT EXISTS dryadStudy \
                    (uid INTEGER PRIMARY KEY AUTOINCREMENT, \
                    doi TEXT, lastmoddate TEXT, dryadjson TEXT, \
@@ -5439,11 +6143,85 @@ is a singleton).</p>
                   ]
 
         for line in create:
-            cls.cursor.execute(line)
-        cls.conn.commit()
-        LOGGER.info('Using database %s', cls.dbase)
+            cursor.execute(line)
+        conn.commit()
+        conn.close()
+    self.init = 1</code></pre>
+            </details>
+    </div>
 
-    return cls.__instance</code></pre>
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dryad2dataverse.monitor.Monitor.__new__" class="doc doc-heading">
+            <code class=" language-python">__new__(*args, **kwargs)</code>
+
+<a href="#dryad2dataverse.monitor.Monitor.__new__" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Creates a new singleton instance of Monitor.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>*args</code></b>
+              –
+              <div class="doc-md-description">
+                
+              </div>
+            </li>
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dryad2dataverse/monitor.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def __new__(cls, *args, **kwargs):
+    '''
+    Creates a new singleton instance of Monitor.
+
+    Parameters
+    ----------
+    *args
+    **kwargs
+    '''
+    if not hasattr(cls, 'inst'):
+        cls.inst = super().__new__(cls)
+        #This ensures only the first set of kwargs (on instantiation)
+        #are used.
+        cls.init = 0
+        cls.kwargs = kwargs
+        if not cls.kwargs.get('dbase'):
+            try:
+                cls.kwargs['dbase'] = args[0]
+            except ValueError as e:
+                raise KeyError from e
+        cls.conn = sqlite3.connect(pathlib.Path(cls.kwargs['dbase']).expanduser().absolute())
+        cls.cursor = cls.conn.cursor()
+        LOGGER.info('Open database %s', cls.kwargs['dbase'])
+    return cls.inst</code></pre>
             </details>
     </div>
 
@@ -5520,6 +6298,8 @@ except for hash changes), as below:</p>
     ----------
     serial : dryad2dataverse.serializer.Serializer
     '''
+    #pylint: disable=too-many-locals
+
     diffReport = {}
     if self.status(serial)['status'] == 'new':
         #do we want to show what needs to be added?
@@ -5549,7 +6329,7 @@ except for hash changes), as below:</p>
                     downLink = f['_links']['stash:file-download']['href']
                 except KeyError:
                     downLink = f['_links']['stash:download']['href']
-                downLink = f'{constants.DRYURL}{downLink}'
+                downLink = f'{self.kwargs.get("dry_url", "https://datadryad.org")}{downLink}'
                 name = f['path']
                 mimeType = f['mimeType']
                 size = f['size']
@@ -6213,13 +6993,11 @@ in the Dryad state.</p>
                              dryaduid = ?', (dryaduid,))
         dvpid = self.cursor.fetchall()[-1][0]
         serial.dvpid = dvpid
-    except TypeError:
-        try:
-            raise exceptions.DatabaseError
-        except exceptions.DatabaseError as e:
-            LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
-            LOGGER.exception(e)
-            raise
+    except TypeError as exc:
+        LOGGER.error('Dryad DOI : %s. Error finding Dataverse PID', doi)
+        LOGGER.exception(exc)
+        raise exceptions.DatabaseError from exc
+
     newfile = copy.deepcopy(serial.dryadJson)
     testfile = copy.deepcopy(json.loads(result[-1][3]))
     if newfile == testfile:
@@ -6294,6 +7072,7 @@ including Dryad JSON updates, as the last action for transfer.</p>
     ----------
     transfer : dryad2dataverse.transfer.Transfer
     '''
+    #pylint: disable=too-many-branches, too-many-statements, too-many-locals
     # get the pre-update dryad uid in case we need it.
     self.cursor.execute('SELECT max(uid) FROM dryadStudy WHERE doi = ?',
                         (transfer.dryad.dryadJson['identifier'],))
@@ -7006,57 +7785,12 @@ Dryad file size.</p>
     </div>
 
 </div>
-
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="dryad2dataverse.constants" class="doc doc-heading">
-            <code>dryad2dataverse.constants</code>
-
-
-<a href="#dryad2dataverse.constants" class="headerlink" title="Permanent link">&para;</a></h2>
-
-    <div class="doc doc-contents first">
-
-        <p>This module contains the information that configures all the parameters
-required to transfer data from Dryad to Dataverse.</p>
-<p>&ldquo;Constants&rdquo; may be a bit strong, but the only constant is the
-presence of change.</p>
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../reference/" class="btn btn-neutral float-left" title="General Reference"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../track/" class="btn btn-neutral float-right" title="Tracking Database Structure">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../dryadd/" class="btn btn-neutral float-left" title="The dryadd application"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../track/" class="btn btn-neutral float-right" title="Tracking database structure">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -7079,7 +7813,7 @@ presence of change.</p>
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../reference/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../dryadd/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
       <span><a href="../track/" style="color: #fcfcfc">Next &raquo;</a></span>

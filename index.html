@@ -44,36 +44,6 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Overview</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#_1"></a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#the-app-is-probably-what-you-want">The app is probably what you want</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#quick-install">Quick install</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#i-know-how-to-program-in-python-what-does-this-do">I know how to program in Python. What does this do?</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#so-why-would-i-need-this">So why would I need this?</a>
-    </li>
-        </ul>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic usage</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#converting-json">Converting JSON</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#transferring-data">Transferring data</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#change-monitoring">Change monitoring</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup">That&rsquo;s great! I&rsquo;m going to use this for my very important data for which I have no backup.</a>
-    </li>
-        </ul>
-    </li>
     </ul>
                 </li>
               </ul>
@@ -82,31 +52,19 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="script/">The dryadd console application</a>
+                <li class="toctree-l1"><a class="reference internal" href="dryadd/">The dryadd application</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="other_utils/">Other utilities</a>
+                <li class="toctree-l1"><a class="reference internal" href="api_reference/">API reference</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="compiling/">Compiling or packaging the application</a>
+                <li class="toctree-l1"><a class="reference internal" href="track/">Tracking database structure</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="reference/">General Reference</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="api_reference/">API Reference</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="track/">Tracking Database Structure</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="changelog/">Changelog</a>
+                <li class="toctree-l1"><a class="reference internal" href="other_utils/">Other Dataverse related utilities</a>
                 </li>
               </ul>
               <ul>
@@ -140,90 +98,29 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="dryad2dataverse-translate-transfer-and-track">dryad2dataverse -  translate, transfer and track<a class="headerlink" href="#dryad2dataverse-translate-transfer-and-track" title="Permanent link">&para;</a></h1>
-<h2 id="_1"><img alt="dryad2dataverse logo" src="images/dryad2dataverseLogo.svg" /><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p><strong>dryad2dataverse</strong> is an oddly specific <a href="https://python.org">Python</a> package/library which comes with the highly-sought after <a href="script/"><strong>console application</strong></a> which allows easier transfer of metadata and data from a Dryad data repository (ie, <a href="https://datadryad.org">https://datadryad.org</a>) to a <a href="https://dataverse.org/" title="Dataverse software main site">Dataverse</a> repository.</p>
-<h3 id="the-app-is-probably-what-you-want">The app is probably what you want<a class="headerlink" href="#the-app-is-probably-what-you-want" title="Permanent link">&para;</a></h3>
+                <h2 id="_1"><img alt="dryad2dataverse logo" src="images/dryad2dataverseLogo.svg" /><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h2 id="zero-effort-migrations">Zero effort migrations<a class="headerlink" href="#zero-effort-migrations" title="Permanent link">&para;</a></h2>
+<p>If you can edit a text file, you can move material from a Dryad repository to a Dataverse repository.</p>
 <hr />
-<p>If you&rsquo;re interested in moving Dryad studies to Dataverse, being notified on changes and largely automating everything, the <a href="script/">dryadd application</a> can do <em>all</em> of these things without requiring any knowledge of Python or programming. All you need is basic command line knowledge and a platform with enough storage to (temporarily) hold the contents of a few Dryad records.</p>
-<hr />
-<h2 id="quick-install">Quick install<a class="headerlink" href="#quick-install" title="Permanent link">&para;</a></h2>
-<pre><code class="language-nohighlight">pip install dryad2dataverse
+<h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<p>If you don&rsquo;t have <strong>pipx</strong>, <a href="https://pipx.pypa.io/latest/installation/" target="&quot;_blank">install it</a>.</p>
+<pre><code class="language-nohighlight">pipx install dryad2dataverse
+dryadd
 </code></pre>
-<p>or, if you want to stay clear of anything related to a command line, download a compiled version of the migrator <code>dryadd</code> only for your computer system at the <a href="https://github.com/ubc-library-rc/dryad2dataverse/releases">releases page</a>. Note that binary releases are not available for all platforms, and if you want the most recent version you&rsquo;re better off using <code>pip</code>.</p>
-<h3 id="i-know-how-to-program-in-python-what-does-this-do">I know how to program in Python. What does this do?<a class="headerlink" href="#i-know-how-to-program-in-python-what-does-this-do" title="Permanent link">&para;</a></h3>
-<p>With these tools it’s possible to:</p>
-<p>a) Serialize Dryad metadata to Dataverse JSON</p>
-<p>b) Transfer Dryad studies to Dataverse without any knowledge of the somewhat complex Dataverse API</p>
-<p>c) Monitor changes in status</p>
-<h4 id="so-why-would-i-need-this">So why would I need this?<a class="headerlink" href="#so-why-would-i-need-this" title="Permanent link">&para;</a></h4>
+<p>Fill in the newly created configuration file with your information. Then you&rsquo;re set. All you need type is six characters:</p>
+<pre><code class="language-nohighlight">dryadd
+</code></pre>
+<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <ul>
-<li>
-<p>You are a researcher and you wish to deposit via API into Dataverse repository. You can use the tools with this package to that without needing to understand the APIs and formats of two separate platforms.</p>
-</li>
-<li>
-<p>You&rsquo;ve used Dryad, but the Dataverse JSON and API is unfamiliar and <a href="https://guides.dataverse.org/en/latest/_downloads/dataset-create-new-all-default-fields.json" title="Complex Dataverse JSON">complex</a>. </p>
-</li>
-<li>
-<p>You want to write your Dryad JSON and have it convert automatically to Dataverse&rsquo;s much more complex one.</p>
-</li>
-<li>
-<p>Your institution has researchers who have deposited data into Dryad and you wish to copy them into the Dataverse repository which contains the bulk of your institution&rsquo;s research data (for example, the Dataverse repository at <a href="https://borealisdata.ca">https://borealisdata.ca</a>).</p>
-</li>
-<li>
-<p>And on top of that, you don&rsquo;t want to keep checking to see if there were any updates, so you wish to automate the process.</p>
-</li>
+<li><strong>Dryadd</strong> will run on just about anything. No dedictated server is required. If your platform can run Python, it can run <strong>dryadd</strong><sup>1</sup>.</li>
+<li>Setup is easy, requiring editing only a single file with your institution&rsquo;s information.</li>
+<li>All transfer information is held in a single SQLite database, so you can easy move between machines.</li>
+<li><strong>Dryadd</strong> handles updates to existing material so that you don&rsquo;t have to worry about it.</li>
+<li><strong>Dryad2dataverse</strong> for Python can be easily incorporated into other products if you need a custom solution.</li>
+<li>It&rsquo;s free and open source.</li>
 </ul>
-<h2 id="basic-usage">Basic usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
-<h4 id="converting-json">Converting JSON<a class="headerlink" href="#converting-json" title="Permanent link">&para;</a></h4>
-<pre><code class="language-nohighlight">&gt;&gt;&gt; #Convert Dryad JSON to Dataverse JSON and save to a file
-&gt;&gt;&gt; import dryad2dataverse.serializer
-&gt;&gt;&gt; i_heart_dryad = dryad2dataverse.serializer.Serializer('doi:10.5061/dryad.2rbnzs7jp')
-&gt;&gt;&gt; with open('dataverse_json.json', 'w') as f:
-    f.write(f'{i_heart_dryad.dvJson}')
-&gt;&gt;&gt; #Or just view it this way in a Python session
-&gt;&gt;&gt; i_heard_dryad.dvJson
-</code></pre>
-<h4 id="transferring-data">Transferring data<a class="headerlink" href="#transferring-data" title="Permanent link">&para;</a></h4>
-<p>Note: a number of variables must be set [correctly] for this to work, such as your target dataverse. This example continues with the Serializer instance above.</p>
-<pre><code class="language-nohighlight">&gt;&gt;&gt; import dryad2dataverse.transfer
-&gt;&gt;&gt; dv = dryad2dataverse.transfer.Transfer(i_heart_dryad)
-&gt;&gt;&gt; # Files must first be downloaded; there is no direct transfer
-&gt;&gt;&gt; dv.download_files()
-&gt;&gt;&gt; # 'dryad' is the short name of the target dataverse
-&gt;&gt;&gt; # Yours may be different
-&gt;&gt;&gt; # First, create the study metadata
-&gt;&gt;&gt; dv.upload_study(targetDv='dryad')
-&gt;&gt;&gt; # Then upload the files
-&gt;&gt;&gt; dv.upload_files()
-</code></pre>
-<h4 id="change-monitoring">Change monitoring<a class="headerlink" href="#change-monitoring" title="Permanent link">&para;</a></h4>
-<p>Because monitoring the status of something over time requires persistence, the dryad2dataverse.monitor.Monitor object uses an <a href="https://sqlite.org">SQLite3</a> database, which has the enormous advantage of being a single file that is portable between systems. This allows monitoring without laborious database configuration on a host system, and updates can be run on any system that has sufficient storage space to act as an intermediary between Dryad and Dataverse. This is quite a simple database, as the <a href="dbase_structure/">documentation on its structure</a> shows.</p>
-<p>If you need to change systems just swap the database to the new system.</p>
-<p>In theory you could run it from a Raspberry Pi Zero that you have in a desk drawer, although that may not be the wisest idea. Maybe use your cell phone.</p>
-<p>Monitoring changes requires both the <code>Serializer</code> and <code>Transfer</code> objects from above.</p>
-<pre><code class="language-nohighlight">&gt;&gt;&gt; # Create the Monitor instance
-&gt;&gt;&gt; monitor = dryad2dataverse.monitor.Monitor()
-&gt;&gt;&gt; # Check status of your serializer object
-&gt;&gt;&gt; monitor.status(i_heart_dryad)
-{'status': 'new', 'dvpid': None}
-&gt;&gt;&gt; # imagine, now that i_still_heart_dryad is a study
-&gt;&gt;&gt; # that was uploaded previously
-&gt;&gt;&gt; monitor.status(i_still_heart_dryad)
-{'status': 'unchanged', 'dvpid': 'doi:99.99999/FK2/FAKER'}
-&gt;&gt;&gt; #Check the difference in files
-&gt;&gt;&gt; monitor.diff_files(i_still_heart_dryad)
-{}
-&gt;&gt;&gt; # After the transfer dv above:
-&gt;&gt;&gt; monitor.update(transfer)
-&gt;&gt;&gt; # And then, to make your life easier, update the last time you checked Dryad
-&gt;&gt;&gt; monitor.set_timestamp()
-</code></pre>
-<h3 id="thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup">That&rsquo;s great! I&rsquo;m going to use this for my very important data for which I have no backup.<a class="headerlink" href="#thats-great-im-going-to-use-this-for-my-very-important-data-for-which-i-have-no-backup" title="Permanent link">&para;</a></h3>
-<p>The <strong>dryad2dataverse</strong> library is free and open source, released under the MIT license. It&rsquo;s also not written by anyone with a degree in computer science, so as the MIT license says: </p>
-<pre class="codehilite"><code>Software is provided &quot;as is&quot;, without warranty of any kind
-</code></pre>
+<hr />
+<p><sup>1</sup> Assuming you have enough storage</p>
               
             </div>
           </div><footer>
@@ -272,5 +169,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-01-14 21:00:08.549058+00:00
+Build Date UTC : 2026-02-06 22:49:19.252296+00:00
 -->
