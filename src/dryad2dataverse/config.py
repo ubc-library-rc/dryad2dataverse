@@ -73,7 +73,7 @@ class Config(dict):
         self.default_locations = {'ios': '~/.config/dryad2dataverse',
                      'linux' : '~/.config/dryad2dataverse',
                      'darwin': '~/Library/Application Support/dryad2dataverse',
-                     'win32' : 'AppData/Roaming/dryad2dataverse',
+                     'win32' : '~/AppData/Roaming/dryad2dataverse',
                      'cygwin' : '~/.config/dryad2dataverse'}
 
         #Use read() instead of yaml.safe_load.read_text() so that
