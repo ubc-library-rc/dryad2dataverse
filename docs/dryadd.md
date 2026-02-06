@@ -1,92 +1,236 @@
 ---
 layout: default
-title:  
+title: The dryadd application 
 nav_order: 4
 ---
 
-# Automated migrator and tracker - dryadd
+# Dryadd: move your material with almost no effort.
+---
+
+The **dryadd** application is designed to operate with minimal effort after simply filling in the blanks in a configuration file, so that you're one and done.
+
+---
+### Important
+This product **will not publish** anything in a Dataverse installation. This is intentional to allow a human-based curatorial step before releasing any data onto an unsuspecting audience.
+
+**Publishing must be done manually or via automation such as found in [dataverse_utils](https://ubc-library-rc.github.io/dataverse_utils')**
 
 ---
 
-While it's all very nice that there's code that can migrate Dryad material to Dataverse, many users are not familiar enough with Python/programming or, just as likely, don't want to have to program things themselves. Anyone transferring from Dryad to Dataverse is likely doing a variant of the same thing, which consists of:
+## Usage
 
-* Finding new Dryad material, usually from their own institution
-* Moving it to Dataverse
+**Dryadd** operates based on simple [YAML](https://en.wikipedia.org/wiki/YAML) configuration file. The first run of **dryadd** will generate one if there is not one present at its stated location.
 
-and possibly: 
+Defaults are:
 
-* Checking for updates and handling **those** automatically
+|platform|default|
+|--------|-------|
+|ios|~/.config/dryad2dataverse/dryad2dataverse_config.yml|
+|linux|~/.config/dryad2dataverse/dryad2dataverse_config.yml|
+|darwin|~/Library/Application Support/dryad2dataverse/dryad2dataverse_config.yml|
+|win32|~/AppData/Roaming/dryad2dataverse/dryad2dataverse_config.yml|
+|cygwin|~/.config/dryad2dataverse/dryad2dataverse_config.yml|
 
-Included with **dryad2dataverse** package is a console application called **dryadd** which does all of this. Or, if you don't even want to install dryad2dtaverse, [binary files for Windows, MacOS and Linux](https://github.com/ubc-library-rc/dryad2dataverse/releases). Depending on what computing platform and installation method you use, the application will be called `dryadd.py, dryadd`, `dryadd_linux` or `dryadd.exe`. Note that there are a wide variety of system architectures available, but not all of them.
+If you do not want to use the default location for your platform, you can specify a file with the `-c` switch. For example `dryadd -c /tmp/testme.yml` will use the file '/tmp/testme.yml' or create one if it does not exist.
 
-**The most current version of _dryadd_ will always be available if you install via _pip_. The binary files may lag behind and/or not get every release** 
+Once it's configured correctly, you can run the **dryadd** application simply by running `dryadd`.
 
-Note that these utilities are *console* programs. That is, they do not have a GUI and are meant to be run from the command line in a Windows DOS prompt or PowerShell session or a terminal in the case of other platforms.
+If you don't wish to store your Dryad secret and Dataverse API key in the configuration file, they may be specified using the `-s` and `-k` switches respectively, ie: `dryadd -s [dryad_secret] -k [dataverse_key]`
 
-### An important caveat
+If you forget all this, help is available via `dryadd -h`. The help is long, so run it through a pager: `dryadd -h |more`. It is also reproduced below.
 
-This product **will not** publish anything in a Dataverse installation (at this time, at least). This is intentional to allow a human-based curatorial step before releasing any data onto an unsuspecting audience. There's no error like systemic error, so not automatically releasing material should help alleviate this.
+### YAML configuration file
 
-### Usage
+The configration file is self-documenting, and is reproduced here for your convenience.
 
-The implementation is relatively straightforward. Simply supply the required parameters and the software should do the rest. The help menu below is available from the command line by either running the script without inputs or by using the `-h` switch.
+```yaml
+#Sample configuration file dryad2dataverse
+#It will *not* work unless you fill it in, because both
+#Dryad and Dataverse require user information.
+
+#------
+#Dryad configuration
+#------
+#Dryad base URL
+dry_url: https://datadryad.org
+#API path
+api_path: /api/v2
+#Application ID (contact Dryad to get an institutional account)
+app_id: null
+#Secret key, should have come with your application ID.
+secret: null
+
+#------
+#Dataverse configuration
+#------
+#Base url of Dataverse instance (eg: https://borealisdata.ca)
+dv_url: null 
+#Dataverse API KEY
+api_key: null
+#Maximum upload size in bytes (contact Dataverse administrator for value if unknown)
+max_upload: 3221225472
+#Contact email address for Dataverse record, eg: research.data@test.invalid
+dv_contact_email: null
+#Contact name associated with the address (like, say, "[University] Research Data Services")
+dv_contact_name: null
+#Dataverse target collection shortname
+target: Null
+#To stop conversion to tabular data, add extensions here. Tabular processing can cause
+#problems and the original files were not processed that way. It is recommended to
+#keep this as is and add more if required.
+notab:
+- .sav
+- .por
+- .zip
+- .csv
+- .tsv
+- .dta
+- .rdata
+- .xslx
+- .xls
+
+#------
+#Monitoring configuration
+#------
+#Location of persistent database which tracks transfers over time.
+#If you ever move the database, you must change this to the new location or everything will be transferred again
+dbase: ~/dryad_dataverse_monitor.sqlite3
+
+#------
+#Transfer information
+#------
+#Institutional ROR. Find your ROR here: https://ror.org/search
+ror: null
+
+#Location of temporarily downloaded files. This doesn't default to the normal
+#temp file location because the files can be gigantic, and so is manually specified
+tempfile_location: /tmp
+
+#Email address which sends update notifications. 
+#Note, OATH2 is not supported. Yahoo is free 
+#and you may as well use it
+sending_email: null
+#Account username. Check provider for details
+sending_email_username: null
+#Account password. Check provider for details; may be different than
+#an ordinary account if using an application
+email_send_password: null
+#SMTP server configuration
+smtp_server: smtp.mail.yahoo.com
+#Mail is sent using SSL; check with provider for details
+ssl_port: 465
+#List of email addresses that will receive notifications
+recipients: 
+- null
+#location of dryadd log
+#include full file name: eg: /var/log/dryadd.log
+#The default below will exist but is a terrible place
+#for a log so you should change it.
+log: ~/dryadd.log
+#level at which to write a log message. Select from:
+# debug, info, warning, error or critical
+loglevel: warning
+#level at which to send an email message about problems.
+#Same levels as above, obviously.
+email_loglevel: warning
+
+#Forcible file unlock. Forcible file unlocking requires admin privileges in Dataverse.
+#Normally you wouldn't need to change this.
+force_unlock: false
+#Number of database backups to keep
+number_of_backups: 3
+
+#------
+#Troubleshooting options
+#------
+#Warn if too many new updates. Occasionally, Dryad will change their
+#"persistent" IDs and then everything looks new, which causes everything
+#to be loaded again. It's recommended that this be "true" to stop an accidental
+#complete reingest
+warn_too_many: true
+#Number of new Dryad surveys which will trigger a warning and stop execution.
+#This is to prevent accidentally ingesting thousands of surveys if you 
+#misconfigure something
+warning_threshold: 15
+#Force dryadd into test mode
+test_mode: false
+#Test mode - only transfer first [n] of the total number of (new) records. 
+#Old ones will still be updated, though
+test_mode_limit: 5
 
 
-```nohighlight
-usage: dryadd [-h] [-u URL] -k KEY -t TARGET -e EMAIL -s USER -r RECIPIENTS [RECIPIENTS ...] -p PWD [--server MAILSERV] [--port PORT] -c CONTACT -n CNAME [-v] -i ROR [--tmpfile TMP]
-              [--db DBASE] [--log LOG] [-l] [-x EXCLUDE [EXCLUDE ...]] [-b NUM_BACKUPS] [-w] [--warn-threshold WARN] [--testmode-on] [--testmode-limit TESTLIMIT] [--version]
+#------
+#Exclusion list
+#------
+#Dryad DOIs to exclude from transfers. This is usually because the files in the
+#study are too large to be ingested into Dataverse, but may also be used for
+#studies with errors or any other reason
+#
+#IMPORTANT!
+#
+#Uncomment below and add dois in place of null, one per line.
+#exclude_list:
+#- null
+```
 
-Dryad to Dataverse importer/monitor. All arguments NOT enclosed by square brackets are required for the script to run but some may already have defaults, specified by "Default". The
-"optional arguments" below refers to the use of the option switch, (like -u), meaning "not a positional argument."
+### Application help
+
+```no-highlight
+dryadd -h
+
+usage: dryadd [-h] [-c CONFIG] [-s SECRET] [-k API_KEY] [-v] [--version]
+
+Dryad to Dataverse importer/monitor. All arguments enclosed by square brackets are OPTIONAL for and are used for overriding defaults and/or providing sensitive information.
 
 options:
   -h, --help            show this help message and exit
-  -u URL, --dv-url URL  Destination Dataverse root url. Default: https://borealisdata.ca
-  -k KEY, --key KEY     REQUIRED: API key for dataverse user
-  -t TARGET, --target TARGET
-                        REQUIRED: Target dataverse short name
-  -e EMAIL, --email EMAIL
-                        REQUIRED: Email address which sends update notifications. ie: "user@website.invalid".
-  -s USER, --user USER  REQUIRED: User name for SMTP server. Check your server for details.
-  -r RECIPIENTS [RECIPIENTS ...], --recipient RECIPIENTS [RECIPIENTS ...]
-                        REQUIRED: Recipient(s) of email notification. Separate addresses with spaces
-  -p PWD, --pwd PWD     REQUIRED: Password for sending email account. Enclose in single quotes to avoid OS errors with special characters.
-  --server MAILSERV     Mail server for sending account. Default: smtp.mail.yahoo.com
-  --port PORT           Mail server port. Default: 465. Mail is sent using SSL.
-  -c CONTACT, --contact CONTACT
-                        REQUIRED: Contact email address for Dataverse records. Must pass Dataverse email validation rules (so "test@test.invalid" is not acceptable).
-  -n CNAME, --contact-name CNAME
-                        REQUIRED: Contact name for Dataverse records
+  -c, --config-file CONFIG
+                        Dryad configuration file.
+                        Default:
+                        ~/Library/Application Support/dryad2dataverse/dryad2dataverse_config.yml
+  -s, --secret SECRET   Secret for Dryad API.
+  -k, --api-key API_KEY
+                        Dataverse API key
   -v, --verbosity       Verbose output
-  -i ROR, --ror ROR     REQUIRED: Institutional ROR URL. Eg: "https://ror.org/03rmrcq20". This identifies the institution in Dryad repositories.
-  --tmpfile TMP         Temporary file location. Default: /tmp
-  --db DBASE            Tracking database location and name. Default: $HOME/dryad_dataverse_monitor.sqlite3
-  --log LOG             Complete path to log. Default: /var/log/dryadd.log
-  -l, --no_force_unlock
-                        No forcible file unlock. Required if /lock endpint is restricted
-  -x EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
-                        Exclude these DOIs. Separate by spaces
-  -b NUM_BACKUPS, --num-backups NUM_BACKUPS
-                        Number of database backups to keep. Default 3
-  -w, --warn-too-many   Warn and halt execution if abnormally large number of updates present.
-  --warn-threshold WARN
-                        Do not transfer studies if number of updates is greater than or equal to this number. Default: 15
-  --testmode-on         Turn on test mode. Number of transfers will be limited to the value in --testmode-limit or 5 if you don't set --testmode-limit
-  --testmode-limit TESTLIMIT
-                        Test mode - only transfer first [n] of the total number of (new) records. Old ones will still be updated, though. Default: 5
   --version             Show version number and exit
+
+**Dryad configuration file**
+
+All dryadd options can be included in the file, but you can
+also specify the Dryad secret and Dataverse API key with other
+options.
+
+If this file is not specified,
+then the configuration file at the default location will
+be used.
+
+**Dryad secret**
+
+The dryadd program requires both an application and a secret to use.
+App IDs and secrets are provided by Dryad and can only
+be obtained directly from them at http://datadryad.org.
+The app id and secret are used to create a bearer token
+for API authentication.
+
+Use this option if you have not stored the secret
+in the configuration file or wish to override it.
+
+**Dataverse API key**
+
+The Dataverse API is required in order to upload both
+metadata and data. While administrator-level keys
+are recommended, any key which grants upload privileges
+should be sufficient (note: not covered by warranty).
+
+Use this option if you have not stored the key in the
+configuration file or wish to override it.
 ```
-### Requirements
 
-**Software**
-
-* If you installed using _pip_ the requirements will be filled by default (see the [installation document](installation.md) for more details).
-
-* If using a binary file, it must be supported by your operating system and system architecture (eg. Intel Mac).
+## Requirements
 
 **Hardware**
 
-* You will need sufficient storage space on your system to hold the contents of the largest Dryad record that you are transferring. This is not necessarily a small amount; Dryad studies can range into the tens or hundreds of Gb, which means that a "normal" `/tmp` directory will normally not have enough space allocated to it. The software will work on one study at a time and delete the files as it goes, but there are studies in the Dryad repository that are huge, even if most of them are quite small.
+* You will need sufficient storage space on your system to hold the contents of the largest Dryad record that you are transferring. This is not necessarily a small amount; Dryad studies can range into the tens or hundreds of Gb, which means that a "normal" `/tmp` directory will normally not have enough space allocated to it. This is why it is user-specifiable. The software will work on one study at a time and delete the files as it goes, but there are studies in the Dryad repository that are huge, even if most of them are quite small.
 
 **Other**
 
@@ -102,7 +246,9 @@ options:
 * At least one email address to receive update and error notifications. This can be the same as the sender.
 * A place to store your sqlite3 tracking database.
 
-**A note about GMail**
+## Other items of note
+
+**GMail**
 
 Dryad2dataverse is now set up to use yahoo email by default, because it doesn't require two-factor authentication to use. If you decide to use Google mail, you will need to follow the procedure outlined here <https://support.google.com/accounts/answer/185833?hl=en>. Note that it will require enabling two-factor authentication.
 
@@ -110,12 +256,12 @@ Dryad2dataverse is now set up to use yahoo email by default, because it doesn't 
 
 The software is designed to automatically update changed studies. Simply run the utility with the same parameters as the previous run and any studies in Dataverse will be updated
 
+**Scheduling**
+
+While **dryadd** can be run on an ad-hoc basis, you may wish to add it a scheduler such as a linux crontab or the Windows scheduler so that transfers can be made automatically.
 
 **Miscellaneous**
-
-The **dryadd/.py/.exe** works best if run at intervals. This can easily be achieved by adding it to your system's _crontab_ or using the Windows scheduler. Currently it does not run as a system or service, although it may in the future.
-
 Dryad itself is constantly changing, as is Dataverse. Although the software should work predictably, changes in both the Dryad API and Dataverse API can cause unforeseen consequences.
 
-To act as a backup against catastrophic error, the monitoring database is automatically copied and renamed with a timestamp. Although the default number of backups is 3 by default, any number of backups can be kept. Obviously, if you run the software once a minute this isn't helpful, but it could be if you update once a month.
+To act as a backup against catastrophic error, the monitoring database is automatically copied and renamed with a timestamp and retains a user-specified number of backups.
 

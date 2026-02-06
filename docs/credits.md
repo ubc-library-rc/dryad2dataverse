@@ -17,4 +17,4 @@ Thanks to Eugene Barsky,Doug Brigham and Jeremy Buhler of the University of Brit
 
 Without the fabulous [requests](https://requests.readthedocs.io/en/master/) library and [the requests toolbelt](https://toolbelt.readthedocs.io/en/latest/user.html) everything would have taken a great deal longer.
 
-Without [pydoc-markdown](https://pydoc-markdown.readthedocs.io/en/latest/), [mkdocs](https://www.mkdocs.org) and [schemaspy](http://schemaspy.org/) the documentation would have taken much, much longer to write.
+Without [mkdocs](https://www.mkdocs.org) [mkdocstrings](https://mkdocstrings.github.io/) and [schemaspy](http://schemaspy.org/) the documentation would have taken much, much longer to write.

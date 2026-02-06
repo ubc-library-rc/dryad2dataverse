@@ -2,15 +2,12 @@ site_name: Dryad2dataverse
 docs_dir: 'docs'
 nav:
   - Overview: index.md
-  - Installation: installation.md
-  - The dryadd console application: script.md
-  - Other utilities: other_utils.md
-  - Compiling or packaging the application: compiling.md
-  - General Reference: reference.md
-  - API Reference: api_reference.md
+  - installation.md
+  - dryadd.md
+  - api_reference.md
     #- Tracking Database Structure: dbase_structure/index.html
-  - Tracking Database Structure: track.md 
-  - Changelog: changelog.md
+  - Tracking database structure: track.md 
+  - other_utils.md
   - FAQ: faq.md
   - Credits: credits.md
 extra_css:
