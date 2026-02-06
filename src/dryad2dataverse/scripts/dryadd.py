@@ -45,7 +45,7 @@ def argp():
     '''
     description = ('Dryad to Dataverse importer/monitor. '
                    'All arguments enclosed by square brackets are OPTIONAL for '
-                   'and are used for overriding defaults and/or providing sensitive'
+                   'and are used for overriding defaults and/or providing sensitive '
                    'information.'
                    )
 
