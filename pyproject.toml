@@ -1,6 +1,6 @@
 [project]
 name = "dryad2dataverse"
-version = "0.8.4"
+version = "0.8.5a0"
 description = "Utility for copying and syncing data from a Dryad data repository to a Dataverse repository"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -11,7 +11,7 @@ requires-python = ">=3.10, <4"
 dependencies = [
     "certifi (>=2022.12.7)",
     "charset-normalizer (>=2.0.4)",
-    "chardet (>=3.0.4)",
+    "chardet (>=3.0.4, <6.0.0)",
     "idna (>=2.10.0)",
     "pycryptodome (>=3.20.0)",
     "requests (>=2.26.0)",
