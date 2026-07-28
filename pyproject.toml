@@ -18,7 +18,7 @@ dependencies = [
     "requests-toolbelt (>=1.0.0,<1.1.0)",
     "urllib3 (>=2.7.0,<3.0)",
     "pydoc-markdown (>=4.8.2,<5.0.0)",
-    "setuptools (>=80.8.0,<81.0.0)",
+    "setuptools (>=83.0.0,<84.0.0)",
     "tomli-w (>=1.2.0,<2.0.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
 ]
