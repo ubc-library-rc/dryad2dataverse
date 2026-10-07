@@ -1,6 +1,6 @@
 [project]
 name = "dryad2dataverse"
-version = "0.8.7"
+version = "0.8.8"
 description = "Utility for copying and syncing data from a Dryad data repository to a Dataverse repository"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -11,7 +11,7 @@ requires-python = ">=3.10, <4"
 dependencies = [
     "requests (>=2.26.0)",
     "requests-toolbelt (>=1.0.0,<1.1.0)",
-    "urllib3 (>=2.7.0,<3.0)",
+    "urllib3 (>=2.8.0,<3.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
 ]
 

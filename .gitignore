@@ -1,3 +1,7 @@
+#Remove this when you have time to write tests
+tests/**
+
+
 **/__pycache__/**
 **pyc
 **~
