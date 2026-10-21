@@ -1,18 +1,20 @@
 [project]
 name = "dryad2dataverse"
-version = "0.8.8"
+version = "0.8.9"
 description = "Utility for copying and syncing data from a Dryad data repository to a Dataverse repository"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.10, <4"
+requires-python = ">=3.13.17, <4"
 dependencies = [
     "requests (>=2.26.0)",
     "requests-toolbelt (>=1.0.0,<1.1.0)",
     "urllib3 (>=2.8.0,<3.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
+    "certifi (>=2026.10.19)",
+    "pip (>=26.2.2)",
 ]
 
 keywords =['Harvard Dataverse',
